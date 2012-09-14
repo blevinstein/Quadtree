@@ -41,6 +41,16 @@ class Quad {
       }
       child[floor(p.x*2)][floor(p.y*2)]
         .set(new PVector(p.x*2 % 1, p.y*2 % 1), r-1, mid);
+      // if all children have the same positive material_id, join together
+      int child_mid = child[0][0].material_id;
+      for(int i=0; i<2; i++)
+        for(int j=0; j<2; j++)
+          if(child[i][j].material_id != child_mid)
+            child_mid = -1;
+      if(child_mid >= 0) {
+        child = null;
+        material_id = child_mid;
+      }
     }
   }
   
