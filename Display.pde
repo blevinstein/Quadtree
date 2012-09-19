@@ -1,10 +1,10 @@
-Quad root = new Quad(0);
+Quad root = new Quad(255);
 PVector min = new PVector(0, 0);
 PVector max = new PVector(800, 800);
+
 float res = 0;
 float maxRes = 7;
-float wheelSensitivity = .25;
-
+float wheelSensitivity = 1;
 void mouseWheel(int delta) {
   res -= wheelSensitivity * delta;
   if(res < 0) res = 0;
@@ -27,8 +27,10 @@ void draw() {
   // draw quads
   stroke(128);
   strokeWeight(1);
+  rectMode(CORNERS);
   root.iter(min, max, new IterCallback(){
-    public void call(PVector min, PVector max, int mid) {
+    public void call(PVector min, PVector max, Object ... data) {
+      int mid = (Integer)data[0];
       fill(mid);
       rect(min.x, min.y, max.x, max.y);
     }
@@ -40,17 +42,6 @@ void draw() {
   noFill();
   stroke(128);
   strokeWeight(3);
+  rectMode(CORNER);
   rect(cursorPos.x, cursorPos.y, cursorSize.x, cursorSize.y);
-}
-
-PVector lerp(PVector a, PVector b, float f) {
-  return new PVector(lerp(a.x,b.x,f), lerp(a.y,b.y,f), lerp(a.z,b.z,f));
-}
-
-PVector invLerp(PVector a, PVector b, PVector c) {
-  return new PVector(invLerp(a.x,b.x,c.x), invLerp(a.y,b.y,c.y), invLerp(a.z,b.z,c.z));
-}
-
-float invLerp(float a, float b, float c) {
-  return (c-a)/(b-a);
 }
