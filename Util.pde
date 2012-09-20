@@ -31,12 +31,31 @@ PVector intersect(PVector a1, PVector a2, PVector b1, PVector b2) {
   PVector bt = PVector.sub(b2,b1);
   
   float d = at.y*bt.x-at.x*bt.y;
+  if(d == 0) return null;
   float u = (bt.x*(b1.y-a1.y)-bt.y*(b1.x-a1.x))/d;
   float v = (at.x*(b1.y-a1.y)-at.y*(b1.x-a1.x))/d;
   return new PVector(u, v);
 }
 
-boolean intersectLineSeg(PVector a1, PVector a2, PVector b1, PVector b2) {
+// check whether segments intersect
+PVector intersectSegSeg(PVector a1, PVector a2, PVector b1, PVector b2) {
   PVector i = intersect(a1, a2, b1, b2);
-  return (i.x >= 0 && i.x <= 1 && i.y >= 0 && i.y <= 1);
+  if(i != null && i.x >= 0 && i.x <= 1 && i.y >= 0 && i.y <= 1) {
+    PVector at = PVector.sub(a2, a1);
+    return PVector.add(a1, PVector.mult(at, i.x));
+  } else {
+    return null;
+  }
 }
+
+// check whether ray a intersects segment b
+PVector intersectRaySeg(PVector a1, PVector a2, PVector b1, PVector b2) {
+  PVector i = intersect(a1, a2, b1, b2);
+  if(i != null && i.x >= 0 && i.y >= 0 && i.y <= 1) {
+    PVector at = PVector.sub(a2, a1);
+    return PVector.add(a1, PVector.mult(at, i.x));
+  } else {
+    return null;
+  }
+}
+
