@@ -5,6 +5,7 @@ PVector max = new PVector(800, 800);
 float lightFov = PI/8;
 PVector lightSource = new PVector(400, 400);
 PVector lightArc = new PVector(-lightFov, lightFov);
+boolean lightAir = false;
 
 float res = 0;
 float maxRes = 7;
@@ -74,7 +75,7 @@ void draw() {
     public void call(PVector min, PVector max, Object ... data) {
       int mid = (Integer)data[0];
       ArrayList segs = (ArrayList)data[1];
-      if(mid == 0) {
+      if(mid == 0 || lightAir) {
         for(int i=0; i<segs.size(); i++) {
           PVector side[] = (PVector[]) segs.get(i);
           PVector s1 = side[0];

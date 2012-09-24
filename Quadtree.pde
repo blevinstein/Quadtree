@@ -1,3 +1,5 @@
+float TOL = .0001;
+
 class Quad {
 
   Quad parent;
@@ -112,7 +114,6 @@ class Quad {
                                {new PVector(max.x, min.y), max                      }};
         ArrayList sides = new ArrayList();
         // if opaque, cull by choosing only light-facing sides to examine
-        trans = true; // TODO: remove to enable culling
         if(trans || source.x < min.x)
           sides.add(new PVector[] { corners[0][0], corners[0][1] });
         if(trans || source.y < min.y)
@@ -162,20 +163,18 @@ class Quad {
           }
           ArrayList arcs = new ArrayList();
           arcs.add(arc);
-          // TODO: fix and enable occlusion
-          //occludeArcs(arcs, occluded);
-          // merge and return occluded arcs
-          //mergeArcs(occluded);
+          occludeArcs(arcs, occluded);
           return arcs;
         }
       } else if(!trans) { // source inside opaque block
         return new ArrayList();
       }
     } else { // recurse
+      // TODO: cull search tree if light doesn't enter the square
       ArrayList occluded = new ArrayList();
       ArrayList arcs = new ArrayList();
       arcs.add(new PVector(arc.x, arc.y));
-      // determine which quadrants to recurse on first
+      // determine order to recurse over quadrants
       PVector half = lerp(min, max, 0.5);
       int xs[] = new int[2];
       int ys[] = new int[2];
@@ -204,7 +203,6 @@ class Quad {
             else
               newArcs.add(arcs.get(k));
           }
-          mergeArcs(newArcs);
           arcs = newArcs;
         }
       return arcs;
@@ -217,7 +215,13 @@ class Quad {
 void occludeArcs(ArrayList arcs, ArrayList occluded) {
   for(int i=0; i<occluded.size(); i++)
     occludeArcs(arcs, (PVector)occluded.get(i));
-  //mergeArcs(arcs);
+  for(int i=0; i<arcs.size(); i++) {
+    PVector a = (PVector)arcs.get(i);
+    if(abs(a.x-a.y) < TOL) { // TODO: add tolerance?
+      arcs.remove(i);
+      i--;
+    }
+  }
 }
 
 void occludeArcs(ArrayList arcs, PVector o) {
@@ -226,33 +230,14 @@ void occludeArcs(ArrayList arcs, PVector o) {
     if(o.x <= a.x && o.y >= a.y) { // occlude all
       arcs.remove(i);
       i--;
-    } else if(o.x < a.y && o.y > a.y) { // occlude upper
+    } else if(o.x <= a.y && o.y >= a.y) { // occlude upper
       a.y = o.x;
-      arcs.set(i, a);
-    } else if(o.x < a.x && o.y > a.x) { // occlude lower
+    } else if(o.x <= a.x && o.y >= a.x) { // occlude lower
       a.x = o.y;
-      arcs.set(i, a);
-    } else if(o.x > a.x && o.y < a.y) { // occlude middle
+    } else if(o.x >= a.x && o.y <= a.y) { // occlude middle
       PVector n = new PVector(o.y, a.y);
       a.y = o.x;
-      arcs.set(i, a);
       arcs.add(n);
-    }
-  }
-}
-
-void mergeArcs(ArrayList arcs) {
-  for(int i=0; i<arcs.size(); i++) {
-    for(int j=i+1; j<arcs.size(); j++) {
-      PVector a1 = (PVector)arcs.get(i);
-      PVector a2 = (PVector)arcs.get(j);
-      if(a2.x < a1.y && a2.y > a1.x) { // overlap
-        a1.x = min(a1.x, a2.x);
-        a1.y = max(a1.y, a2.y);
-        arcs.set(i, a1); // merge into first arc
-        arcs.remove(j); // remove second arc
-        j--;
-      }
     }
   }
 }
