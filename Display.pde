@@ -2,7 +2,7 @@ Quad root = new Quad(255);
 PVector min = new PVector(0, 0);
 PVector max = new PVector(800, 800);
 
-float lightFov = PI/4;
+float lightFov = PI/8;
 PVector lightSource = new PVector(400, 400);
 PVector lightArc = new PVector(-lightFov, lightFov);
 
