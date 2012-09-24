@@ -2,7 +2,7 @@ Quad root = new Quad(255);
 PVector min = new PVector(0, 0);
 PVector max = new PVector(800, 800);
 
-float lightFov = PI/8;
+float lightFov = PI/4;
 PVector lightSource = new PVector(400, 400);
 PVector lightArc = new PVector(-lightFov, lightFov);
 
@@ -75,9 +75,10 @@ void draw() {
       int mid = (Integer)data[0];
       ArrayList segs = (ArrayList)data[1];
       if(mid == 0) {
-        for(int i=0; i<segs.size(); i+=2) {
-          PVector s1 = (PVector) segs.get(i);
-          PVector s2 = (PVector) segs.get(i+1);
+        for(int i=0; i<segs.size(); i++) {
+          PVector side[] = (PVector[]) segs.get(i);
+          PVector s1 = side[0];
+          PVector s2 = side[1];
           line(s1.x, s1.y, s2.x, s2.y);
         }
       }
