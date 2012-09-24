@@ -34,6 +34,9 @@ class Quad {
   }
   
   void set(PVector p, int r, int mid) {
+    if(p.x < 0 || p.x > 1 ||
+       p.y < 0 || p.y > 1)
+       return;
     if(r <= 0) {
       material_id = mid;
       child = null;
@@ -93,77 +96,81 @@ class Quad {
   
   /* Recursive Lightcasting
    * light is emitted from source along arc (angle arc.x to arc.y)
-   * returns ArrayList of PVectors representing occluded arcs
+   * returns ArrayList of PVectors representing light after occlusion
+   *         OR null to signify no occlusions
    * invokes callbacks to denote blocks and edges hit by light
    */
   // TODO: add intensity based on initial intensity (arc.z?) and distance
   ArrayList lightcast(PVector min, PVector max, PVector source, PVector arc, IterCallback cb) {
     boolean trans = transparent(material_id);
     if(material_id >= 0) {
-      ArrayList litSides = new ArrayList(); // PVector[2] sides
-      /* TEMP
-      if(contains(min, max, source) && !trans) { // source inside opaque block
-        ArrayList occluded = new ArrayList(); // PVector arcs
-        occluded.add(0, 2*PI);
-        return occluded;
-      }
-      */
-      PVector v[] = {new PVector(source.x + cos(arc.x), source.y + sin(arc.x)),
-                     new PVector(source.x + cos(arc.y), source.y + sin(arc.y))};
-      PVector corners[][] = {{min,                       new PVector(min.x, max.y)},
-                             {new PVector(max.x, min.y), max                      }};
-      ArrayList sides = new ArrayList();
-      // if opaque, cull by choosing only light-facing sides to examine
-      //if(trans || source.x < min.x)
-        sides.add(new PVector[] { corners[0][0], corners[0][1] });
-      //if(trans || source.y < min.y)
-        sides.add(new PVector[] { corners[0][0], corners[1][0] });
-      //if(trans || source.x > max.x )
-        sides.add(new PVector[] { corners[1][0], corners[1][1] });
-      //if(trans || source.y > max.y )
-        sides.add(new PVector[] { corners[0][1], corners[1][1] });
-      for(int i=0; i<sides.size(); i++) { // foreach side
-        PVector side[] = (PVector[])sides.get(i);
-        PVector c1 = side[0];
-        PVector c2 = side[1];
-        PVector ct = PVector.sub(c2, c1);
-        boolean i1 = intersectRaySeg(source, c1, v[0], v[1]) != null; // true if corner c1 is inside arc
-        boolean i2 = intersectRaySeg(source, c2, v[0], v[1]) != null; // true if corner c2 is inside arc
-        if(i1 && i2) { litSides.add(new PVector[] {c1, c2}); } // corner-corner
-        else if(i1 ^ i2) {
-            PVector p1 = i1 ? c1 : c2, p2 = null;
-            for(int j=0; j<2; j++) {
-              PVector pt = intersectRaySeg(source, v[j], c1, c2);
-              if(pt != null) p2 = pt;
+      if(!contains(min, max, source)) {
+        ArrayList litSides = new ArrayList(); // PVector[2] sides
+        PVector v[] = {new PVector(source.x + cos(arc.x), source.y + sin(arc.x)),
+                       new PVector(source.x + cos(arc.y), source.y + sin(arc.y))};
+        PVector corners[][] = {{min,                       new PVector(min.x, max.y)},
+                               {new PVector(max.x, min.y), max                      }};
+        ArrayList sides = new ArrayList();
+        // if opaque, cull by choosing only light-facing sides to examine
+        trans = true; // TODO: remove to enable culling
+        if(trans || source.x < min.x)
+          sides.add(new PVector[] { corners[0][0], corners[0][1] });
+        if(trans || source.y < min.y)
+          sides.add(new PVector[] { corners[0][0], corners[1][0] });
+        if(trans || source.x > max.x )
+          sides.add(new PVector[] { corners[1][0], corners[1][1] });
+        if(trans || source.y > max.y )
+          sides.add(new PVector[] { corners[0][1], corners[1][1] });
+        for(int i=0; i<sides.size(); i++) { // foreach side
+          PVector side[] = (PVector[])sides.get(i);
+          PVector c1 = side[0];
+          PVector c2 = side[1];
+          PVector ct = PVector.sub(c2, c1);
+          boolean i1 = PVector.sub(source,c1).mag()==0 || intersectRaySeg(source, c1, v[0], v[1]) != null; // true if corner c1 is inside arc
+          boolean i2 = PVector.sub(source,c2).mag()==0 || intersectRaySeg(source, c2, v[0], v[1]) != null; // true if corner c2 is inside arc
+          if(i1 && i2) { litSides.add(new PVector[] {c1, c2}); } // corner-corner
+          else if(i1 ^ i2) {
+              PVector p1 = i1 ? c1 : c2, p2 = null;
+              for(int j=0; j<2; j++) {
+                PVector pt = intersectRaySeg(source, v[j], c1, c2);
+                if(pt != null) p2 = pt;
+              }
+              if(p2 != null) { litSides.add(new PVector[] {p1, p2}); } // intersection-corner
+          } else {
+            PVector p1 = intersectRaySeg(source, v[0], c1, c2);
+            PVector p2 = intersectRaySeg(source, v[1], c1, c2);
+            assert(!(p1==null ^ p2==null));
+            if(p1 != null) { litSides.add(new PVector[] {p1, p2}); } // intersection-intersection or none
+          }
+        }
+        // callback lit sides
+        if(litSides.size() > 0)
+          cb.call(min, max, material_id, litSides);
+        // convert into occlusion arcs
+        if(!trans) {
+          ArrayList occluded = new ArrayList(); // PVector arcs
+          for(int i=0; i<litSides.size(); i++) {
+            PVector side[] = (PVector[])litSides.get(i);
+            float s1 = atan(PVector.sub(side[0],source));
+            float s2 = atan(PVector.sub(side[1],source));
+            if(abs(s1-s2) > PI) {
+              occluded.add(new PVector(-PI, min(s1, s2)));
+              occluded.add(new PVector(max(s1, s2), PI));
+            } else {
+              occluded.add(new PVector(min(s1, s2), max(s1, s2)));
             }
-            if(p2 != null) { litSides.add(new PVector[] {p1, p2}); } // intersection-corner
-        } else {
-          PVector p1 = intersectRaySeg(source, v[0], c1, c2);
-          PVector p2 = intersectRaySeg(source, v[1], c1, c2);
-          // TODO: fix
-          if(p1==null ^ p2==null) { println("shouldn't happen"); }
-          else if(p1 != null) { litSides.add(new PVector[] {p1, p2}); } // intersection-intersection or none
+          }
+          ArrayList arcs = new ArrayList();
+          arcs.add(arc);
+          // TODO: fix and enable occlusion
+          //occludeArcs(arcs, occluded);
+          // merge and return occluded arcs
+          //mergeArcs(occluded);
+          return arcs;
         }
+      } else if(!trans) { // source inside opaque block
+        return new ArrayList();
       }
-      if(litSides.size() > 0)
-        cb.call(min, max, material_id, litSides);
-      ArrayList occluded = new ArrayList(); // PVector arcs
-      /* TODO: fix
-      for(int i=0; i<litSides.size(); i++) {
-        PVector side[] = (PVector[])litSides.get(i);
-        float s1 = atan(PVector.sub(side[0],source));
-        float s2 = atan(PVector.sub(side[1],source));
-        if(abs(s1-s2) > PI) {
-          occluded.add(new PVector(-PI, min(s1, s2)));
-          occluded.add(new PVector(max(s1, s2), PI));
-        } else {
-          occluded.add(new PVector(min(s1, s2), max(s1, s2)));
-        }
-      }
-      // merge and return occluded arcs
-      mergeArcs(occluded);
-      */
-      return occluded;
     } else { // recurse
       ArrayList occluded = new ArrayList();
       ArrayList arcs = new ArrayList();
@@ -186,35 +193,37 @@ class Quad {
         for(int j=0; j<2; j++) { // foreach y
           int x = xs[i];
           int y = ys[j];
+          ArrayList newArcs = new ArrayList();
           for(int k=0; k<arcs.size(); k++) { // foreach arc
             PVector halfx = new PVector(half.x-min.x, 0);
             PVector halfy = new PVector(0, half.y-min.y);
-            PVector offset = PVector.add(PVector.mult(halfx, i), PVector.mult(halfy, j));
-            ArrayList childOccluded = child[x][y].lightcast(PVector.add(min, offset), PVector.add(half, offset), source, (PVector)arcs.get(k), cb);
-            /* TODO: fix
-            occludeArcs(arcs, childOccluded);
-            occluded.addAll(childOccluded);
-            */
+            PVector offset = PVector.add(PVector.mult(halfx, x), PVector.mult(halfy, y));
+            ArrayList childArcs = child[x][y].lightcast(PVector.add(min, offset), PVector.add(half, offset), source, (PVector)arcs.get(k), cb);
+            if(childArcs != null)
+              newArcs.addAll(childArcs);
+            else
+              newArcs.add(arcs.get(k));
           }
+          mergeArcs(newArcs);
+          arcs = newArcs;
         }
-    mergeArcs(occluded);
-    return occluded;
+      return arcs;
     }
+    return null;
   }
 
 }
 
 void occludeArcs(ArrayList arcs, ArrayList occluded) {
-  for(int i=0; i<occluded.size(); i++) {
-    PVector o = (PVector)occluded.get(i);
-    occludeArcs(arcs, o);
-  }
+  for(int i=0; i<occluded.size(); i++)
+    occludeArcs(arcs, (PVector)occluded.get(i));
+  //mergeArcs(arcs);
 }
 
 void occludeArcs(ArrayList arcs, PVector o) {
   for(int i=0; i<arcs.size(); i++) {
     PVector a = (PVector)arcs.get(i);
-    if(o.x < a.x && o.y > a.y) { // occlude allk
+    if(o.x <= a.x && o.y >= a.y) { // occlude all
       arcs.remove(i);
       i--;
     } else if(o.x < a.y && o.y > a.y) { // occlude upper
@@ -224,8 +233,8 @@ void occludeArcs(ArrayList arcs, PVector o) {
       a.x = o.y;
       arcs.set(i, a);
     } else if(o.x > a.x && o.y < a.y) { // occlude middle
-      a.y = o.x;
       PVector n = new PVector(o.y, a.y);
+      a.y = o.x;
       arcs.set(i, a);
       arcs.add(n);
     }
