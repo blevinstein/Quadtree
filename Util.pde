@@ -15,6 +15,10 @@ boolean contains(PVector min, PVector max, PVector p) {
          p.y >= min.y && p.y <= max.y;
 }
 
+float atan(PVector p) {
+  return atan2(p.y, p.x);
+}
+
 /*
  * http://stackoverflow.com/questions/563198/how-do-you-detect-where-two-line-segments-intersect
  * at = a2 - a1, bt = b2 - b1
