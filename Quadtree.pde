@@ -1,4 +1,9 @@
-float TOL = .0001;
+final float TOL = .0001;
+
+boolean transparent(int mid) {
+  // TODO: implement material registry, including transparency flag
+  return mid >= 128;
+}
 
 class Quad {
 
@@ -36,8 +41,8 @@ class Quad {
   }
   
   void set(PVector p, int r, int mid) {
-    if(p.x < 0 || p.x > 1 ||
-       p.y < 0 || p.y > 1)
+    if(p.x < 0 || p.x >= 1 ||
+       p.y < 0 || p.y >= 1)
        return;
     if(r <= 0) {
       material_id = mid;
@@ -91,11 +96,6 @@ class Quad {
     }
   }
   
-  boolean transparent(int mid) {
-    // TODO: implement material registry, including transparency flag
-    return mid >= 128;
-  }
-  
   /* Recursive Lightcasting
    * light is emitted from source along arc (angle arc.x to arc.y)
    * returns ArrayList of PVectors representing light after occlusion
@@ -140,7 +140,7 @@ class Quad {
           } else {
             PVector p1 = intersectRaySeg(source, v[0], c1, c2);
             PVector p2 = intersectRaySeg(source, v[1], c1, c2);
-            assert(!(p1==null ^ p2==null));
+            if(p1==null ^ p2==null) println("err");
             if(p1 != null) { litSides.add(new PVector[] {p1, p2}); } // intersection-intersection or none
           }
         }
