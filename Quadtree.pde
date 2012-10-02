@@ -1,7 +1,7 @@
 final float TOL = .0001;
 
 boolean transparent(int mid) {
-  // TODO: implement material registry, including transparency flag
+  // TODO: implement material registry, including transparency and other flags
   return mid >= 128;
 }
 
@@ -172,8 +172,19 @@ class Quad {
     } else { // recurse
       // TODO: cull search tree if light doesn't enter the square
       ArrayList occluded = new ArrayList();
+      
+      // deal with malformed input arcs
+      while(arc.x < -PI) arc.x += 2*PI;
+      while(arc.y > PI) arc.y -= 2*PI;
+      if(arc.x > arc.y) arc = new PVector(arc.y, arc.x);
       ArrayList arcs = new ArrayList();
-      arcs.add(new PVector(arc.x, arc.y));
+      if(abs(arc.x-arc.y) < PI) {
+        arcs.add(new PVector(arc.x, arc.y));
+      } else {
+        arcs.add(new PVector(-PI, arc.x));
+        arcs.add(new PVector(arc.y, PI));
+      }
+      
       // determine order to recurse over quadrants
       PVector half = lerp(min, max, 0.5);
       int xs[] = new int[2];
@@ -188,6 +199,8 @@ class Quad {
       } else {
         ys[0] = 1; ys[1] = 0;
       }
+
+      // recurse over quadrants
       for(int i=0; i<2; i++) // foreach x
         for(int j=0; j<2; j++) { // foreach y
           int x = xs[i];
@@ -217,7 +230,7 @@ void occludeArcs(ArrayList arcs, ArrayList occluded) {
     occludeArcs(arcs, (PVector)occluded.get(i));
   for(int i=0; i<arcs.size(); i++) {
     PVector a = (PVector)arcs.get(i);
-    if(abs(a.x-a.y) < TOL) { // TODO: add tolerance?
+    if(abs(a.x-a.y) < TOL) {
       arcs.remove(i);
       i--;
     }
