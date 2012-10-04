@@ -69,7 +69,7 @@ class Quad {
   
   void iter(PVector min, PVector max, IterCallback cb) {
     if(material_id >= 0) {
-      cb.call(min, max, material_id);
+      cb.call(min, max, this);
     } else {
       PVector half = lerp(min, max, 0.5);
       child[0][0].iter(min, half, cb);
@@ -79,19 +79,19 @@ class Quad {
     }
   }
   
-  void raycast(PVector min, PVector max, PVector a, PVector b, IterCallback cb) {
-    if(contains(min, max, a) ||
-       contains(min, max, b) ||
-       intersectSegSeg(min, max, a, b) != null ||
-       intersectSegSeg(new PVector(min.x, max.y), new PVector(max.x, min.y), a, b) != null) {
+  void raycast(PVector min, PVector max, PVector source, PVector direction, IterCallback cb) {
+    if(contains(min, max, source) ||
+       contains(min, max, direction) ||
+       intersectRaySeg(source, direction, min, max) != null ||
+       intersectRaySeg(source, direction, new PVector(min.x, max.y), new PVector(max.x, min.y)) != null) {
       if(material_id >= 0) {
-        cb.call(min, max, material_id);
+        cb.call(min, max, this);
       } else {
         PVector half = lerp(min, max, 0.5);
-        child[0][0].raycast(min, half, a, b, cb);
-        child[0][1].raycast(new PVector(min.x, half.y), new PVector(half.x, max.y), a, b, cb);
-        child[1][0].raycast(new PVector(half.x, min.y), new PVector(max.x, half.y), a, b, cb);
-        child[1][1].raycast(half, max, a, b, cb);
+        child[0][0].raycast(min, half, source, direction, cb);
+        child[0][1].raycast(new PVector(min.x, half.y), new PVector(half.x, max.y), source, direction, cb);
+        child[1][0].raycast(new PVector(half.x, min.y), new PVector(max.x, half.y), source, direction, cb);
+        child[1][1].raycast(half, max, source, direction, cb);
       }
     }
   }
@@ -103,16 +103,26 @@ class Quad {
    * invokes callbacks to denote blocks and edges hit by light
    */
   // TODO: add intensity based on initial intensity (arc.z?) and distance
+  // TODO: add directional lightcasting as opposed to point-source lightcasting
+  // TODO: generalize iteration algorithms, add short-circuiting?
   ArrayList lightcast(PVector min, PVector max, PVector source, PVector arc, IterCallback cb) {
-    boolean trans = transparent(material_id);
-    if(material_id >= 0) {
-      if(!contains(min, max, source)) {
+    if(material_id >= 0) { // base case
+      // determine transparency
+      boolean trans = transparent(material_id);
+      if(contains(min, max, source) && !trans) return new ArrayList(); // occlude all
+      else if(!trans) { // find lit sides
+      
         ArrayList litSides = new ArrayList(); // PVector[2] sides
+        
+        // specify ray by two vectors
         PVector v[] = {new PVector(source.x + cos(arc.x), source.y + sin(arc.x)),
                        new PVector(source.x + cos(arc.y), source.y + sin(arc.y))};
+
+        // specify corner coordinates
         PVector corners[][] = {{min,                       new PVector(min.x, max.y)},
                                {new PVector(max.x, min.y), max                      }};
         ArrayList sides = new ArrayList();
+        
         // if opaque, cull by choosing only light-facing sides to examine
         if(trans || source.x < min.x)
           sides.add(new PVector[] { corners[0][0], corners[0][1] });
@@ -122,13 +132,14 @@ class Quad {
           sides.add(new PVector[] { corners[1][0], corners[1][1] });
         if(trans || source.y > max.y )
           sides.add(new PVector[] { corners[0][1], corners[1][1] });
+
         for(int i=0; i<sides.size(); i++) { // foreach side
           PVector side[] = (PVector[])sides.get(i);
           PVector c1 = side[0];
           PVector c2 = side[1];
           PVector ct = PVector.sub(c2, c1);
-          boolean i1 = PVector.sub(source,c1).mag()==0 || intersectRaySeg(source, c1, v[0], v[1]) != null; // true if corner c1 is inside arc
-          boolean i2 = PVector.sub(source,c2).mag()==0 || intersectRaySeg(source, c2, v[0], v[1]) != null; // true if corner c2 is inside arc
+          boolean i1 = PVector.sub(source,c1).mag()<TOL || intersectRaySeg(source, c1, v[0], v[1]) != null; // true if corner c1 is inside arc
+          boolean i2 = PVector.sub(source,c2).mag()<TOL || intersectRaySeg(source, c2, v[0], v[1]) != null; // true if corner c2 is inside arc
           if(i1 && i2) { litSides.add(new PVector[] {c1, c2}); } // corner-corner
           else if(i1 ^ i2) {
               PVector p1 = i1 ? c1 : c2, p2 = null;
@@ -140,13 +151,14 @@ class Quad {
           } else {
             PVector p1 = intersectRaySeg(source, v[0], c1, c2);
             PVector p2 = intersectRaySeg(source, v[1], c1, c2);
-            if(p1==null ^ p2==null) println("err");
+            assert(!(p1==null ^ p2==null));
             if(p1 != null) { litSides.add(new PVector[] {p1, p2}); } // intersection-intersection or none
           }
         }
+
         // callback lit sides
         if(litSides.size() > 0)
-          cb.call(min, max, material_id, litSides);
+          cb.call(min, max, this, litSides);
         // convert into occlusion arcs
         if(!trans) {
           ArrayList occluded = new ArrayList(); // PVector arcs
@@ -166,25 +178,10 @@ class Quad {
           occludeArcs(arcs, occluded);
           return arcs;
         }
-      } else if(!trans) { // source inside opaque block
-        return new ArrayList();
+      } else { // transparent
+        return null; // occlude none
       }
     } else { // recurse
-      // TODO: cull search tree if light doesn't enter the square
-      ArrayList occluded = new ArrayList();
-      
-      // deal with malformed input arcs
-      while(arc.x < -PI) arc.x += 2*PI;
-      while(arc.y > PI) arc.y -= 2*PI;
-      if(arc.x > arc.y) arc = new PVector(arc.y, arc.x);
-      ArrayList arcs = new ArrayList();
-      if(abs(arc.x-arc.y) < PI) {
-        arcs.add(new PVector(arc.x, arc.y));
-      } else {
-        arcs.add(new PVector(-PI, arc.x));
-        arcs.add(new PVector(arc.y, PI));
-      }
-      
       // determine order to recurse over quadrants
       PVector half = lerp(min, max, 0.5);
       int xs[] = new int[2];
@@ -199,16 +196,45 @@ class Quad {
       } else {
         ys[0] = 1; ys[1] = 0;
       }
+      
+      // determine whether any light enters this quad
+      PVector v[] = {new PVector(source.x + cos(arc.x), source.y + sin(arc.x)),
+                     new PVector(source.x + cos(arc.y), source.y + sin(arc.y))};
+      PVector c1 = new PVector(xs[0] == 1 ? max.x : min.x, ys[1] == 1 ? max.y : min.y);
+      PVector c2 = new PVector(xs[1] == 1 ? max.x : min.x, ys[0] == 1 ? max.y : min.y);
+      PVector ct = PVector.sub(c2, c1);
+      boolean i1 = PVector.sub(source,c1).mag()<TOL || intersectRaySeg(source, c1, v[0], v[1]) != null; // true if corner c1 is inside arc
+      boolean i2 = PVector.sub(source,c2).mag()<TOL || intersectRaySeg(source, c2, v[0], v[1]) != null; // true if corner c2 is inside arc
+      if(!(i1 || i2)) { // neither corner inside arc
+        PVector p1 = intersectRaySeg(source, v[0], c1, c2);
+        PVector p2 = intersectRaySeg(source, v[1], c1, c2);
+        assert(!(p1==null ^ p2==null));
+        if(p1 == null) { return null; } // no light enters this quadrant
+      }
+
+      ArrayList occluded = new ArrayList();
+      
+      // deal with malformed input arcs
+      while(arc.x < -PI) arc.x += 2*PI;
+      while(arc.y > PI) arc.y -= 2*PI;
+      if(arc.x > arc.y) arc = new PVector(arc.y, arc.x);
+      ArrayList arcs = new ArrayList();
+      if(abs(arc.x-arc.y) < PI) {
+        arcs.add(new PVector(arc.x, arc.y));
+      } else {
+        arcs.add(new PVector(-PI, arc.x));
+        arcs.add(new PVector(arc.y, PI));
+      }
 
       // recurse over quadrants
+      PVector halfx = new PVector(half.x-min.x, 0);
+      PVector halfy = new PVector(0, half.y-min.y);
       for(int i=0; i<2; i++) // foreach x
         for(int j=0; j<2; j++) { // foreach y
           int x = xs[i];
           int y = ys[j];
           ArrayList newArcs = new ArrayList();
           for(int k=0; k<arcs.size(); k++) { // foreach arc
-            PVector halfx = new PVector(half.x-min.x, 0);
-            PVector halfy = new PVector(0, half.y-min.y);
             PVector offset = PVector.add(PVector.mult(halfx, x), PVector.mult(halfy, y));
             ArrayList childArcs = child[x][y].lightcast(PVector.add(min, offset), PVector.add(half, offset), source, (PVector)arcs.get(k), cb);
             if(childArcs != null)
@@ -255,6 +281,7 @@ void occludeArcs(ArrayList arcs, PVector o) {
   }
 }
 
+// TODO: add a return value to call() for shortcircuiting, etc?
 abstract class IterCallback {
-  abstract void call(PVector min, PVector max, Object ... data);
+  abstract void call(PVector min, PVector max, Quad q, Object ... data);
 }

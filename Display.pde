@@ -1,5 +1,3 @@
-HashMap blocks;
-
 Quad root = new Quad(255);
 PVector min = new PVector(0, 0);
 PVector max = new PVector(1200, 1200);
@@ -74,8 +72,8 @@ void draw() {
   strokeWeight(1);
   rectMode(CORNERS);
   root.iter(win_min, win_max, new IterCallback() {
-    public void call(PVector min, PVector max, Object ... data) {
-      int mid = (Integer)data[0];
+    public void call(PVector min, PVector max, Quad q, Object ... data) {
+      int mid = q.material_id;
       fill(mid);
       rect(min.x, min.y, max.x, max.y);
     }
@@ -102,9 +100,9 @@ void draw() {
   // draw light
   final PVector light_win = transform(lightSource, player, player_win, zoom);
   ArrayList lightOut = root.lightcast(win_min, win_max, light_win, lightArc, new IterCallback() {
-    public void call(PVector min, PVector max, Object ... data) {
-      int mid = (Integer)data[0];
-      ArrayList segs = (ArrayList)data[1];
+    public void call(PVector min, PVector max, Quad q, Object ... data) {
+      int mid = q.material_id;
+      ArrayList segs = (ArrayList)data[0];
       if(mid == 0) {
         for(int i=0; i<segs.size(); i++) {
           PVector side[] = (PVector[]) segs.get(i);
