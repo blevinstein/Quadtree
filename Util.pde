@@ -62,4 +62,3 @@ PVector intersectRaySeg(PVector a1, PVector a2, PVector b1, PVector b2) {
     return null;
   }
 }
-

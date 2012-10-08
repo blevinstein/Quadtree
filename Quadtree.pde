@@ -103,9 +103,7 @@ class Quad {
    * invokes callbacks to denote blocks and edges hit by light
    */
   // TODO: add intensity based on initial intensity (arc.z?) and distance
-  // TODO: add directional lightcasting as opposed to point-source lightcasting
-  // TODO: generalize iteration algorithms, add short-circuiting?
-  ArrayList lightcast(PVector min, PVector max, PVector source, PVector arc, IterCallback cb) {
+  ArrayList arccast(PVector min, PVector max, PVector source, PVector arc, IterCallback cb) {
     if(material_id >= 0) { // base case
       // determine transparency
       boolean trans = transparent(material_id);
@@ -236,7 +234,7 @@ class Quad {
           ArrayList newArcs = new ArrayList();
           for(int k=0; k<arcs.size(); k++) { // foreach arc
             PVector offset = PVector.add(PVector.mult(halfx, x), PVector.mult(halfy, y));
-            ArrayList childArcs = child[x][y].lightcast(PVector.add(min, offset), PVector.add(half, offset), source, (PVector)arcs.get(k), cb);
+            ArrayList childArcs = child[x][y].arccast(PVector.add(min, offset), PVector.add(half, offset), source, (PVector)arcs.get(k), cb);
             if(childArcs != null)
               newArcs.addAll(childArcs);
             else
@@ -246,6 +244,11 @@ class Quad {
         }
       return arcs;
     }
+    return null;
+  }
+  
+  ArrayList bandcast(PVector min, PVector max, PVector dir, PVector band, IterCallback cb) {
+    // TODO: implement directional lightcasting
     return null;
   }
 
