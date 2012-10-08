@@ -20,6 +20,10 @@ class Grid {
     return (Quad)m.get(s(i,j));
   }
   
+  boolean has(int i, int j) {
+    return m.get(s(i,j)) != null;
+  }
+  
   Quad get(PVector p) {
     int i = (int)(p.x/BLOCK_SIZE);
     int j = (int)(p.y/BLOCK_SIZE);

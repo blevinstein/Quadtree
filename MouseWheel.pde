@@ -1,5 +1,5 @@
 /*
- * Wheel mouse adapted from http://wiki.processing.org/index.php/Wheel_mouse
+ * Wheel mouse code adapted from http://wiki.processing.org/index.php/Wheel_mouse
  * @author Rick Companje
 */
 import java.awt.event.*;
