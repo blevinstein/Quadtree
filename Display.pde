@@ -1,3 +1,6 @@
+/*
+import java.awt.event.*;
+
 Grid grid;
 
 float max_zoom = 10;
@@ -12,18 +15,25 @@ float res = 0;
 
 int tick_count = 0;
 
+
 void setup() {
-  setupMouseWheel();
+  // Wheel mouse code adapted from http://wiki.processing.org/index.php/Wheel_mouse (@author Rick Companje)
+  addMouseWheelListener(new MouseWheelListener() { 
+    public void mouseWheelMoved(MouseWheelEvent mwe) { 
+      mouseWheel(mwe.getWheelRotation());
+  }});
 
   grid = new Grid();
   
   size(1200,800);
+  //frame.setResizable(true);
   player = new PVector(0,0);
   
   grid.load(0, 0, new Quad(255));
   grid.load(1, 0, new Quad(255));
   grid.load(-1, 0, new Quad(255));
 }
+
 
 void mouseWheel(int delta) {
   res -= wheel_sensitivity * delta;
@@ -122,3 +132,4 @@ void drawLight(PVector source, PVector s1, PVector s2) {
 PVector transform(PVector p, PVector real_coord, PVector win_coord, float zoom) {
   return PVector.add(PVector.mult(PVector.sub(p, real_coord), zoom), win_coord);
 }
+*/
