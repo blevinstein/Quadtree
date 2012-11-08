@@ -35,7 +35,7 @@ PVector intersect(PVector a1, PVector a2, PVector b1, PVector b2) {
   PVector bt = PVector.sub(b2,b1);
   
   float d = at.y*bt.x-at.x*bt.y;
-  if(d == 0) return null;
+  if(d == 0) return null; // TODO: account for 0/d when d==0
   float u = (bt.x*(b1.y-a1.y)-bt.y*(b1.x-a1.x))/d;
   float v = (at.x*(b1.y-a1.y)-at.y*(b1.x-a1.x))/d;
   return new PVector(u, v);
