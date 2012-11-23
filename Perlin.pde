@@ -5,10 +5,11 @@
  * Now using builtins (noiseSeed, noiseDetail, noise) instead of writing my own.
  */
 
-float[] perlin(int N, int octaves, float falloff, float x1, float x2) {
+float[] perlin(int N, int octaves, float falloff, float interval) {
+  noiseSeed(millis());
   float r[] = new float[N];
   noiseDetail(octaves, falloff);
   for(int i=0; i<N; i++)
-    r[i] = noise(lerp(x1, x2, i*1f/N));
+    r[i] = noise(i*interval);
   return r;
 }

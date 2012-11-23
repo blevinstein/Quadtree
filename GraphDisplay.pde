@@ -12,7 +12,7 @@ void draw() {
 }
 
 void mouseClicked() {
-  x = perlin(N, (int)(mouseY*10f/height), mouseX*1f/width, 0, 5);
+  x = perlin(N, 4, 0.5, 0.005);
 }
 
 void barGraph(float[] x, float min, float max) {
@@ -29,7 +29,6 @@ void barGraph(float[] x, float min, float max) {
   rectMode(CORNERS);
   for(int i=0; i<N; i++)
     rect(i*bar_width, height, (i+1)*bar_width, height - height*(x[i] - bar_min)/(bar_max-bar_min));
-    //rect(i*bar_width, height - height*(-bar_min)/(bar_max-bar_min), (i+1)*bar_width, height - height*(x[i] - bar_min)/(bar_max-bar_min));
   fill(0);
   text(bar_max+"", 0, textAscent());
   text(bar_min+"", 0, height-textDescent());
