@@ -1,3 +1,5 @@
+import java.awt.event.*;
+
 final float TOL = .0001;
 
 boolean transparent(int mid) {

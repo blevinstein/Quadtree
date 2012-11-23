@@ -4,37 +4,22 @@ float[] x;
 void setup() {
   size(N,300);
   frame.setResizable(true);
-  
-  //x = bandLimitedNoise(N, 60);
-  x = exponentLimitedNoise(N, 80);
+  mouseClicked();
 }
 
 void draw() {
-  barGraph(rdft(x));
-  //barGraph(x);
+  barGraph(x, 0, 5);
 }
 
-float[] exponentLimitedNoise(int N, float k) {
-  float x[] = new float[N];
-  for(int i=0; i<N; i++)
-    x[i] = random(-1, 1) * exp(-i*k/N);
-  return x;
+void mouseClicked() {
+  x = perlinOne(N, 5, 10, 0, 0);
 }
 
-float[] bandLimitedNoise(int N, int LIM) {
-  float x[] = new float[N];
-  for(int i=0; i<LIM && i<N; i++)
-    x[i] = random(-1, 1);
-  for(int i=LIM; i<N; i++)
-    x[i] = 0;
-  return x;
-}
-
-void barGraph(float[] x) {
+void barGraph(float[] x, float min, float max) {
   int N = x.length;
   background(255);
   float bar_width = width*1f / N;
-  float bar_min = -5, bar_max = 5;
+  float bar_min = min, bar_max = max;
   for(int i=0; i<N; i++) {
     if(x[i] > bar_max) bar_max = x[i];
     if(x[i] < bar_min) bar_min = x[i];

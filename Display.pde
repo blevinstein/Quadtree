@@ -1,6 +1,4 @@
 /*
-import java.awt.event.*;
-
 Grid grid;
 
 float max_zoom = 10;
