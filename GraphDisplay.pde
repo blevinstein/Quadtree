@@ -8,11 +8,11 @@ void setup() {
 }
 
 void draw() {
-  barGraph(x, 0, 5);
+  barGraph(x, 0, 1);
 }
 
 void mouseClicked() {
-  x = perlinOne(N, 5, 10, 0, 0);
+  x = perlin(N, (int)(mouseY*10f/height), mouseX*1f/width, 0, 5);
 }
 
 void barGraph(float[] x, float min, float max) {
