@@ -1,3 +1,4 @@
+/*
 int N = 1000;
 float[] x;
 
@@ -12,7 +13,7 @@ void draw() {
 }
 
 void mouseClicked() {
-  x = perlin(N, 4, 0.5, 0.005);
+  x = perlin(N, 4, 0.5, millis(), -5, 5);
 }
 
 void barGraph(float[] x, float min, float max) {
@@ -33,3 +34,4 @@ void barGraph(float[] x, float min, float max) {
   text(bar_max+"", 0, textAscent());
   text(bar_min+"", 0, height-textDescent());
 }
+*/

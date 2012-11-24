@@ -5,11 +5,15 @@ class Grid {
   
   PVector min, max;
   HashMap m;
+  QuadGenerator generator;
+  int seed;
 
   Grid() {
     min = new PVector(0, 0);
     max = new PVector(0, 0);
     m = new HashMap();
+    //generator = new ConstantGenerator(255);
+    generator = new PerlinGenerator(5, 4, 0.5, millis(), .001);
   }
   
   String s(int i, int j) {
@@ -32,6 +36,11 @@ class Grid {
       return null;
     else
       return q.get(PVector.sub(p, new PVector(i * BLOCK_SIZE, j * BLOCK_SIZE)));
+  }
+  
+  void gen(int i, int j) {
+    Quad q = generator.gen(i, j);
+    load(i, j, q);
   }
   
   void load(int i, int j, Quad q) {
@@ -94,4 +103,18 @@ class Grid {
     }
   }
 
+}
+
+abstract class QuadGenerator {
+  abstract Quad gen(int i, int j);
+}
+
+class ConstantGenerator extends QuadGenerator {
+  int value;
+  ConstantGenerator(int v) {
+    value = v;
+  }
+  Quad gen(int i, int j) {
+    return new Quad(value);
+  }
 }

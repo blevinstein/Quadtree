@@ -1,4 +1,3 @@
-/*
 Grid grid;
 
 float max_zoom = 10;
@@ -8,30 +7,24 @@ float wheel_sensitivity = .25;
 float speed = 5;
 
 PVector player;
-float zoom = 1;
+PVector zoom = new PVector(1, -1);
 float res = 0;
 
 int tick_count = 0;
 
-
 void setup() {
   // Wheel mouse code adapted from http://wiki.processing.org/index.php/Wheel_mouse (@author Rick Companje)
-  addMouseWheelListener(new MouseWheelListener() { 
-    public void mouseWheelMoved(MouseWheelEvent mwe) { 
+  addMouseWheelListener(new MouseWheelListener() {
+    public void mouseWheelMoved(MouseWheelEvent mwe) {
       mouseWheel(mwe.getWheelRotation());
   }});
 
   grid = new Grid();
-  
+
   size(1200,800);
   //frame.setResizable(true);
   player = new PVector(0,0);
-  
-  grid.load(0, 0, new Quad(255));
-  grid.load(1, 0, new Quad(255));
-  grid.load(-1, 0, new Quad(255));
 }
-
 
 void mouseWheel(int delta) {
   res -= wheel_sensitivity * delta;
@@ -40,10 +33,9 @@ void mouseWheel(int delta) {
 }
 
 void draw() {
-  
   // handle input
   final PVector player_win = new PVector(width/2 + (width/2-mouseX)*pan_frac, height/2 + (height/2-mouseY)*pan_frac);
-  PVector mouse = transform(new PVector(mouseX, mouseY), player_win, player, 1/zoom);
+  PVector mouse = transform(new PVector(mouseX, mouseY), player_win, player, PVector.div(new PVector(1, 1), zoom));
   if(mouseButton == LEFT)
     grid.set(mouse, floor(res), 0);
   else if(mouseButton == RIGHT)
@@ -51,29 +43,27 @@ void draw() {
   
   // adjust zoom
   //zoom = floor(res)/2f + 1;
-  if(keys[KEY_Q]) zoom += .5;
-  if(keys[KEY_E]) zoom -= .5;
-  if(zoom < 1) zoom = 1;
-  if(zoom > max_zoom) zoom = max_zoom;
+  if(keys[KEY_Q]) zoom = PVector.mult(zoom, 1.05);
+  if(keys[KEY_E]) zoom = PVector.div(zoom, 1.05);
   
   // move player
-  if(keys[KEY_W]) player.y -= speed;
-  if(keys[KEY_S]) player.y += speed;
+  if(keys[KEY_S]) player.y -= speed;
+  if(keys[KEY_W]) player.y += speed;
   if(keys[KEY_A]) player.x -= speed;
   if(keys[KEY_D]) player.x += speed;
   
   // handle tick actions
   if(tick_count % 30 == 0) { // load new blocks every 30 ticks
-    PVector win_min = transform(new PVector(0, 0), player_win, player, 1/zoom);
-    PVector win_max = transform(new PVector(width, height), player_win, player, 1/zoom);
+    PVector win_min = transform(new PVector(0, 0), player_win, player, PVector.div(new PVector(1, 1), zoom));
+    PVector win_max = transform(new PVector(width, height), player_win, player, PVector.div(new PVector(1, 1), zoom));
     int minx = floor(win_min.x / BLOCK_SIZE);
     int maxx = ceil(win_max.x / BLOCK_SIZE);
     int miny = floor(win_min.y / BLOCK_SIZE);
     int maxy = ceil(win_max.y / BLOCK_SIZE);
     for(int x=minx-1; x<=maxx+1; x++)
-      for(int y=miny-1; y<=maxy+1; y++)
+      for(int y=maxy-1; y<=miny+1; y++)
         if(!grid.has(x, y))
-          grid.load(x, y, new Quad(255));
+          grid.gen(x, y);
   }
   tick_count++;
 
@@ -98,7 +88,7 @@ void draw() {
   stroke(0,0,255);
   noFill();
   ellipseMode(CENTER);
-  ellipse(player_win.x, player_win.y, 10*zoom, 10*zoom);
+  ellipse(player_win.x, player_win.y, zoom.x*10, zoom.y*10);
 
   // draw cursor
   int divs = (int)pow(2,floor(res));
@@ -109,8 +99,7 @@ void draw() {
   stroke(128);
   strokeWeight(1);
   rectMode(CORNER);
-  rect(cursor_win.x, cursor_win.y, cursor_size*zoom, cursor_size*zoom);
-
+  rect(cursor_win.x, cursor_win.y, zoom.x*cursor_size, zoom.y*cursor_size);
 }
 
 void drawLight(PVector source, PVector arc) {
@@ -127,7 +116,6 @@ void drawLight(PVector source, PVector s1, PVector s2) {
   triangle(source.x, source.y, s1.x, s1.y, s2.x, s2.y);
 }
 
-PVector transform(PVector p, PVector real_coord, PVector win_coord, float zoom) {
+PVector transform(PVector p, PVector real_coord, PVector win_coord, PVector zoom) {
   return PVector.add(PVector.mult(PVector.sub(p, real_coord), zoom), win_coord);
 }
-*/
