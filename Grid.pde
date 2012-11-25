@@ -1,6 +1,5 @@
 float BLOCK_SIZE = 1000;
 
-// TODO: implement this shit
 class Grid {
   
   PVector min, max;
@@ -13,11 +12,8 @@ class Grid {
     max = new PVector(0, 0);
     m = new HashMap();
     //generator = new ConstantGenerator(255);
-    generator = new PerlinGenerator(5, 4, 0.5, millis(), .001);
-  }
-  
-  String s(int i, int j) {
-    return i+","+j;
+    generator = new NoiseGenerator(5, 4, 0.5, millis(), .001);
+    //generator = new PerlinGenerator(5, 4, 0.5, 4, 0.5);
   }
   
   Quad get(int i, int j) {
@@ -25,7 +21,7 @@ class Grid {
   }
   
   boolean has(int i, int j) {
-    return m.get(s(i,j)) != null;
+    return m.containsKey(s(i,j));
   }
   
   Quad get(PVector p) {
@@ -70,12 +66,11 @@ class Grid {
     Iterator iter = m.entrySet().iterator();
     while(iter.hasNext()) {
       Map.Entry e = (Map.Entry)iter.next();
-      String s = (String)e.getKey();
-      String[] ss = s.split(",");
-      int i = Integer.parseInt(ss[0]), j = Integer.parseInt(ss[1]);
+      String str = (String)e.getKey();
+      int i[] = rs(str);
       Quad q = (Quad)e.getValue();
-      q.iter(new PVector(i * BLOCK_SIZE, j * BLOCK_SIZE),
-             new PVector((i+1) * BLOCK_SIZE, (j+1) * BLOCK_SIZE), cb);
+      q.iter(new PVector(i[0] * BLOCK_SIZE, i[1] * BLOCK_SIZE),
+             new PVector((i[0]+1) * BLOCK_SIZE, (i[1]+1) * BLOCK_SIZE), cb);
     }
   }
   

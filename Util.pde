@@ -62,3 +62,23 @@ PVector intersectRaySeg(PVector a1, PVector a2, PVector b1, PVector b2) {
     return null;
   }
 }
+
+// helpers to enable use of HashMap indexed on multiple ints
+String HASH_DELIM = ":";
+// int[] to String helper
+String s(int... is) {
+  String str = "";
+  for(int i=0; i<is.length; i++) {
+    if(i > 0) str += HASH_DELIM;
+    str += is[i];
+  }
+  return str;
+}
+// String to int[] helper
+int[] rs(String s) {
+  String[] ss = s.split(HASH_DELIM);
+  int r[] = new int[ss.length];
+  for(int i=0; i<ss.length; i++)
+    r[i] = Integer.parseInt(ss[i]);
+  return r;
+}
