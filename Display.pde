@@ -39,9 +39,9 @@ void draw() {
   // handle input
   final PVector player_win = new PVector(width/2 + (width/2-mouseX)*pan_frac, height/2 + (height/2-mouseY)*pan_frac);
   PVector mouse = transform(new PVector(mouseX, mouseY), player_win, player, PVector.div(new PVector(1, 1), zoom));
-  if(mouseButton == LEFT)
+  if(mousePressed && mouseButton == LEFT)
     grid.set(mouse, floor(res), 0);
-  else if(mouseButton == RIGHT)
+  else if(mousePressed && mouseButton == RIGHT)
     grid.set(mouse, floor(res), 255);
   
   // adjust zoom
@@ -58,8 +58,10 @@ void draw() {
   } else {
     velocity.y -= gravity;
   }
-  if(keys[KEY_LEFT] ^ keys[KEY_RIGHT]) velocity.x = keys[KEY_LEFT] ? -speed : speed;
+  if(keys[KEY_A] ^ keys[KEY_D]) velocity.x = keys[KEY_A] ? -speed : speed;
+  else velocity.x = 0;
   PVector new_player = PVector.add(player, velocity);
+  /*
   Quad q = grid.get(new_player);
   if(q != null && q.material_id == 0) {
     velocity = new PVector(0, 0);
@@ -67,6 +69,22 @@ void draw() {
   } else {
     player = new_player;
     grounded = false;
+  }
+  */
+  Quad q;
+  if(null != (q = grid.get(new PVector(player.x+velocity.x, player.y+velocity.y))) && q.material_id != 0) {
+    player = new_player;
+    grounded = false;
+  } else if(null != (q = grid.get(new PVector(player.x, player.y+velocity.y))) && q.material_id != 0) {
+    player.y += velocity.y;
+    velocity.x = 0;
+    grounded = false;
+  } else if(null != (q = grid.get(new PVector(player.x+velocity.x, player.y))) && q.material_id != 0) {
+    player.x += velocity.x;
+    if(velocity.y < 0) grounded = true;
+    velocity.y = 0;
+  } else {
+    grounded = true;
   }
   
   // handle tick actions
