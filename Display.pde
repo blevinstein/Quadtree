@@ -5,8 +5,12 @@ float pan_frac = 0.5;
 float max_res = 8;
 float wheel_sensitivity = .25;
 float speed = 5;
+float gravity = 2;
+float jump_accel = 15;
+boolean grounded = false;
 
-PVector player;
+PVector player = new PVector(0, 1000);
+PVector velocity = new PVector(0, 0);
 PVector zoom = new PVector(1, -1);
 float res = 0;
 
@@ -23,7 +27,6 @@ void setup() {
 
   size(1200,800);
   //frame.setResizable(true);
-  player = new PVector(0,0);
 }
 
 void mouseWheel(int delta) {
@@ -47,10 +50,24 @@ void draw() {
   if(keys[KEY_E]) zoom = PVector.div(zoom, 1.05);
   
   // move player
-  if(keys[KEY_S]) player.y -= speed;
-  if(keys[KEY_W]) player.y += speed;
-  if(keys[KEY_A]) player.x -= speed;
-  if(keys[KEY_D]) player.x += speed;
+  if(grounded) {
+    if(keys[KEY_SPACE]) {
+      velocity.y = jump_accel;
+      grounded = false;
+    }
+  } else {
+    velocity.y -= gravity;
+  }
+  if(keys[KEY_LEFT] ^ keys[KEY_RIGHT]) velocity.x = keys[KEY_LEFT] ? -speed : speed;
+  PVector new_player = PVector.add(player, velocity);
+  Quad q = grid.get(new_player);
+  if(q != null && q.material_id == 0) {
+    velocity = new PVector(0, 0);
+    grounded = true;
+  } else {
+    player = new_player;
+    grounded = false;
+  }
   
   // handle tick actions
   if(tick_count % 30 == 0) { // load new blocks every 30 ticks

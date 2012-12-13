@@ -25,13 +25,13 @@ class Grid {
   }
   
   Quad get(PVector p) {
-    int i = (int)(p.x/BLOCK_SIZE);
-    int j = (int)(p.y/BLOCK_SIZE);
+    int i = floor(p.x/BLOCK_SIZE);
+    int j = floor(p.y/BLOCK_SIZE);
     Quad q = (Quad)m.get(s(i,j));
     if(q == null)
       return null;
     else
-      return q.get(PVector.sub(p, new PVector(i * BLOCK_SIZE, j * BLOCK_SIZE)));
+      return q.get(new PVector((p.x - BLOCK_SIZE*i)/BLOCK_SIZE, (p.y - BLOCK_SIZE*j)/BLOCK_SIZE));
   }
   
   void gen(int i, int j) {
