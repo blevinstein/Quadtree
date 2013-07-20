@@ -3,7 +3,7 @@ float BLOCK_SIZE = 1000;
 class Grid {
   
   PVector min, max;
-  HashMap m;
+  HashMap<String, Quad> m;
   QuadGenerator generator;
   int seed;
 
@@ -63,9 +63,7 @@ class Grid {
   }
   
   void iter(IterCallback cb) {
-    Iterator iter = m.entrySet().iterator();
-    while(iter.hasNext()) {
-      Map.Entry e = (Map.Entry)iter.next();
+    for(Map.Entry e : m.entrySet()) {
       String str = (String)e.getKey();
       int i[] = rs(str);
       Quad q = (Quad)e.getValue();
