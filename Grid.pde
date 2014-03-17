@@ -57,7 +57,7 @@ class Grid {
     if(q == null)
       return false;
     PVector relP = PVector.sub(p, new PVector(i * BLOCK_SIZE, j * BLOCK_SIZE));
-    PVector propP = PVector.div(relP, new PVector(BLOCK_SIZE, BLOCK_SIZE));
+    PVector propP = pdiv(relP, new PVector(BLOCK_SIZE, BLOCK_SIZE));
     q.set(propP, res, val);
     return true;
   }
@@ -85,7 +85,7 @@ class Grid {
     while(true) {
       PVector n = new PVector((dir.x > 0 ? floor(g.x/BLOCK_SIZE) + 1 : ceil(g.x/BLOCK_SIZE) - 1) * BLOCK_SIZE,
                               (dir.y > 0 ? floor(g.y/BLOCK_SIZE) + 1 : ceil(g.y/BLOCK_SIZE) - 1) * BLOCK_SIZE);
-      PVector t = PVector.div(PVector.sub(n, g), dir);
+      PVector t = pdiv(PVector.sub(n, g), dir);
       if(t.x < t.y) {
         i++;
         g = PVector.add(g, PVector.mult(dir, t.x));
