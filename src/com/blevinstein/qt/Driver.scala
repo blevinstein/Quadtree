@@ -36,13 +36,13 @@ object Driver extends App {
   val frame = new Frame()
   frame.add(glCanvas)
   frame.addWindowListener(WindowListener)
-  frame.setSize(640, 480 + 25)
+  frame.setSize(640, 480 + 25) // scalastyle:off magic.number
   frame.setVisible(true)
   // TODO: add input listeners
 
   run
 
-  def run = {
+  def run : Unit  = {
     val throttle = new Throttle(FPS)
     while (true) {
       // TODO: update loop
@@ -51,12 +51,12 @@ object Driver extends App {
     }
   }
 
-  def getCanvas = glCanvas
+  def getCanvas : GLCanvas = glCanvas
 
-  def setup(gl : GL2) = {
+  def setup(gl : GL2) : Unit = {
     gl.glMatrixMode(GL_PROJECTION)
     gl.glLoadIdentity
-    
+
     val glu = new GLU()
     glu.gluOrtho2D(0, width, 0, height)
 
@@ -66,28 +66,28 @@ object Driver extends App {
     gl.glViewport(0, 0, width, height)
   }
 
-  def render(gl : GL2) = {
+  def render(gl : GL2) : Unit = {
     gl.glClear(GL_COLOR_BUFFER_BIT)
     // TODO: draw
     gl.glFlush()
   }
-  
+
   object EventListener extends GLEventListener {
-    def reshape(drawable : GLAutoDrawable, x : Int, y : Int, w : Int, h : Int)  = {
+    def reshape(drawable : GLAutoDrawable, x : Int, y : Int, w : Int, h : Int) : Unit = {
       width = w
       height = h
       setup(drawable.getGL().getGL2())
     }
 
-    def init(drawable : GLAutoDrawable) = setup(drawable.getGL().getGL2())
+    def init(drawable : GLAutoDrawable) : Unit = setup(drawable.getGL().getGL2())
 
-    def dispose(drawable : GLAutoDrawable) = ()
+    def dispose(drawable : GLAutoDrawable) : Unit = ()
 
-    def display(drawable : GLAutoDrawable) = render(drawable.getGL().getGL2())
+    def display(drawable : GLAutoDrawable) : Unit = render(drawable.getGL().getGL2())
   }
 
   object WindowListener extends WindowAdapter {
-    override def windowClosing(e : WindowEvent) {
+    override def windowClosing(e : WindowEvent) : Unit = {
       frame.remove(glCanvas)
       frame.dispose()
       System.exit(0)

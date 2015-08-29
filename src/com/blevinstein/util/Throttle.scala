@@ -17,7 +17,7 @@ class Throttle(rate : Int) {
   var beforeTime = System.nanoTime()
   var oversleep = 0L
 
-  def sleep = {
+  def sleep : Unit = {
     // determine duration between sleep() calls
     val afterTime = System.nanoTime()
     val duration = afterTime - beforeTime
