@@ -5,30 +5,33 @@ JARS = $(subst $(space),:,$(wildcard lib/*.jar))
 BUILDPATH = src:test:${JARS}
 RUNPATH = build:${JARS}
 
-BUILDFLAGS = -Xlint:all
+SCALAC_FLAGS =
 
-DRIVER = com.blevinstein.qt.Driver;
+DRIVER = com.blevinstein.qt.Driver
 
-JAVA_SRCS = \
-		$(wildcard src/*/*/*/*.java) \
-		$(wildcard src/*/*/*/*/*.java) \
-		$(wildcard test/*/*/*/*.java) \
-		$(wildcard test/*/*/*/*/*.java)
+SCALA_SRCS = \
+		$(wildcard src/*/*/*/*.scala) \
+		$(wildcard src/*/*/*/*/*.scala) \
+		$(wildcard test/*/*/*/*.scala) \
+		$(wildcard test/*/*/*/*/*.scala)
 
-TEST_SRCS = $(wildcard test/*/*/*/*Test.java) \
-						$(wildcard test/*/*/*/*/*Test.java)
-TESTS = $(subst /,.,$(subst test/,,$(subst .java,,${TEST_SRCS})))
+TEST_SRCS = $(wildcard test/*/*/*/*Test.scala) \
+						$(wildcard test/*/*/*/*/*Test.scala)
+TESTS = $(subst /,.,$(subst test/,,$(subst .scala,,${TEST_SRCS})))
 
 default: compile
 
-compile: ${JAVA_SRCS}
-	javac -cp ${BUILDPATH} ${BUILDFLAGS} ${JAVA_SRCS} -d build
+compile: ${SCALA_SRCS}
+	scalac -cp ${BUILDPATH} ${SCALAC_FLAGS} ${SCALA_SRCS} -d build
 
 run: compile
-	java -cp ${RUNPATH} ${DRIVER}
+	scala -cp ${RUNPATH} ${DRIVER}
+
+shell:
+	scala -cp ${RUNPATH}
 
 tests: compile
-	java -cp ${RUNPATH} org.junit.runner.JUnitCore ${TESTS}
+	# TODO: add scala test support
 
 clean:
 	rm -rf build/*
