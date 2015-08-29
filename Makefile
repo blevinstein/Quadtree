@@ -30,6 +30,9 @@ run: compile
 shell:
 	scala -cp ${RUNPATH}
 
+style:
+	scalastyle -c scalastyle-config.xml src
+
 tests: compile
 	# TODO: add scala test support
 
