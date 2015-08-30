@@ -12,8 +12,8 @@ case class Man() extends Square
 case class Ball() extends Square
 
 object Board {
-  val width = 15;
-  val height = 19;
+  val width = 15
+  val height = 19
   val center = new Position(7, 9)
 
   val allPositions = for (i <- 0 until width; j <- 0 until height) yield new Position(i, j)
