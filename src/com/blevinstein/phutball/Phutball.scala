@@ -46,7 +46,7 @@ class Board(state: Array[Array[Square]]) {
       Some(state(position.x)(position.y))
     else
       None
-  
+
   def getJump(start: Position, dir: (Int, Int)) : Option[Position] = {
     var current = add(start, dir)
     if (get(current) != Man) {
@@ -65,7 +65,7 @@ class Board(state: Array[Array[Square]]) {
       }
     }
   }
-  
+
   // TODO: This function returns all legal chains of jumps, use recursion
   // This function returns all jumps that can be made in this position
   def getJumpMoves: List[Move] = {
@@ -97,7 +97,7 @@ class Board(state: Array[Array[Square]]) {
       }
     }
   }
- 
+
   def add(position : Position, direction : (Int, Int)) =
     new Position(position.x + direction._1, position.y + direction._2)
 
