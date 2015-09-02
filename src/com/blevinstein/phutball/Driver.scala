@@ -41,14 +41,14 @@ object Driver extends App {
   val glCanvas = new GLCanvas(glCapabilities)
   glCanvas.addGLEventListener(EventListener)
   val textRenderer = new TextRenderer(new Font("Arial", Font.PLAIN, 10))
+  glCanvas.addMouseListener(MouseListener)
 
   // setup window
   val frame = new Frame()
   frame.add(glCanvas)
   frame.addWindowListener(WindowListener)
-  frame.setSize(800, 800 + 25) // scalastyle:off magic.number
+  frame.setSize(640, 800 + 25) // scalastyle:off magic.number
   frame.setVisible(true)
-  frame.addMouseListener(MouseListener)
 
   // setup game
   val board = Board.newBoard
@@ -122,7 +122,8 @@ object Driver extends App {
     override def mouseClicked(e : MouseEvent) {
       val pos = new Position(
         math.floor(e.getX() * 1f / boardWidth * Board.width).toInt,
-        math.floor(e.getY() * 1f / boardHeight * Board.height).toInt)
+        math.floor((boardHeight - e.getY()) * 1f / boardHeight * Board.height).toInt)
+      Console.println(pos.toString)
     }
   }
 
