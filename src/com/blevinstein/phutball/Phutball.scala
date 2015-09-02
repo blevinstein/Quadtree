@@ -1,6 +1,12 @@
 package com.blevinstein.phutball
 
-class Position(val x: Int, val y: Int)
+class Position(val x: Int, val y: Int) {
+  val cols = List("A", "B", "C", "D", "E", "F", "G", "H", "J", "K", "L", "M", "N", "O", "P")
+  val rows = List("1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14",
+      "15", "16", "17", "18", "19")
+
+  override def toString = cols(x) + rows(y)
+}
 
 abstract class Move
 case class Add(position: Position) extends Move
@@ -12,8 +18,8 @@ case class Man() extends Square
 case class Ball() extends Square
 
 object Board {
-  val width = 15
   val height = 19
+  val width = 15
   val center = new Position(7, 9)
 
   val allPositions = for (i <- 0 until width; j <- 0 until height) yield new Position(i, j)
@@ -23,7 +29,9 @@ object Board {
   val newBoard = empty.update(Map(center -> Ball()))
 }
 class Board(state: Array[Array[Square]]) {
-  val ballPosition = (for (pos <- Board.allPositions if get(pos) == Ball()) yield pos).head
+  val ballPosition = (for (pos <- Board.allPositions if get(pos) == Ball())
+    yield pos
+  ).headOption
 
   def update(changes: Map[Position, Square]): Board = {
     var newState = copy2d(state)
@@ -62,8 +70,12 @@ class Board(state: Array[Array[Square]]) {
   // This function returns all jumps that can be made in this position
   def getJumpMoves: List[Move] = {
     def getJumpMoves(prefix: List[Position]): List[Move] = {
-      val jumpDests = (for (dir <- Board.allDirections) yield getJump(ballPosition, dir)).flatten
-      (for (dest <- jumpDests) yield Jump(prefix :+ dest)).toList
+      val jumpDests = (for (dir <- Board.allDirections)
+        yield getJump(ballPosition.get, dir)
+      ).flatten
+      (for (dest <- jumpDests)
+        yield Jump(prefix :+ dest)
+      ).toList
     }
     getJumpMoves(List())
   }
@@ -77,7 +89,12 @@ class Board(state: Array[Array[Square]]) {
     move match {
       case Add(pos) => update(Map(pos -> Man()))
       // TODO: remove men who are jumped over
-      case Jump(positions) => update(Map(ballPosition -> Empty(), positions.last -> Ball()))
+      case Jump(positions) => {
+        var updateMap = Map[Position, Square]()
+        updateMap += ((ballPosition.get, Empty()))
+        updateMap += ((positions.last, Ball()))
+        update(updateMap)
+      }
     }
   }
  
