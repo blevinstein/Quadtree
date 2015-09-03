@@ -4,6 +4,7 @@ import com.blevinstein.util.Throttle
 
 import com.jogamp.opengl.GL.GL_COLOR_BUFFER_BIT
 import com.jogamp.opengl.GL.GL_LINES
+import com.jogamp.opengl.GL.GL_LINE_LOOP
 import com.jogamp.opengl.GL2
 import com.jogamp.opengl.GLAutoDrawable
 import com.jogamp.opengl.GLCapabilities
@@ -34,6 +35,7 @@ object Driver extends App {
   var boardWidth : Int = 1
 
   var cursor : Position = Board.center
+  var jumpMode : Boolean = false
 
   // setup OpenGL
   val glProfile = GLProfile.getDefault()
@@ -55,7 +57,7 @@ object Driver extends App {
   frame.setVisible(true)
 
   // setup game
-  val board = Board.newBoard
+  var board = Board.newBoard
 
   run
 
@@ -114,6 +116,37 @@ object Driver extends App {
       boardHeight * cursor.y / Board.height,
       boardWidth * (cursor.x + 1) / Board.width,
       boardHeight * (cursor.y + 1) / Board.height)
+    // draw pieces
+    def drawPiece(p : Position) {
+      val cx = (p.x + 0.5f) / Board.width * boardWidth
+      val cy = (p.y + 0.5f) / Board.height * boardHeight
+      val r = boardWidth / Board.width / 2 * 0.75
+
+      // draw ellipse
+      gl.glBegin(GL_LINE_LOOP)
+      for (k <- 0 until 20) {
+        val a = math.Pi * 2 * k / 20
+        gl.glVertex2d(cx + math.cos(a) * r, cy + math.sin(a) * r)
+      }
+      gl.glEnd()
+    }
+    for (i <- 0  until Board.width) {
+      for (j <- 0 until Board.height) {
+        val pos = new Position(i, j)
+        val square = board.get(pos)
+        board.get(pos) match {
+          case Ball() => {
+            setColor(gl, Color.WHITE)
+            drawPiece(pos)
+          }
+          case Man() => {
+            setColor(gl, Color.BLACK)
+            drawPiece(pos)
+          }
+          case Empty() => ()
+        }
+      }
+    }
     // draw coords
     textRenderer.beginRendering(width, height)
     for (i <- 0 until Board.width) {
@@ -135,13 +168,35 @@ object Driver extends App {
   object MouseListener extends MouseAdapter {
     override def mouseClicked(e : MouseEvent) {
       val pos = getPosition(e)
-      Console.println(pos.toString)
+      e.getButton() match {
+        case MouseEvent.BUTTON1 => {
+          if (jumpMode) {
+            val move = board.jumpMoves
+              .find((m : Move) => m match { case Jump(ps) => ps.last == pos })
+            move match {
+              case Some(m) => board = board.after(m)
+              case None => Console.println("no jump move")
+            }
+          } else {
+            val move = board.addMoves
+              .find((m : Move) => m match { case Add(p) => p == pos })
+            move match {
+              case Some(m) => board = board.after(m)
+              case None => Console.println("no add move")
+            }
+          }
+        }
+        case MouseEvent.BUTTON3 => {
+          jumpMode = !jumpMode
+        }
+      }
     }
   }
 
   object MouseMotionListener extends MouseMotionAdapter {
     override def mouseMoved(e : MouseEvent) {
-      cursor = getPosition(e)
+      val pos = getPosition(e)
+      if (pos.valid) cursor = pos
     }
   }
 
