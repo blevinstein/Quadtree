@@ -38,6 +38,7 @@ object Driver extends App {
   var boardWidth : Int = 1
 
   var cursor : Position = Board.center
+  var cursorMove : Option[Move] = None
   var jumpMode : Boolean = false
 
   // setup OpenGL
@@ -107,6 +108,14 @@ object Driver extends App {
       }
       gl.glEnd()
     }
+    def drawLine(a : Position, b : Position) {
+      gl.glBegin(GL_LINES)
+      gl.glVertex2d((a.x + 0.5f) / Board.width * boardWidth,
+        (a.y + 0.5f) / Board.height * boardHeight)
+      gl.glVertex2d((b.x + 0.5f) / Board.width * boardWidth,
+        (b.y + 0.5f) / Board.height * boardHeight)
+      gl.glEnd()
+    }
 
     gl.glClear(GL_COLOR_BUFFER_BIT)
     gl.glPolygonMode(GL_FRONT_AND_BACK, GL_FILL)
@@ -141,6 +150,18 @@ object Driver extends App {
         setColor(Color.BLACK)
         drawPiece(cursor)
       }
+    }
+    // draw cursorMove
+    cursorMove match {
+      case None => ()
+      case Some(Add(p)) => ()
+      case Some(Jump(ps)) => {
+        val nodes = board.ballPosition :: ps
+        for (pair <- nodes zip nodes.tail) {
+          drawLine(pair._1, pair._2)
+        }
+      }
+      case _ => ???
     }
     // draw pieces
     for (i <- 0  until Board.width) {
@@ -184,24 +205,13 @@ object Driver extends App {
       val pos = getPosition(e)
       e.getButton() match {
         case MouseEvent.BUTTON1 => {
-          if (jumpMode) {
-            val move = board.jumpMoves
-              .find((m : Move) => m match { case Jump(ps) => ps.last == pos })
-            move match {
-              case Some(m) => board = board.after(m)
-              case None => Console.println("no jump move")
-            }
-          } else {
-            val move = board.addMoves
-              .find((m : Move) => m match { case Add(p) => p == pos })
-            move match {
-              case Some(m) => board = board.after(m)
-              case None => Console.println("no add move")
-            }
+          if (!cursorMove.isEmpty) {
+            board = board.after(cursorMove.get)
           }
         }
         case MouseEvent.BUTTON3 => {
           jumpMode = !jumpMode
+          cursorMove = None
         }
       }
     }
@@ -211,6 +221,14 @@ object Driver extends App {
     override def mouseMoved(e : MouseEvent) {
       val pos = getPosition(e)
       if (pos.valid) cursor = pos
+      // Try to find a valid move
+      if (jumpMode) {
+        cursorMove = board.jumpMoves
+            .find((m : Move) => m match { case Jump(ps) => ps.last == pos })
+      } else {
+        cursorMove = board.addMoves
+            .find((m : Move) => m match { case Add(p) => p == pos })
+      }
     }
   }
 
