@@ -19,6 +19,7 @@ import java.awt.Font
 import java.awt.Frame
 import java.awt.event.MouseAdapter
 import java.awt.event.MouseEvent
+import java.awt.event.MouseMotionAdapter
 import java.awt.event.WindowAdapter
 import java.awt.event.WindowEvent
 
@@ -32,6 +33,8 @@ object Driver extends App {
   var boardHeight : Int = 1
   var boardWidth : Int = 1
 
+  var cursor : Position = Board.center
+
   // setup OpenGL
   val glProfile = GLProfile.getDefault()
   GLProfile.initSingleton()
@@ -42,6 +45,7 @@ object Driver extends App {
   glCanvas.addGLEventListener(EventListener)
   val textRenderer = new TextRenderer(new Font("Arial", Font.PLAIN, 10))
   glCanvas.addMouseListener(MouseListener)
+  glCanvas.addMouseMotionListener(MouseMotionListener)
 
   // setup window
   val frame = new Frame()
@@ -104,6 +108,12 @@ object Driver extends App {
       gl.glVertex2d(boardWidth, boardHeight * j / Board.height)
     }
     gl.glEnd()
+    // draw cursor
+    setColor(gl, Color.LIGHT_GRAY)
+    gl.glRectf(boardWidth * cursor.x / Board.width,
+      boardHeight * cursor.y / Board.height,
+      boardWidth * (cursor.x + 1) / Board.width,
+      boardHeight * (cursor.y + 1) / Board.height)
     // draw coords
     textRenderer.beginRendering(width, height)
     for (i <- 0 until Board.width) {
@@ -118,12 +128,20 @@ object Driver extends App {
     gl.glFlush()
   }
 
+  def getPosition(e : MouseEvent) = new Position(
+      math.floor(e.getX() * 1f / boardWidth * Board.width).toInt,
+      math.floor((boardHeight - e.getY()) * 1f / boardHeight * Board.height).toInt)
+
   object MouseListener extends MouseAdapter {
     override def mouseClicked(e : MouseEvent) {
-      val pos = new Position(
-        math.floor(e.getX() * 1f / boardWidth * Board.width).toInt,
-        math.floor((boardHeight - e.getY()) * 1f / boardHeight * Board.height).toInt)
+      val pos = getPosition(e)
       Console.println(pos.toString)
+    }
+  }
+
+  object MouseMotionListener extends MouseMotionAdapter {
+    override def mouseMoved(e : MouseEvent) {
+      cursor = getPosition(e)
     }
   }
 
