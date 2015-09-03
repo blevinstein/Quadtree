@@ -20,6 +20,7 @@ abstract class Move
 case class Add(position: Position) extends Move
 case class Jump(positions: List[Position]) extends Move
 
+// TODO: replace with Enumeration
 abstract class Square
 case class Empty() extends Square
 case class Man() extends Square
@@ -86,21 +87,31 @@ class Board(state: Array[Array[Square]]) {
     }
   }
 
-  // TODO: This function returns all legal chains of jumps, use recursion
-  // This function returns all jumps that can be made in this position
+  // This function returns all chains of jumps that can be made in this position
   def jumpMoves: List[Move] = {
-    def getJumpMoves(prefix: List[Position]): List[Move] = {
-      val jumpDests = (for (dir <- Board.allDirections)
-        yield getJump(ballPosition, dir)
-      ).flatten
-      (for (dest <- jumpDests)
-        yield Jump(prefix :+ dest)
-      ).toList
+    def getJumpMoves(board : Board, prefix: List[Position]): List[Move] = {
+      var jumpMoves = List[Move]()
+      for (dir <- Board.allDirections) {
+        val newPosition = board.getJump(board.ballPosition, dir)
+        if (!newPosition.isEmpty) {
+          // add single jump
+          jumpMoves = jumpMoves :+ Jump(prefix :+ newPosition.get)
+          // recur, add multi jumps
+          val singleJump = Jump(List(newPosition.get))
+          jumpMoves = jumpMoves ++
+              getJumpMoves(board.after(singleJump), prefix :+ newPosition.get)
+        }
+      }
+      jumpMoves
     }
-    getJumpMoves(List())
+    getJumpMoves(this, List())
   }
 
-  def addMoves = (for (pos <- Board.allPositions if get(pos) == Empty()) yield Add(pos)).toList
+  def addMoves =
+    (for (pos <- Board.allPositions
+      if get(pos) == Empty())
+        yield Add(pos)
+    ).toList
 
   def positionsBetween(a: Position, b: Position): List[Position] = {
     val ab = (b.x - a.x, b.y - a.y)
