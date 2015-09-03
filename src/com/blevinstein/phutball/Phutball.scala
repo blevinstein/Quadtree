@@ -30,11 +30,22 @@ object Board {
   val width = 15
   val center = new Position(7, 9)
 
-  val allPositions = for (i <- 0 until width; j <- 0 until height) yield new Position(i, j)
-  val allDirections = for (di <- -1 until 2; dj <- -1 until 2 if di != 0 || dj != 0) yield (di, dj)
+  val allPositions =
+    for (i <- 0 until width; j <- 0 until height)
+      yield new Position(i, j)
 
-  val empty = new Board(Array.fill[Square](width, height) { Empty() })
-  val newBoard = empty.update(Map(center -> Ball()))
+  val allDirections =
+    for (di <- -1 until 2; dj <- -1 until 2
+      if di != 0 || dj != 0)
+        yield (di, dj)
+
+  val newBoard = new Board(Array.tabulate[Square](width, height) {
+    (i, j) => if (new Position(i, j) == center) {
+      Ball()
+    } else {
+      Empty()
+    }
+  })
 }
 class Board(state: Array[Array[Square]]) {
   val ballPosition = (for (pos <- Board.allPositions if get(pos) == Ball())
