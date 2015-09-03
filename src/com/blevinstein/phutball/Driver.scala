@@ -88,6 +88,7 @@ object Driver extends App {
     gl.glViewport(0, 0, width, height)
   }
 
+  // TODO: when 'm' key is pressed, show all moves
   def render(gl : GL2) : Unit = {
     // drawing subroutines
     def setColor(c : Color) {
