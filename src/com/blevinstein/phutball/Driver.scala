@@ -3,12 +3,14 @@ package com.blevinstein.phutball
 import com.blevinstein.util.Throttle
 
 import com.jogamp.opengl.GL.GL_COLOR_BUFFER_BIT
+import com.jogamp.opengl.GL.GL_FRONT_AND_BACK
 import com.jogamp.opengl.GL.GL_LINES
-import com.jogamp.opengl.GL.GL_LINE_LOOP
+import com.jogamp.opengl.GL.GL_TRIANGLE_FAN
 import com.jogamp.opengl.GL2
 import com.jogamp.opengl.GLAutoDrawable
 import com.jogamp.opengl.GLCapabilities
 import com.jogamp.opengl.GLEventListener
+import com.jogamp.opengl.GL2GL3.GL_FILL
 import com.jogamp.opengl.GLProfile
 import com.jogamp.opengl.awt.GLCanvas
 import com.jogamp.opengl.fixedfunc.GLMatrixFunc.GL_MODELVIEW
@@ -25,6 +27,7 @@ import java.awt.event.WindowAdapter
 import java.awt.event.WindowEvent
 
 object Driver extends App {
+  val drawCoords = false
   val FPS : Int = 60
   // dimensions of the screen
   var height : Int = 1
@@ -84,21 +87,35 @@ object Driver extends App {
     gl.glViewport(0, 0, width, height)
   }
 
-  def setColor(gl : GL2, c : Color) {
-    gl.glColor4d(c.getRed() / 255.0,
-      c.getGreen() / 255.0,
-      c.getBlue() / 255.0,
-      c.getAlpha() / 255.0)
-  }
-
   def render(gl : GL2) : Unit = {
+    // drawing subroutines
+    def setColor(c : Color) {
+      gl.glColor4d(c.getRed() / 255.0,
+        c.getGreen() / 255.0,
+        c.getBlue() / 255.0,
+        c.getAlpha() / 255.0)
+    }
+    def drawPiece(p : Position) {
+      val cx = (p.x + 0.5f) / Board.width * boardWidth
+      val cy = (p.y + 0.5f) / Board.height * boardHeight
+      val r = boardWidth / Board.width / 2 * 0.75
+
+      gl.glBegin(GL_TRIANGLE_FAN)
+      for (k <- 0 until 20) {
+        val a = math.Pi * 2 * k / 20
+        gl.glVertex2d(cx + math.cos(a) * r, cy + math.sin(a) * r)
+      }
+      gl.glEnd()
+    }
+
     gl.glClear(GL_COLOR_BUFFER_BIT)
+    gl.glPolygonMode(GL_FRONT_AND_BACK, GL_FILL)
 
     // draw background
-    setColor(gl, Color.DARK_GRAY)
+    setColor(Color.DARK_GRAY)
     gl.glRectf(0, 0, boardWidth, boardHeight)
     // draw grid
-    setColor(gl, Color.WHITE)
+    setColor(Color.WHITE)
     gl.glColor4d(255, 255, 255, 255)
     gl.glBegin(GL_LINES)
     for (i <- 0 until Board.width + 1) {
@@ -111,52 +128,49 @@ object Driver extends App {
     }
     gl.glEnd()
     // draw cursor
-    setColor(gl, Color.LIGHT_GRAY)
+    setColor(Color.LIGHT_GRAY)
     gl.glRectf(boardWidth * cursor.x / Board.width,
       boardHeight * cursor.y / Board.height,
       boardWidth * (cursor.x + 1) / Board.width,
       boardHeight * (cursor.y + 1) / Board.height)
-    // draw pieces
-    def drawPiece(p : Position) {
-      val cx = (p.x + 0.5f) / Board.width * boardWidth
-      val cy = (p.y + 0.5f) / Board.height * boardHeight
-      val r = boardWidth / Board.width / 2 * 0.75
-
-      // draw ellipse
-      gl.glBegin(GL_LINE_LOOP)
-      for (k <- 0 until 20) {
-        val a = math.Pi * 2 * k / 20
-        gl.glVertex2d(cx + math.cos(a) * r, cy + math.sin(a) * r)
+    if (board.get(cursor) == Empty()) {
+      if (jumpMode) {
+        setColor(Color.WHITE)
+        drawPiece(cursor)
+      } else {
+        setColor(Color.BLACK)
+        drawPiece(cursor)
       }
-      gl.glEnd()
     }
+    // draw pieces
     for (i <- 0  until Board.width) {
       for (j <- 0 until Board.height) {
         val pos = new Position(i, j)
         val square = board.get(pos)
         board.get(pos) match {
           case Ball() => {
-            setColor(gl, Color.WHITE)
+            setColor(Color.WHITE)
             drawPiece(pos)
           }
           case Man() => {
-            setColor(gl, Color.BLACK)
+            setColor(Color.BLACK)
             drawPiece(pos)
           }
           case Empty() => ()
         }
       }
     }
-    // draw coords
-    textRenderer.beginRendering(width, height)
-    for (i <- 0 until Board.width) {
-      for (j <- 0 until Board.height) {
-        textRenderer.draw(new Position(i, j).toString,
-          ((i + 0.5f) / Board.width * boardWidth).toInt,
-          ((j + 0.5f) / Board.height * boardHeight).toInt)
+    if (drawCoords) {
+      textRenderer.beginRendering(width, height)
+      for (i <- 0 until Board.width) {
+        for (j <- 0 until Board.height) {
+          textRenderer.draw(new Position(i, j).toString,
+            ((i + 0.5f) / Board.width * boardWidth).toInt,
+            ((j + 0.5f) / Board.height * boardHeight).toInt)
+        }
       }
+      textRenderer.endRendering()
     }
-    textRenderer.endRendering()
 
     gl.glFlush()
   }
