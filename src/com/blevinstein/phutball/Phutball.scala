@@ -50,7 +50,7 @@ object Board {
 class Board(state: Array[Array[Square]]) {
   val ballPosition = (for (pos <- Board.allPositions if get(pos) == Ball())
     yield pos
-  ).headOption
+  ).head
 
   def update(changes: Map[Position, Square]): Board = {
     var newState = copy2d(state)
@@ -67,7 +67,9 @@ class Board(state: Array[Array[Square]]) {
 
   def getJump(start: Position, dir: (Int, Int)) : Option[Position] = {
     var current = add(start, dir)
-    if (get(current) != Man()) {
+    if (!current.valid) {
+      None // Off the edge of the board
+    } else if (get(current) != Man()) {
       None // Nothing to jump over
     } else {
       // Jump over one or more men
@@ -89,7 +91,7 @@ class Board(state: Array[Array[Square]]) {
   def jumpMoves: List[Move] = {
     def getJumpMoves(prefix: List[Position]): List[Move] = {
       val jumpDests = (for (dir <- Board.allDirections)
-        yield getJump(ballPosition.get, dir)
+        yield getJump(ballPosition, dir)
       ).flatten
       (for (dest <- jumpDests)
         yield Jump(prefix :+ dest)
@@ -100,14 +102,31 @@ class Board(state: Array[Array[Square]]) {
 
   def addMoves = (for (pos <- Board.allPositions if get(pos) == Empty()) yield Add(pos)).toList
 
+  def positionsBetween(a: Position, b: Position): List[Position] = {
+    val ab = (b.x - a.x, b.y - a.y)
+    val abMax = math.max(math.abs(ab._1), math.abs(ab._2))
+    val abNorm = (ab._1 / abMax, ab._2 / abMax) // should be -1 or 0 or 1
+    (for (i <- 1 until abMax)
+      yield new Position(a.x + abNorm._1 * i, a.y + abNorm._2 * i)
+    ).toList
+  }
+
   def after(move: Move): Board = {
     move match {
       case Add(pos) => update(Map(pos -> Man()))
       // TODO: remove men who are jumped over
       case Jump(positions) => {
         var updateMap = Map[Position, Square]()
-        updateMap += ((ballPosition.get, Empty()))
+        updateMap += ((ballPosition, Empty()))
         updateMap += ((positions.last, Ball()))
+        // generate a list of places you jumped from/to
+        val nodes = ballPosition :: positions
+        // for all pairs of places, remove pieces jumped over
+        for (pair <- nodes zip nodes.tail) {
+          for (pos <- positionsBetween(pair._1, pair._2)) {
+            updateMap += ((pos, Empty()))
+          }
+        }
         update(updateMap)
       }
     }
