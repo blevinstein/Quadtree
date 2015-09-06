@@ -13,19 +13,19 @@ class Quad {
   Quad parent;
   Quad child[][];
   int material_id;
-  
+
   Quad(int mid) {
     material_id = mid;
     child = null;
     parent = null;
   }
-  
+
   Quad(Quad q0, Quad q1, Quad q2, Quad q3) {
     material_id = -1;
     setChildren(q0, q1, q2, q3);
     parent = null;
   }
-  
+
   void setChildren(Quad q0, Quad q1, Quad q2, Quad q3) {
     child = new Quad[2][];
     child[0] = new Quad[2];
@@ -35,14 +35,14 @@ class Quad {
     child[1][0] = q2; child[1][0].parent = this;
     child[1][1] = q3; child[1][1].parent = this;
   }
-  
+
   Quad get(PVector p) {
     if(material_id >= 0)
       return this;
     return child[floor(p.x*2)][floor(p.y*2)]
       .get(new PVector(p.x*2 % 1, p.y*2 % 1));
   }
-  
+
   void set(PVector p, int r, int mid) {
     if(p.x < 0 || p.x >= 1 ||
        p.y < 0 || p.y >= 1)
@@ -69,7 +69,7 @@ class Quad {
       }
     }
   }
-  
+
   void iter(PVector min, PVector max, IterCallback cb) {
     if(material_id >= 0) {
       cb.call(min, max, this);
@@ -81,7 +81,7 @@ class Quad {
       child[1][1].iter(half, max, cb);
     }
   }
-  
+
   void raycast(PVector min, PVector max, PVector source, PVector direction, IterCallback cb) {
     if(contains(min, max, source) ||
        contains(min, max, direction) ||
@@ -98,7 +98,7 @@ class Quad {
       }
     }
   }
-  
+
   /* Recursive Lightcasting
    * light is emitted from source along arc (angle arc.x to arc.y)
    * returns ArrayList of PVectors representing light after occlusion
@@ -112,9 +112,9 @@ class Quad {
       boolean trans = transparent(material_id);
       if(contains(min, max, source) && !trans) return new ArrayList(); // occlude all
       else if(!trans) { // find lit sides
-      
+
         ArrayList litSides = new ArrayList(); // PVector[2] sides
-        
+
         // specify ray by two vectors
         PVector v[] = {new PVector(source.x + cos(arc.x), source.y + sin(arc.x)),
                        new PVector(source.x + cos(arc.y), source.y + sin(arc.y))};
@@ -123,7 +123,7 @@ class Quad {
         PVector corners[][] = {{min,                       new PVector(min.x, max.y)},
                                {new PVector(max.x, min.y), max                      }};
         ArrayList sides = new ArrayList();
-        
+
         // if opaque, cull by choosing only light-facing sides to examine
         if(trans || source.x < min.x)
           sides.add(new PVector[] { corners[0][0], corners[0][1] });
@@ -192,12 +192,12 @@ class Quad {
       } else {
         xs[0] = 1; xs[1] = 0;
       }
-      if(source.y < half.y) { // determine y iteration 
+      if(source.y < half.y) { // determine y iteration
         ys[0] = 0; ys[1] = 1;
       } else {
         ys[0] = 1; ys[1] = 0;
       }
-      
+
       // determine whether any light enters this quad
       PVector v[] = {new PVector(source.x + cos(arc.x), source.y + sin(arc.x)),
                      new PVector(source.x + cos(arc.y), source.y + sin(arc.y))};
@@ -214,7 +214,7 @@ class Quad {
       }
 
       ArrayList occluded = new ArrayList();
-      
+
       // deal with malformed input arcs
       while(arc.x < -PI) arc.x += 2*PI;
       while(arc.y > PI) arc.y -= 2*PI;
@@ -249,7 +249,7 @@ class Quad {
     }
     return null;
   }
-  
+
   ArrayList bandcast(PVector min, PVector max, PVector dir, PVector band, IterCallback cb) {
     // TODO: implement directional lightcasting
     return null;
