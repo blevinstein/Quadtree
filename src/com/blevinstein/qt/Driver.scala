@@ -40,6 +40,7 @@ object Driver extends App {
   glCapabilities setDoubleBuffered true
   val glCanvas = new GLCanvas(glCapabilities)
   glCanvas.addGLEventListener(EventListener)
+  // scalastyle:off magic.number
   val textRenderer = new TextRenderer(new Font("Arial", Font.PLAIN, 10))
   glCanvas.addMouseListener(MouseListener)
   glCanvas.addMouseMotionListener(MouseMotionListener)
@@ -99,11 +100,11 @@ object Driver extends App {
   }
 
   object MouseListener extends MouseAdapter {
-    override def mouseClicked(e : MouseEvent) = {}
+    override def mouseClicked(e : MouseEvent): Unit = {}
   }
 
   object MouseMotionListener extends MouseMotionAdapter {
-    override def mouseMoved(e : MouseEvent) {}
+    override def mouseMoved(e : MouseEvent): Unit = {}
   }
 
   object EventListener extends GLEventListener {

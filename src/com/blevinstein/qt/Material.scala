@@ -5,5 +5,5 @@ object Material {
   val FULL = new Material
 }
 
-class Material {
-}
+class Material
+
