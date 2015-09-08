@@ -27,7 +27,7 @@ abstract class QuadTree {
   }
 
   def iter(cb: (Rectangle, Material) => Unit): Unit = {
-    iter(cb, new Rectangle(Point.zero, new Point(1, 1)))
+    iter(cb, Rectangle.unit)
   }
   def iter(cb: (Rectangle, Material) => Unit, rect: Rectangle): Unit = {
     this match {
