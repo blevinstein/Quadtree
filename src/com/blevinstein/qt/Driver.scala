@@ -102,6 +102,12 @@ object Driver extends App {
     }
     def drawRect(rect : Rectangle): Unit = {
       val screenRect = rect * size + offset
+      setFill(true)
+      setColor(Color.GRAY)
+      gl.glRectf(screenRect.min.x, screenRect.min.y,
+          screenRect.max.x, screenRect.max.y)
+      setFill(false)
+      setColor(Color.BLACK)
       gl.glRectf(screenRect.min.x, screenRect.min.y,
           screenRect.max.x, screenRect.max.y)
     }
