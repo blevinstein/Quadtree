@@ -6,7 +6,7 @@ object Material {
 }
 
 class Material {
-  override def toString = this match {
+  override def toString: String = this match {
     case Material.Empty => " "
     case Material.Full => "X"
   }

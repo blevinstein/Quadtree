@@ -1,5 +1,6 @@
 package com.blevinstein.qt
 
+// scalastyle:off underscore.import
 import com.blevinstein.qt.Quadrant._
 
 object Point {

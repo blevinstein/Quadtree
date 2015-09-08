@@ -58,10 +58,11 @@ object Driver extends App {
 
   // setup game
   val root = QuadTree.approx(3, (p) =>
-      if ((p - new Point(0.5f, 0.5f)).mag < 0.5f)
+      if ((p - new Point(0.5f, 0.5f)).mag < 0.5f) {
         Material.Full
-      else
-        Material.Empty)
+      } else {
+        Material.Empty
+      })
 
   run
 
@@ -90,16 +91,16 @@ object Driver extends App {
 
   def render(gl : GL2) : Unit = {
     // drawing subroutines
-    def setColor(c : Color) = {
+    def setColor(c : Color): Unit = {
       gl.glColor4d(c.getRed() / 255.0,
         c.getGreen() / 255.0,
         c.getBlue() / 255.0,
         c.getAlpha() / 255.0)
     }
-    def setFill(fill : Boolean) = {
+    def setFill(fill : Boolean): Unit = {
       gl.glPolygonMode(GL_FRONT_AND_BACK, if (fill) GL_FILL else GL_LINE)
     }
-    def drawRect(rect : Rectangle) = {
+    def drawRect(rect : Rectangle): Unit = {
       val screenRect = rect * size + offset
       gl.glRectf(screenRect.min.x, screenRect.min.y,
           screenRect.max.x, screenRect.max.y)

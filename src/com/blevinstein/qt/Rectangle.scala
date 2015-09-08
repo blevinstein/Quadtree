@@ -1,10 +1,12 @@
 package com.blevinstein.qt
 
+// scalastyle:off underscore.import
 import com.blevinstein.qt.Quadrant._
 
 object Rectangle {
   val unit = new Rectangle(Point.zero, new Point(1, 1))
 }
+// scalastyle:off
 class Rectangle(val min: Point, val max: Point) {
   def *(k: Float): Rectangle = new Rectangle(min * k, max * k)
   def +(p: Point): Rectangle = new Rectangle(min + p, max + p)

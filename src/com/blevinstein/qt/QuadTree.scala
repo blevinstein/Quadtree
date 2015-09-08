@@ -1,5 +1,6 @@
 package com.blevinstein.qt
 
+// scalastyle:off underscore.import
 import com.blevinstein.qt.Quadrant._
 
 object QuadTree {
@@ -36,7 +37,7 @@ abstract class QuadTree {
     }
   }
 
-  override def toString = {
+  override def toString: String = {
     this match {
       case branch: QuadBranch => new StringBuilder("[[")
           .append(branch.getSubtree(TopLeft)).append(",")
