@@ -102,12 +102,6 @@ object Driver extends App {
     }
     def drawRect(rect : Rectangle): Unit = {
       val screenRect = rect * size + offset
-      setFill(true)
-      setColor(Color.GRAY)
-      gl.glRectf(screenRect.min.x, screenRect.min.y,
-          screenRect.max.x, screenRect.max.y)
-      setFill(false)
-      setColor(Color.BLACK)
       gl.glRectf(screenRect.min.x, screenRect.min.y,
           screenRect.max.x, screenRect.max.y)
     }
@@ -120,12 +114,19 @@ object Driver extends App {
     gl.glRectf(0, 0, width, height)
 
     // draw quadtree
-    setColor(Color.BLACK)
+    var rects = List[Rectangle]()
     root.iter((r, m) => {
       if (m == Material.Full) {
-        drawRect(r)
+        rects = r :: rects
       }
     })
+
+    setFill(true)
+    setColor(Color.LIGHT_GRAY)
+    rects.foreach(drawRect(_))
+    setFill(false)
+    setColor(Color.BLACK)
+    rects.foreach(drawRect(_))
 
     // end drawing
     gl.glFlush()
