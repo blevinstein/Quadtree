@@ -24,6 +24,7 @@ object QuadTree {
     }
   }
 }
+
 abstract class QuadTree {
   def get(p: Point): Material = {
     require(p.x >= 0 && p.x <= 1)
@@ -58,6 +59,7 @@ abstract class QuadTree {
     }
   }
 }
+
 class QuadBranch(a: QuadTree,
     b: QuadTree,
     c: QuadTree,
@@ -79,6 +81,7 @@ class QuadBranch(a: QuadTree,
     }
   }
 }
+
 class QuadLeaf(val material: Material) extends QuadTree {
   override def hashCode: Int = material.hashCode
 
