@@ -108,7 +108,11 @@ object Driver extends App {
 
   object EventListener extends GLEventListener {
     // Respond to changes in width or height
-    def reshape(drawable : GLAutoDrawable, x : Int, y : Int, w : Int, h : Int) : Unit = {
+    def reshape(drawable : GLAutoDrawable,
+        x : Int,
+        y : Int,
+        w : Int,
+        h : Int) : Unit = {
       // update screen dimensions
       width = w
       height = h
@@ -116,11 +120,13 @@ object Driver extends App {
       setup(drawable.getGL().getGL2())
     }
 
-    def init(drawable : GLAutoDrawable) : Unit = setup(drawable.getGL().getGL2())
+    def init(drawable : GLAutoDrawable) : Unit =
+        setup(drawable.getGL().getGL2())
 
     def dispose(drawable : GLAutoDrawable) : Unit = ()
 
-    def display(drawable : GLAutoDrawable) : Unit = render(drawable.getGL().getGL2())
+    def display(drawable : GLAutoDrawable) : Unit =
+        render(drawable.getGL().getGL2())
   }
 
   object WindowListener extends WindowAdapter {
