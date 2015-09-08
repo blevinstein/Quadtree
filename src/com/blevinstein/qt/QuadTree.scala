@@ -2,6 +2,18 @@ package com.blevinstein.qt
 
 import com.blevinstein.qt.Quadrant._
 
+object QuadTree {
+  def approx(depth: Int, f: Point => Material): QuadTree = {
+    if (depth <= 0) {
+      new QuadLeaf(f(new Point(0.5f, 0.5f)))
+    } else {
+      new QuadBranch(approx(depth - 1, f compose Point.zoomFunc(TopLeft)),
+        approx(depth - 1, f compose Point.zoomFunc(TopRight)),
+        approx(depth - 1, f compose Point.zoomFunc(BottomLeft)),
+        approx(depth - 1, f compose Point.zoomFunc(BottomRight)))
+    }
+  }
+}
 abstract class QuadTree {
   def get(p: Point): Material = {
     require(p.x >= 0 && p.x <= 1)
@@ -36,3 +48,4 @@ class QuadBranch(a: QuadTree,
   }
 }
 class QuadLeaf(val material: Material) extends QuadTree
+
