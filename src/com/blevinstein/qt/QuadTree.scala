@@ -4,6 +4,7 @@ package com.blevinstein.qt
 import com.blevinstein.qt.Quadrant._
 
 object QuadTree {
+  // TODO: implement merging of redundant QuadBranches
   def approx(depth: Int, f: Point => Material): QuadTree = {
     if (depth <= 0) {
       new QuadLeaf(f(new Point(0.5f, 0.5f)))
