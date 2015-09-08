@@ -1,6 +1,13 @@
 package com.blevinstein.qt
 
+object Rectangle {
+  val unit = new Rectangle(Point.zero, new Point(1, 1))
+}
 class Rectangle(val min: Point, val max: Point) {
+  def *(k: Float): Rectangle = new Rectangle(min * k, max * k)
+  def +(p: Point): Rectangle = new Rectangle(min + p, max + p)
+  def -(p: Point): Rectangle = new Rectangle(min - p, max - p)
+
   val center = (min + max) / 2
 
   def contains(p: Point): Boolean = {

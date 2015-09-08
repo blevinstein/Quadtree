@@ -1,7 +1,7 @@
 package com.blevinstein.qt
 
 object Point {
-  val ZERO = new Point(0, 0)
+  val zero = new Point(0, 0)
 }
 // scalastyle:off
 class Point(val x: Float, val y: Float) {

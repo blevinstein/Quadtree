@@ -27,7 +27,7 @@ abstract class QuadTree {
   }
 
   def iter(cb: (Rectangle, Material) => Unit): Unit = {
-    iter(cb, new Rectangle(Point.ZERO, new Point(1, 1)))
+    iter(cb, new Rectangle(Point.zero, new Point(1, 1)))
   }
   def iter(cb: (Rectangle, Material) => Unit, rect: Rectangle): Unit = {
     this match {
@@ -41,6 +41,8 @@ abstract class QuadTree {
     }
   }
 }
-class QuadBranch(val a: QuadTree, val b: QuadTree,
-  val c: QuadTree, val d: QuadTree) extends QuadTree
+class QuadBranch(val a: QuadTree,
+  val b: QuadTree,
+  val c: QuadTree,
+  val d: QuadTree) extends QuadTree
 class QuadLeaf(val material: Material) extends QuadTree

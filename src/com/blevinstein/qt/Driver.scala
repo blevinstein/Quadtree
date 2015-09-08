@@ -32,6 +32,9 @@ object Driver extends App {
   // dimensions of the screen
   var height : Int = 1
   var width : Int = 1
+  // size and offset of the screen
+  var size : Int = 1
+  var offset : Point = Point.zero
 
   // setup OpenGL
   val glProfile = GLProfile.getDefault()
@@ -54,6 +57,10 @@ object Driver extends App {
   frame.setVisible(true)
 
   // setup game
+  val root = new QuadBranch(new QuadLeaf(Material.FULL),
+    new QuadLeaf(Material.EMPTY),
+    new QuadLeaf(Material.EMPTY),
+    new QuadLeaf(Material.FULL))
 
   run
 
@@ -91,13 +98,26 @@ object Driver extends App {
     def setFill(fill : Boolean) = {
       gl.glPolygonMode(GL_FRONT_AND_BACK, if (fill) GL_FILL else GL_LINE)
     }
+    def drawRect(rect : Rectangle) = {
+      val screenRect = rect * size + offset
+      gl.glRectf(screenRect.min.x, screenRect.min.y,
+          screenRect.max.x, screenRect.max.y)
+    }
 
     gl.glClear(GL_COLOR_BUFFER_BIT)
 
     // draw background
     setFill(true)
-    setColor(Color.DARK_GRAY)
+    setColor(Color.WHITE)
     gl.glRectf(0, 0, width, height)
+
+    // draw quadtree
+    setColor(Color.BLACK)
+    root.iter((r, m) => {
+      if (m == Material.FULL) {
+        drawRect(r)
+      }
+    })
 
     // end drawing
     gl.glFlush()
@@ -121,6 +141,13 @@ object Driver extends App {
       // update screen dimensions
       width = w
       height = h
+      size = math.min(width, height)
+      val offsetDist = math.abs(width - height) / 2
+      offset = if (width > height) {
+        new Point(offsetDist, 0)
+      } else {
+        new Point(0, offsetDist)
+      }
 
       setup(drawable.getGL().getGL2())
     }
