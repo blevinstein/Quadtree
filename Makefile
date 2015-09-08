@@ -28,10 +28,6 @@ compile: ${SCALA_SRCS}
 run: compile
 	scala -cp ${RUNPATH} ${DRIVER}
 
-# TODO: move to separate repo
-phutball: compile
-	scala -cp ${RUNPATH} com.blevinstein.phutball.Driver
-
 shell:
 	scala -cp ${RUNPATH}
 
