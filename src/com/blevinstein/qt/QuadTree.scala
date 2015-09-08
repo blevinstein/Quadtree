@@ -2,9 +2,6 @@ package com.blevinstein.qt
 
 import com.blevinstein.qt.Quadrant._
 
-// [ a b ]
-// [ c d ]
-
 abstract class QuadTree {
   def get(p: Point): Material = {
     require(p.x >= 0 && p.x <= 1)
@@ -27,10 +24,10 @@ abstract class QuadTree {
     }
   }
 }
-class QuadBranch(val a: QuadTree,
-    val b: QuadTree,
-    val c: QuadTree,
-    val d: QuadTree) extends QuadTree {
+class QuadBranch(a: QuadTree,
+    b: QuadTree,
+    c: QuadTree,
+    d: QuadTree) extends QuadTree {
   def getSubtree(quadrant : Quadrant): QuadTree = quadrant match {
     case TopLeft => a
     case TopRight => b
