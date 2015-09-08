@@ -57,10 +57,11 @@ object Driver extends App {
   frame.setVisible(true)
 
   // setup game
-  val root = new QuadBranch(new QuadLeaf(Material.FULL),
-    new QuadLeaf(Material.EMPTY),
-    new QuadLeaf(Material.EMPTY),
-    new QuadLeaf(Material.FULL))
+  val root = QuadTree.approx(3, (p) =>
+      if ((p - new Point(0.5f, 0.5f)).mag < 0.5f)
+        Material.Full
+      else
+        Material.Empty)
 
   run
 
@@ -114,7 +115,7 @@ object Driver extends App {
     // draw quadtree
     setColor(Color.BLACK)
     root.iter((r, m) => {
-      if (m == Material.FULL) {
+      if (m == Material.Full) {
         drawRect(r)
       }
     })

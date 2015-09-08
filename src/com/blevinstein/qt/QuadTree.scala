@@ -35,6 +35,18 @@ abstract class QuadTree {
       case leaf: QuadLeaf => cb(rect, leaf.material)
     }
   }
+
+  override def toString = {
+    this match {
+      case branch: QuadBranch => new StringBuilder("[[")
+          .append(branch.getSubtree(TopLeft)).append(",")
+          .append(branch.getSubtree(TopRight)).append("][")
+          .append(branch.getSubtree(BottomLeft)).append(",")
+          .append(branch.getSubtree(BottomRight)).append("]]")
+          .toString
+      case leaf: QuadLeaf => leaf.material.toString
+    }
+  }
 }
 class QuadBranch(a: QuadTree,
     b: QuadTree,
