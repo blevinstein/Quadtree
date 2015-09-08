@@ -21,6 +21,7 @@ object QuadTree {
         approx(depth - 1, f compose QuadTree.zoomFunc(TopRight)),
         approx(depth - 1, f compose QuadTree.zoomFunc(BottomLeft)),
         approx(depth - 1, f compose QuadTree.zoomFunc(BottomRight)))
+        .tryMerge
     }
   }
 }
@@ -68,6 +69,25 @@ class QuadBranch(a: QuadTree,
     case BottomLeft => c
     case BottomRight => d
   }
+  def tryMerge: QuadTree = {
+    a match {
+      case leaf: QuadLeaf => if (a == b && a == c && a == d) {
+        new QuadLeaf(leaf.material)
+      } else {
+        this // no merge
+      }
+      case _ => this // no merge
+    }
+  }
 }
-class QuadLeaf(val material: Material) extends QuadTree
+class QuadLeaf(val material: Material) extends QuadTree {
+  override def hashCode: Int = material.hashCode
+
+  override def equals(o: Any): Boolean = {
+    o match {
+      case other: QuadLeaf => material == other.material
+      case _ => false
+    }
+  }
+}
 
