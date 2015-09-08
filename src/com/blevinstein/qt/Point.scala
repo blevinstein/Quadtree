@@ -5,14 +5,6 @@ import com.blevinstein.qt.Quadrant._
 
 object Point {
   val zero = new Point(0, 0)
-  def zoomFunc(quad : Quadrant): (Point => Point) = {
-    quad match {
-      case TopLeft => (p) => p / 2
-      case TopRight => (p) => p / 2 + new Point(0.5f, 0)
-      case BottomLeft => (p) => p / 2 + new Point(0, 0.5f)
-      case BottomRight => (p) => p / 2 + new Point(0.5f, 0.5f)
-    }
-  }
 }
 // scalastyle:off
 class Point(val x: Float, val y: Float) {

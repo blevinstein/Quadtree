@@ -4,15 +4,23 @@ package com.blevinstein.qt
 import com.blevinstein.qt.Quadrant._
 
 object QuadTree {
+  def zoomFunc(quad : Quadrant): (Point => Point) = {
+    quad match {
+      case TopLeft => (p) => p / 2
+      case TopRight => (p) => p / 2 + new Point(0.5f, 0)
+      case BottomLeft => (p) => p / 2 + new Point(0, 0.5f)
+      case BottomRight => (p) => p / 2 + new Point(0.5f, 0.5f)
+    }
+  }
   // TODO: implement merging of redundant QuadBranches
   def approx(depth: Int, f: Point => Material): QuadTree = {
     if (depth <= 0) {
       new QuadLeaf(f(new Point(0.5f, 0.5f)))
     } else {
-      new QuadBranch(approx(depth - 1, f compose Point.zoomFunc(TopLeft)),
-        approx(depth - 1, f compose Point.zoomFunc(TopRight)),
-        approx(depth - 1, f compose Point.zoomFunc(BottomLeft)),
-        approx(depth - 1, f compose Point.zoomFunc(BottomRight)))
+      new QuadBranch(approx(depth - 1, f compose QuadTree.zoomFunc(TopLeft)),
+        approx(depth - 1, f compose QuadTree.zoomFunc(TopRight)),
+        approx(depth - 1, f compose QuadTree.zoomFunc(BottomLeft)),
+        approx(depth - 1, f compose QuadTree.zoomFunc(BottomRight)))
     }
   }
 }
