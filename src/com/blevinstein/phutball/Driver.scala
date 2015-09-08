@@ -37,7 +37,7 @@ object Driver extends App {
   var boardHeight : Int = 1
   var boardWidth : Int = 1
 
-  var cursor : Position = Board.center
+  var cursor : Position = Position.center
   var cursorMove : Option[Move] = None
   var jumpMode : Boolean = false
 

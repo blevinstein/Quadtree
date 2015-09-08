@@ -3,6 +3,7 @@ space := $(empty) $(empty)
 
 JARS = $(subst $(space),:,$(wildcard lib/*.jar))
 BUILDPATH = src:test:${JARS}
+TESTPATH = src:test:build:${JARS}
 RUNPATH = build:${JARS}
 
 SCALAC_FLAGS =
@@ -15,8 +16,8 @@ SCALA_SRCS = \
 		$(wildcard test/*/*/*/*.scala) \
 		$(wildcard test/*/*/*/*/*.scala)
 
-TEST_SRCS = $(wildcard test/*/*/*/*Test.scala) \
-						$(wildcard test/*/*/*/*/*Test.scala)
+TEST_SRCS = $(wildcard test/*/*/*/*Spec.scala) \
+						$(wildcard test/*/*/*/*/*Spec.scala)
 TESTS = $(subst /,.,$(subst test/,,$(subst .scala,,${TEST_SRCS})))
 
 default: compile
@@ -38,7 +39,7 @@ style:
 	scalastyle -c scalastyle-config.xml src
 
 tests: compile
-	# TODO: add scala test support
+	scala -cp ${TESTPATH} org.scalatest.run ${TESTS}
 
 clean:
 	rm -rf build/*

@@ -1,9 +1,13 @@
 package com.blevinstein.phutball
 
+object Position {
+  val center = new Position(7, 9)
+}
 class Position(val x: Int, val y: Int) {
-  val cols = List("A", "B", "C", "D", "E", "F", "G", "H", "J", "K", "L", "M", "N", "O", "P")
-  val rows = List("1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14",
-      "15", "16", "17", "18", "19")
+  val cols = List("A", "B", "C", "D", "E", "F", "G", "H", "J", "K", "L", "M",
+      "N", "O", "P")
+  val rows = List("1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11",
+      "12", "13", "14", "15", "16", "17", "18", "19")
 
   def valid = x >= 0 && x < Board.width && y >= 0 && y < Board.height
 
@@ -29,7 +33,6 @@ case class Ball() extends Square
 object Board {
   val height = 19
   val width = 15
-  val center = new Position(7, 9)
 
   val allPositions =
     for (i <- 0 until width; j <- 0 until height)
@@ -41,7 +44,7 @@ object Board {
         yield (di, dj)
 
   val newBoard = new Board(Array.tabulate[Square](width, height) {
-    (i, j) => if (new Position(i, j) == center) {
+    (i, j) => if (new Position(i, j) == Position.center) {
       Ball()
     } else {
       Empty()
@@ -125,7 +128,6 @@ class Board(state: Array[Array[Square]]) {
   def after(move: Move): Board = {
     move match {
       case Add(pos) => update(Map(pos -> Man()))
-      // TODO: remove men who are jumped over
       case Jump(positions) => {
         var updateMap = Map[Position, Square]()
         updateMap += ((ballPosition, Empty()))
@@ -147,8 +149,12 @@ class Board(state: Array[Array[Square]]) {
     new Position(position.x + direction._1, position.y + direction._2)
 
   // 2D Array Manipulation
-  def copy2d(source : Array[Array[Square]]): Array[Array[Square]] = source.map(_.clone).toArray
-  def update2d(source : Array[Array[Square]], x : Int, y : Int, value : Square): Array[Array[Square]] =
+  def copy2d(source : Array[Array[Square]]): Array[Array[Square]] =
+      source.map(_.clone).toArray
+  def update2d(source : Array[Array[Square]],
+      x : Int,
+      y : Int,
+      value : Square): Array[Array[Square]] =
     (for (i <- 0 until Board.width) yield
       if (i == x) {
         (for (j <- 0 until Board.height) yield
