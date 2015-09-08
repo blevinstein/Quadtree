@@ -57,7 +57,7 @@ object Driver extends App {
   frame.setVisible(true)
 
   // setup game
-  val root = QuadTree.approx(3, (p) =>
+  val root = QuadTree.approx(4, (p) =>
       if ((p - new Point(0.5f, 0.5f)).mag < 0.5f) {
         Material.Full
       } else {
