@@ -12,7 +12,6 @@ object QuadTree {
       case BottomRight => (p) => p / 2 + new Point(0.5f, 0.5f)
     }
   }
-  // TODO: implement merging of redundant QuadBranches
   def approx(depth: Int, f: Point => Material): QuadTree = {
     if (depth <= 0) {
       new QuadLeaf(f(new Point(0.5f, 0.5f)))
