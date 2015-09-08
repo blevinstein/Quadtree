@@ -11,6 +11,7 @@ import com.jogamp.opengl.GLAutoDrawable
 import com.jogamp.opengl.GLCapabilities
 import com.jogamp.opengl.GLEventListener
 import com.jogamp.opengl.GL2GL3.GL_FILL
+import com.jogamp.opengl.GL2GL3.GL_LINE
 import com.jogamp.opengl.GLProfile
 import com.jogamp.opengl.awt.GLCanvas
 import com.jogamp.opengl.fixedfunc.GLMatrixFunc.GL_MODELVIEW
@@ -81,17 +82,20 @@ object Driver extends App {
 
   def render(gl : GL2) : Unit = {
     // drawing subroutines
-    def setColor(c : Color) {
+    def setColor(c : Color) = {
       gl.glColor4d(c.getRed() / 255.0,
         c.getGreen() / 255.0,
         c.getBlue() / 255.0,
         c.getAlpha() / 255.0)
     }
+    def setFill(fill : Boolean) = {
+      gl.glPolygonMode(GL_FRONT_AND_BACK, if (fill) GL_FILL else GL_LINE)
+    }
 
     gl.glClear(GL_COLOR_BUFFER_BIT)
-    gl.glPolygonMode(GL_FRONT_AND_BACK, GL_FILL)
 
     // draw background
+    setFill(true)
     setColor(Color.DARK_GRAY)
     gl.glRectf(0, 0, width, height)
 
