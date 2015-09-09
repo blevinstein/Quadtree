@@ -1,21 +1,14 @@
 package com.blevinstein.qt
 
-object Quadrant extends Enumeration {
-  type Quadrant = Value
-  val TopLeft, TopRight, BottomLeft, BottomRight = Value
-  def of(p: Point): Quadrant = {
-    if (p.x < 0.5) {
-      if (p.y < 0.5) {
-        BottomLeft
-      } else {
-        TopLeft
-      }
-    } else {
-      if (p.y < 0.5) {
-        BottomRight
-      } else {
-        TopRight
-      }
-    }
-  }
+object Quadrant {
+  val BottomLeft = new Quadrant(false, false)
+  val BottomRight = new Quadrant(true, false)
+  val TopLeft = new Quadrant(false, true)
+  val TopRight = new Quadrant(true, true)
+
+  val values = List(BottomLeft, BottomRight, TopLeft, TopRight)
+
+  def of(p: Point) = new Quadrant(p.x >= 0.5, p.y >= 0.5)
 }
+class Quadrant(val x: Boolean, val y: Boolean)
+

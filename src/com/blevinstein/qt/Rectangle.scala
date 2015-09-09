@@ -1,8 +1,5 @@
 package com.blevinstein.qt
 
-// scalastyle:off underscore.import
-import com.blevinstein.qt.Quadrant._
-
 object Rectangle {
   val unit = new Rectangle(Point.zero, new Point(1, 1))
 }
@@ -19,11 +16,11 @@ class Rectangle(val min: Point, val max: Point) {
   }
 
   def getQuadrant(quadrant : Quadrant): Rectangle = quadrant match {
-    case TopLeft => new Rectangle(min, center)
-    case TopRight =>
+    case Quadrant.TopLeft => new Rectangle(min, center)
+    case Quadrant.TopRight =>
         new Rectangle(new Point(center.x, min.y), new Point(max.x, center.y))
-    case BottomLeft =>
+    case Quadrant.BottomLeft =>
         new Rectangle(new Point(min.x, center.y), new Point(center.x, max.y))
-    case BottomRight => new Rectangle(center, max)
+    case Quadrant.BottomRight => new Rectangle(center, max)
   }
 }
