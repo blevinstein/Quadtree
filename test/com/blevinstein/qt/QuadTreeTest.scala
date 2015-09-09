@@ -37,13 +37,30 @@ class QuadTreeTest extends FunSuite with Matchers {
         new QuadLeaf(Material.Full))
 
     (QuadTree.approx(1, (p) =>
-        if(p.x + p.y > 0.75f) Material.Full else Material.Empty)
+        if(p.x + p.y >= 1) Material.Full else Material.Empty)
       shouldEqual
         new QuadBranch(
           new QuadLeaf(Material.Full),
           new QuadLeaf(Material.Full),
           new QuadLeaf(Material.Empty),
           new QuadLeaf(Material.Full)))
+
+    (QuadTree.approx(2, (p) =>
+        if(p.x + p.y >= 1) Material.Full else Material.Empty)
+      shouldEqual
+        new QuadBranch(
+          new QuadBranch(
+            new QuadLeaf(Material.Full),
+            new QuadLeaf(Material.Full),
+            new QuadLeaf(Material.Empty),
+            new QuadLeaf(Material.Full)),
+          new QuadLeaf(Material.Full),
+          new QuadLeaf(Material.Empty),
+          new QuadBranch(
+            new QuadLeaf(Material.Full),
+            new QuadLeaf(Material.Full),
+            new QuadLeaf(Material.Empty),
+            new QuadLeaf(Material.Full))))
 
     // tests merging
     (QuadTree.approx(3, (p) =>
