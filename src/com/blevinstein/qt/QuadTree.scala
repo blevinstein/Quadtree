@@ -6,9 +6,12 @@ object QuadTree {
   // TODO: if necessary, refactor into a real class (and separate file)
   type QuadAddr = List[Quadrant]
 
+  // returns a mapping from the unit Rectangle to the given quadrant
   def zoomFunc(quad : Quadrant): (Point => Point) =
     (p) => (p + new Point(if (quad.x) 1 else 0, if (quad.y) 1 else 0)) / 2
 
+  // returns an approximation of the f over the unit Rectangle up to a maximum
+  // depth
   def approx(depth: Int, f: Point => Material): QuadTree = {
     if (depth <= 0) {
       new QuadLeaf(f(new Point(0.5f, 0.5f)))
@@ -24,6 +27,7 @@ object QuadTree {
 
   type Operator = (Material, Material) => Material
 
+  // Used for constructing operators on QuadTrees
   def apply(op: Operator)(q1: QuadTree, q2: QuadTree): QuadTree = {
     def applyBranchLeaf(branch: QuadBranch, leaf: QuadLeaf): QuadTree = {
       new QuadBranch(
@@ -91,6 +95,7 @@ abstract class QuadTree {
     }
   }
 
+  // TODO: refactor recursive function inside iter
   def iter(cb: (Rectangle, Material) => Unit): Unit = {
     iter(cb, Rectangle.unit)
   }
