@@ -1,5 +1,7 @@
 package com.blevinstein.qt
 
+import com.blevinstein.qt.Quadrant.{TopLeft,TopRight,BottomLeft,BottomRight}
+
 object QuadTree {
   def zoomFunc(quad : Quadrant): (Point => Point) =
     (p) => (p + new Point(if (quad.x) 1 else 0, if (quad.y) 1 else 0)) / 2
@@ -8,10 +10,10 @@ object QuadTree {
       new QuadLeaf(f(new Point(0.5f, 0.5f)))
     } else {
       new QuadBranch(
-        approx(depth - 1, f compose QuadTree.zoomFunc(Quadrant.TopLeft)),
-        approx(depth - 1, f compose QuadTree.zoomFunc(Quadrant.TopRight)),
-        approx(depth - 1, f compose QuadTree.zoomFunc(Quadrant.BottomLeft)),
-        approx(depth - 1, f compose QuadTree.zoomFunc(Quadrant.BottomRight)))
+        approx(depth - 1, f compose QuadTree.zoomFunc(TopLeft)),
+        approx(depth - 1, f compose QuadTree.zoomFunc(TopRight)),
+        approx(depth - 1, f compose QuadTree.zoomFunc(BottomLeft)),
+        approx(depth - 1, f compose QuadTree.zoomFunc(BottomRight)))
         .tryMerge
     }
   }
@@ -42,10 +44,10 @@ abstract class QuadTree {
   override def toString: String = {
     this match {
       case branch: QuadBranch => new StringBuilder("[[")
-          .append(branch.getSubtree(Quadrant.TopLeft)).append(",")
-          .append(branch.getSubtree(Quadrant.TopRight)).append("][")
-          .append(branch.getSubtree(Quadrant.BottomLeft)).append(",")
-          .append(branch.getSubtree(Quadrant.BottomRight)).append("]]")
+          .append(branch.getSubtree(TopLeft)).append(",")
+          .append(branch.getSubtree(TopRight)).append("][")
+          .append(branch.getSubtree(BottomLeft)).append(",")
+          .append(branch.getSubtree(BottomRight)).append("]]")
           .toString
       case leaf: QuadLeaf => leaf.material.toString
     }
@@ -57,10 +59,10 @@ class QuadBranch(a: QuadTree,
     c: QuadTree,
     d: QuadTree) extends QuadTree {
   def getSubtree(quadrant : Quadrant): QuadTree = quadrant match {
-    case Quadrant.TopLeft => a
-    case Quadrant.TopRight => b
-    case Quadrant.BottomLeft => c
-    case Quadrant.BottomRight => d
+    case TopLeft => a
+    case TopRight => b
+    case BottomLeft => c
+    case BottomRight => d
   }
   def tryMerge: QuadTree = {
     a match {
