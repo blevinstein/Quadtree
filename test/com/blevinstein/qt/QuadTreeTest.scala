@@ -72,4 +72,40 @@ class QuadTreeTest extends FunSuite with Matchers {
           new QuadLeaf(Material.Empty),
           new QuadLeaf(Material.Full)))
   }
+
+  test("QuadTree.apply") {
+    val andFunc = QuadTree.apply((m1, m2) =>
+        if (m1 == Material.Full && m2 == Material.Full)
+          Material.Full
+        else Material.Empty) _
+    val orFunc = QuadTree.apply((m1, m2) =>
+        if (m1 == Material.Full || m2 == Material.Full)
+          Material.Full
+        else Material.Empty) _
+
+    val q1 = new QuadBranch(
+      new QuadLeaf(Material.Empty),
+      new QuadLeaf(Material.Full),
+      new QuadLeaf(Material.Empty),
+      new QuadLeaf(Material.Full))
+    val q2 = new QuadBranch(
+      new QuadLeaf(Material.Empty),
+      new QuadLeaf(Material.Empty),
+      new QuadLeaf(Material.Full),
+      new QuadLeaf(Material.Full))
+
+    andFunc(q1, q2) shouldEqual
+      new QuadBranch(
+        new QuadLeaf(Material.Empty),
+        new QuadLeaf(Material.Empty),
+        new QuadLeaf(Material.Empty),
+        new QuadLeaf(Material.Full))
+
+    orFunc(q1, q2) shouldEqual
+      new QuadBranch(
+        new QuadLeaf(Material.Empty),
+        new QuadLeaf(Material.Full),
+        new QuadLeaf(Material.Full),
+        new QuadLeaf(Material.Full))
+  }
 }

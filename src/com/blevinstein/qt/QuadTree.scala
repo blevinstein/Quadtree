@@ -22,6 +22,32 @@ object QuadTree {
     }
   }
 
+  type Operator = (Material, Material) => Material
+
+  def apply(op: Operator)(q1: QuadTree, q2: QuadTree): QuadTree = {
+    def applyBranchLeaf(branch: QuadBranch, leaf: QuadLeaf): QuadTree = {
+      new QuadBranch(
+        apply(op)(branch.a, leaf),
+        apply(op)(branch.b, leaf),
+        apply(op)(branch.c, leaf),
+        apply(op)(branch.d, leaf))
+        .tryMerge
+    }
+    (q1, q2) match {
+      case (b1: QuadBranch, b2: QuadBranch) =>
+        new QuadBranch(
+          apply(op)(b1.a, b2.a),
+          apply(op)(b1.b, b2.b),
+          apply(op)(b1.c, b2.c),
+          apply(op)(b1.d, b2.d))
+          .tryMerge
+      case (branch: QuadBranch, leaf: QuadLeaf) => applyBranchLeaf(branch, leaf)
+      case (leaf: QuadLeaf, branch: QuadBranch) => applyBranchLeaf(branch, leaf)
+      case (l1: QuadLeaf, l2: QuadLeaf) =>
+        new QuadLeaf(op(l1.material, l2.material))
+    }
+  }
+
   class Builder(background: Material = Material.Empty) {
     var pieces: List[(QuadAddr, Material)] = List()
 
