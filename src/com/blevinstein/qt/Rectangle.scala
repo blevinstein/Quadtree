@@ -3,7 +3,7 @@ package com.blevinstein.qt
 object Rectangle {
   val unit = new Rectangle(Point.zero, new Point(1, 1))
 }
-// scalastyle:off
+// scalastyle:off method.name
 class Rectangle(val min: Point, val max: Point) {
   def *(k: Float): Rectangle = new Rectangle(min * k, max * k)
   def +(p: Point): Rectangle = new Rectangle(min + p, max + p)
