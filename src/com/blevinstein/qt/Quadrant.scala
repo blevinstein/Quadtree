@@ -8,7 +8,7 @@ object Quadrant {
 
   val values = List(BottomLeft, BottomRight, TopLeft, TopRight)
 
-  def of(p: Point) = new Quadrant(p.x >= 0.5, p.y >= 0.5)
+  def of(p: Point): Quadrant = new Quadrant(p.x >= 0.5, p.y >= 0.5)
 }
 class Quadrant(val x: Boolean, val y: Boolean)
 

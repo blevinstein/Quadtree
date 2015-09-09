@@ -16,8 +16,8 @@ SCALA_SRCS = \
 		$(wildcard test/*/*/*/*.scala) \
 		$(wildcard test/*/*/*/*/*.scala)
 
-TEST_SRCS = $(wildcard test/*/*/*/*Spec.scala) \
-						$(wildcard test/*/*/*/*/*Spec.scala)
+TEST_SRCS = $(wildcard test/*/*/*/*Test.scala) \
+						$(wildcard test/*/*/*/*/*Test.scala)
 TESTS = $(subst /,.,$(subst test/,,$(subst .scala,,${TEST_SRCS})))
 
 default: compile style tests
