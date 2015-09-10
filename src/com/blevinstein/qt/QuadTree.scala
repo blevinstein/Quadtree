@@ -85,26 +85,39 @@ object QuadTree {
 }
 
 abstract class QuadTree {
-  def get(p: Point): Material = {
+  // TODO: DRY
+  type QuadAddr = List[Quadrant]
+
+  def getMaterial(p: Point): Material = {
     require(p.x >= 0 && p.x <= 1)
     require(p.y >= 0 && p.y <= 1)
     this match {
       case branch: QuadBranch =>
-        branch.getSubtree(Quadrant.of(p)).get((p * 2) % 1)
+        branch.getSubtree(Quadrant.of(p)).getMaterial((p * 2) % 1)
       case leaf: QuadLeaf => leaf.material
     }
   }
 
-  // TODO: refactor recursive function inside iter
-  def iter(cb: (Rectangle, Material) => Unit): Unit = {
-    iter(cb, Rectangle.unit)
+  // TODO: add getRectangle(QuadAddr) or equivalent?
+  def getMaterial(addr: QuadAddr): Material = this match {
+    case branch: QuadBranch =>
+      branch.getSubtree(addr.head).getMaterial(addr.tail)
+    case leaf: QuadLeaf => leaf.material
   }
-  def iter(cb: (Rectangle, Material) => Unit, rect: Rectangle): Unit = {
-    this match {
-      case branch: QuadBranch => Quadrant.values.foreach((quadrant) =>
-          branch.getSubtree(quadrant).iter(cb, rect.getQuadrant(quadrant)))
-      case leaf: QuadLeaf => cb(rect, leaf.material)
+
+  // TODO: refactor recursive function inside iter
+  type IterCallback = (Rectangle, Material) => Unit
+  def iter(cb: IterCallback): Unit = {
+    def iter_recur(cb: IterCallback, qt: QuadTree, rect: Rectangle): Unit = {
+      qt match {
+        case branch: QuadBranch => Quadrant.values.foreach((quadrant) =>
+            iter_recur(cb,
+              branch.getSubtree(quadrant),
+              rect.getQuadrant(quadrant)))
+          case leaf: QuadLeaf => cb(rect, leaf.material)
+      }
     }
+    iter_recur(cb, this, Rectangle.unit)
   }
 
   override def toString: String = {
