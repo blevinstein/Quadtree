@@ -8,7 +8,7 @@ class QuadTreeTest extends FunSuite with Matchers {
   test("QuadTree.Builder") {
     (new QuadTree.Builder().build shouldEqual new QuadLeaf(Material.Empty))
 
-    (new QuadTree.Builder().add(List(TopLeft), Material.Full).build
+    (new QuadTree.Builder().add(new QuadAddr(TopLeft), Material.Full).build
       shouldEqual
         new QuadBranch(new QuadLeaf(Material.Full),
           new QuadLeaf(Material.Empty),
@@ -16,8 +16,8 @@ class QuadTreeTest extends FunSuite with Matchers {
           new QuadLeaf(Material.Empty)))
 
     (new QuadTree.Builder()
-        .add(List(TopLeft), Material.Full)
-        .add(List(TopRight, TopLeft), Material.Full)
+        .add(new QuadAddr(TopLeft), Material.Full)
+        .add(new QuadAddr(TopRight, TopLeft), Material.Full)
         .build
       shouldEqual
         new QuadBranch(
@@ -127,9 +127,9 @@ class QuadTreeTest extends FunSuite with Matchers {
     q1.getMaterial(new Point(0.9f, 0.1f)) shouldEqual Material.Full
 
     // getMaterial by address
-    q1.getMaterial(List(BottomLeft)) shouldEqual Material.Empty
-    q1.getMaterial(List(BottomRight)) shouldEqual Material.Full
-    q1.getMaterial(List(BottomRight, BottomLeft)) shouldEqual Material.Full
+    q1.getMaterial(new QuadAddr(BottomLeft)) shouldEqual Material.Empty
+    q1.getMaterial(new QuadAddr(BottomRight)) shouldEqual Material.Full
+    q1.getMaterial(new QuadAddr(BottomRight, BottomLeft)) shouldEqual Material.Full
   }
 }
 

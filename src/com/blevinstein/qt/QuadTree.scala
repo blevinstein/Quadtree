@@ -3,9 +3,6 @@ package com.blevinstein.qt
 import com.blevinstein.qt.Quadrant.{TopLeft,TopRight,BottomLeft,BottomRight}
 
 object QuadTree {
-  // TODO: if necessary, refactor into a real class (and separate file)
-  type QuadAddr = List[Quadrant]
-
   // returns a mapping from the unit Rectangle to the given quadrant
   def zoomFunc(quad : Quadrant): (Point => Point) =
     (p) => (p + new Point(if (quad.x) 1 else 0, if (quad.y) 1 else 0)) / 2
@@ -62,32 +59,29 @@ object QuadTree {
 
     def build: QuadTree = {
       // scalastyle:off method.name
-      def build_recur(prefix: QuadAddr): QuadTree = {
-        val exactPieces = pieces.filter(_._1 /* addr */ == prefix)
+      def build_recur(addr: QuadAddr): QuadTree = {
+        val exactPieces = pieces.filter(_._1 == addr)
         if (!exactPieces.isEmpty) {
           new QuadLeaf(exactPieces.head._2 /* mat */)
         } else {
-          val smallerPieces = pieces.filter(_._1 /* addr */ startsWith prefix)
+          val smallerPieces = pieces.filter(_._1 isInside addr)
           if (!smallerPieces.isEmpty) {
-            new QuadBranch(build_recur(prefix :+ Quadrant.TopLeft),
-              build_recur(prefix :+ Quadrant.TopRight),
-              build_recur(prefix :+ Quadrant.BottomLeft),
-              build_recur(prefix :+ Quadrant.BottomRight))
+            new QuadBranch(build_recur(addr + Quadrant.TopLeft),
+              build_recur(addr + Quadrant.TopRight),
+              build_recur(addr + Quadrant.BottomLeft),
+              build_recur(addr + Quadrant.BottomRight))
               .tryMerge
           } else {
             new QuadLeaf(background)
           }
         }
       }
-      build_recur(List())
+      build_recur(new QuadAddr())
     }
   }
 }
 
 abstract class QuadTree {
-  // TODO: DRY
-  type QuadAddr = List[Quadrant]
-
   def getMaterial(p: Point): Material = {
     require(p.x >= 0 && p.x <= 1)
     require(p.y >= 0 && p.y <= 1)

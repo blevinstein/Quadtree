@@ -1,0 +1,26 @@
+package com.blevinstein.qt
+
+class QuadAddr(val quads: List[Quadrant]) {
+  def this(someQuads: Quadrant*) = this(someQuads.toList)
+
+  // delegate to quads
+  def apply(idx: Int): Quadrant = quads.apply(idx)
+  def iterator: Iterator[Quadrant] = quads.iterator
+  def length: Int = quads.length
+  def head: Quadrant = quads.head
+  def tail: QuadAddr = new QuadAddr(quads.tail)
+
+  // (A inside B) iff (B isPrefixOf A)
+  def isInside(other: QuadAddr): Boolean = quads startsWith other.quads
+
+  // scalastyle:off method.name spaces.after.plus
+  def +(other: QuadAddr): QuadAddr = new QuadAddr(quads ++ other.quads)
+  def +(quad: Quadrant): QuadAddr = new QuadAddr(quads :+ quad)
+
+  override def hashCode: Int = quads.hashCode
+  override def equals(o: Any): Boolean = o match {
+    case other: QuadAddr => quads == other.quads
+    case _ => false
+  }
+}
+
