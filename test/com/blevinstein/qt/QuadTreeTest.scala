@@ -114,4 +114,22 @@ class QuadTreeTest extends FunSuite with Matchers {
     orFunc(q1, q3) shouldEqual q1
     orFunc(q1, q4) shouldEqual q4
   }
+
+  test ("QuadTree#getMaterial") {
+    val q1 = new QuadBranch(
+      new QuadLeaf(Material.Empty),
+      new QuadLeaf(Material.Full),
+      new QuadLeaf(Material.Empty),
+      new QuadLeaf(Material.Full))
+
+    // getMaterial by Point
+    q1.getMaterial(new Point(0.1f, 0.1f)) shouldEqual Material.Empty
+    q1.getMaterial(new Point(0.9f, 0.1f)) shouldEqual Material.Full
+
+    // getMaterial by address
+    q1.getMaterial(List(BottomLeft)) shouldEqual Material.Empty
+    q1.getMaterial(List(BottomRight)) shouldEqual Material.Full
+    q1.getMaterial(List(BottomRight, BottomLeft)) shouldEqual Material.Full
+  }
 }
+
