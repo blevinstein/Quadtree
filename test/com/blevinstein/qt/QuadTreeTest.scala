@@ -93,6 +93,8 @@ class QuadTreeTest extends FunSuite with Matchers {
       new QuadLeaf(Material.Empty),
       new QuadLeaf(Material.Full),
       new QuadLeaf(Material.Full))
+    val q3 = new QuadLeaf(Material.Empty)
+    val q4 = new QuadLeaf(Material.Full)
 
     andFunc(q1, q2) shouldEqual
       new QuadBranch(
@@ -100,6 +102,8 @@ class QuadTreeTest extends FunSuite with Matchers {
         new QuadLeaf(Material.Empty),
         new QuadLeaf(Material.Empty),
         new QuadLeaf(Material.Full))
+    andFunc(q1, q4) shouldEqual q1
+    andFunc(q1, q3) shouldEqual q3
 
     orFunc(q1, q2) shouldEqual
       new QuadBranch(
@@ -107,5 +111,7 @@ class QuadTreeTest extends FunSuite with Matchers {
         new QuadLeaf(Material.Full),
         new QuadLeaf(Material.Full),
         new QuadLeaf(Material.Full))
+    orFunc(q1, q3) shouldEqual q1
+    orFunc(q1, q4) shouldEqual q4
   }
 }
