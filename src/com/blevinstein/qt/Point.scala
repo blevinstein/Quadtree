@@ -12,10 +12,5 @@ class Point(val x: Float, val y: Float) {
   def %(k: Float): Point = new Point(x % k, y % k)
   def mag: Float = math.sqrt(x * x + y * y).toFloat
 
-  override def toString: String = new StringBuilder("(")
-      .append(x)
-      .append(",")
-      .append(y)
-      .append(")")
-      .toString
+  override def toString: String = s"($x, $y)"
 }

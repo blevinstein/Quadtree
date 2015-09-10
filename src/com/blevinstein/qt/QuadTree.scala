@@ -122,13 +122,9 @@ abstract class QuadTree {
 
   override def toString: String = {
     this match {
-      case branch: QuadBranch => new StringBuilder("[[")
-          .append(branch.getSubtree(TopLeft)).append(",")
-          .append(branch.getSubtree(TopRight)).append("][")
-          .append(branch.getSubtree(BottomLeft)).append(",")
-          .append(branch.getSubtree(BottomRight)).append("]]")
-          .toString
-      case leaf: QuadLeaf => leaf.material.toString
+      case branch: QuadBranch =>
+        s"[[${branch.a},${branch.b}][${branch.c},${branch.d}]]"
+      case leaf: QuadLeaf => s"${leaf.material}"
     }
   }
 }
