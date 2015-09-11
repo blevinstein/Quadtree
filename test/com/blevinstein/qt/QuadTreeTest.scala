@@ -115,7 +115,7 @@ class QuadTreeTest extends FunSuite with Matchers {
     orFunc(q1, q4) shouldEqual q4
   }
 
-  test ("QuadTree#getMaterial") {
+  test("QuadTree#getMaterial") {
     val q1 = new QuadBranch(
       new QuadLeaf(Material.Empty),
       new QuadLeaf(Material.Full),
@@ -130,6 +130,23 @@ class QuadTreeTest extends FunSuite with Matchers {
     q1.getMaterial(new QuadAddr(BottomLeft)) shouldEqual Material.Empty
     q1.getMaterial(new QuadAddr(BottomRight)) shouldEqual Material.Full
     q1.getMaterial(new QuadAddr(BottomRight, BottomLeft)) shouldEqual Material.Full
+  }
+
+  test("QuadOffset#simplify") {
+    // explicit simplify
+    new QuadOffset(4, 8, 6).simplify shouldEqual new QuadOffset(3, 4, 3)
+
+    // equals should understand simplification
+    assert(new QuadOffset(4, 8, 6) isEqualTo new QuadOffset(3, 4, 3))
+    assert(new QuadOffset(3, 4, 3) isEqualTo new QuadOffset(4, 8, 6))
+  }
+
+  test("QuadAddr <=> QuadOffset") {
+    (new QuadAddr(TopRight, BottomRight).toOffset
+      shouldEqual new QuadOffset(2, 3, 2))
+
+    (new QuadOffset(2, 3, 2).toAddress(2)
+      shouldEqual new QuadAddr(TopRight, BottomRight))
   }
 }
 

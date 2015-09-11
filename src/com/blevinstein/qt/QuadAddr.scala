@@ -2,6 +2,19 @@ package com.blevinstein.qt
 
 class QuadAddr(val quads: List[Quadrant]) {
   def this(someQuads: Quadrant*) = this(someQuads.toList)
+  // copy constructor
+  def this(addr: QuadAddr) = this(addr.quads)
+
+  def toOffset: QuadOffset = {
+    var bottomLeft = QuadOffset.zero
+    for (i <- 0 until this.length) {
+      val quadrant = this.apply(i)
+      bottomLeft = bottomLeft + new QuadOffset(i + 1,
+        if (quadrant.x) 1 else 0,
+        if (quadrant.y) 1 else 0)
+    }
+    bottomLeft
+  }
 
   // delegate to quads
   def apply(idx: Int): Quadrant = quads.apply(idx)
