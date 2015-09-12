@@ -6,7 +6,7 @@ BUILDPATH = src:test:${JARS}
 TESTPATH = src:test:build:${JARS}
 RUNPATH = build:${JARS}
 
-SCALAC_FLAGS =
+SCALAC_FLAGS = -feature
 
 DRIVER = com.blevinstein.qt.Driver
 
