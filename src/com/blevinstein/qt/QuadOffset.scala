@@ -19,25 +19,31 @@ class QuadOffset(val depth: Int, val x: Int, val y: Int) {
   // copy constructor
   def this(offset: QuadOffset) = this(offset.depth, offset.x, offset.y)
 
-  def toAddress(depth: Int): QuadAddr = {
+  // d = depth (specificity) of the node at the address
+  def toAddress(d: Int): QuadAddr = {
     require(x < (1 << depth))
     require(y < (1 << depth))
     var currentX = x
     var currentY = y
-    var currentDepth = 1
-    var currentGridSize = 1 << (depth - 1)
     var addr = new QuadAddr()
-    while (currentX > 0 || currentY > 0) {
+    for (currentDepth <- 0 until d) {
+      // calculate grid size from depth
+      val currentGridSize = 1 << (depth - 1 - currentDepth)
+      // find which quadrant we are in, and subtract from currentX/Y
       val quadrant = new Quadrant(currentX >= currentGridSize,
         currentY >= currentGridSize)
       currentX = currentX - (if (quadrant.x) currentGridSize else 0)
       currentY = currentY - (if (quadrant.y) currentGridSize else 0)
       addr = addr + quadrant
-      // update depth and grid size
-      currentDepth = currentDepth + 1
-      currentGridSize = currentGridSize >> 1
     }
     addr
+  }
+
+  // d = depth (size) of the node to be outlined
+  def toRectangle(d: Int): Rectangle = {
+    val bottomLeft = new Point(1f * x / (1 << depth), 1f * y / (1 << depth))
+    val size = new Point(1f / (1 << d), 1f / (1 << d))
+    new Rectangle(bottomLeft, bottomLeft + size)
   }
 
   // Operators
