@@ -23,4 +23,14 @@ class Rectangle(val min: Point, val max: Point) {
         new Rectangle(new Point(min.x, center.y), new Point(center.x, max.y))
     case Quadrant.BottomRight => new Rectangle(center, max)
   }
+
+  override def hashCode: Int =
+    31 * (min.hashCode +
+      31 * max.hashCode)
+  override def equals(o: Any) = o match {
+    case other: Rectangle => min == other.min && max == other.max
+    case _ => false
+  }
+
+  override def toString: String = s"Rectangle($min, $max)"
 }

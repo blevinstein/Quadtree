@@ -35,5 +35,7 @@ class QuadAddr(val quads: List[Quadrant]) {
     case other: QuadAddr => quads == other.quads
     case _ => false
   }
+
+  override def toString: String = s"QuadAddr($quads)"
 }
 
