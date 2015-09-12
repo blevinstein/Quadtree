@@ -27,7 +27,7 @@ class Rectangle(val min: Point, val max: Point) {
   override def hashCode: Int =
     31 * (min.hashCode +
       31 * max.hashCode)
-  override def equals(o: Any) = o match {
+  override def equals(o: Any): Boolean = o match {
     case other: Rectangle => min == other.min && max == other.max
     case _ => false
   }
