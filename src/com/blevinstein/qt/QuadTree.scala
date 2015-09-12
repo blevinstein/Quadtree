@@ -13,11 +13,8 @@ object QuadTree {
     if (depth <= 0) {
       new QuadLeaf(f(new Point(0.5f, 0.5f)))
     } else {
-      new QuadBranch(
-        approx(depth - 1, f compose QuadTree.zoomFunc(TopLeft)),
-        approx(depth - 1, f compose QuadTree.zoomFunc(TopRight)),
-        approx(depth - 1, f compose QuadTree.zoomFunc(BottomLeft)),
-        approx(depth - 1, f compose QuadTree.zoomFunc(BottomRight)))
+      QuadBranch.create(
+        (quadrant) => approx(depth - 1, f compose QuadTree.zoomFunc(quadrant)))
         .tryMerge
     }
   }
@@ -27,20 +24,11 @@ object QuadTree {
   // Used for constructing operators on QuadTrees
   def apply(op: Operator)(q1: QuadTree, q2: QuadTree): QuadTree = {
     def applyBranchLeaf(branch: QuadBranch, leaf: QuadLeaf): QuadTree = {
-      new QuadBranch(
-        apply(op)(branch.a, leaf),
-        apply(op)(branch.b, leaf),
-        apply(op)(branch.c, leaf),
-        apply(op)(branch.d, leaf))
-        .tryMerge
+      branch.map((tree, quadrant) => apply(op)(tree, leaf)).tryMerge
     }
     (q1, q2) match {
       case (b1: QuadBranch, b2: QuadBranch) =>
-        new QuadBranch(
-          apply(op)(b1.a, b2.a),
-          apply(op)(b1.b, b2.b),
-          apply(op)(b1.c, b2.c),
-          apply(op)(b1.d, b2.d))
+        b1.map((tree, quadrant) => apply(op)(tree, b2.getSubtree(quadrant)))
           .tryMerge
       case (branch: QuadBranch, leaf: QuadLeaf) => applyBranchLeaf(branch, leaf)
       case (leaf: QuadLeaf, branch: QuadBranch) => applyBranchLeaf(branch, leaf)
@@ -66,11 +54,8 @@ object QuadTree {
         } else {
           val smallerPieces = pieces.filter(_._1 isInside addr)
           if (!smallerPieces.isEmpty) {
-            new QuadBranch(build_recur(addr + Quadrant.TopLeft),
-              build_recur(addr + Quadrant.TopRight),
-              build_recur(addr + Quadrant.BottomLeft),
-              build_recur(addr + Quadrant.BottomRight))
-              .tryMerge
+            QuadBranch.create((quadrant) =>
+                build_recur(addr + quadrant)).tryMerge
           } else {
             new QuadLeaf(background)
           }
@@ -121,6 +106,10 @@ abstract class QuadTree {
   }
 }
 
+object QuadBranch {
+  def create(f: Quadrant => QuadTree): QuadBranch = new QuadBranch(
+    f(TopLeft), f(TopRight), f(BottomLeft), f(BottomRight))
+}
 class QuadBranch(val a: QuadTree,
     val b: QuadTree,
     val c: QuadTree,
@@ -141,6 +130,12 @@ class QuadBranch(val a: QuadTree,
       case _ => this // no merge
     }
   }
+
+  def map(f: (QuadTree, Quadrant) => QuadTree): QuadBranch = new QuadBranch(
+      f(a, TopLeft),
+      f(b, TopRight),
+      f(c, BottomLeft),
+      f(d, BottomRight))
 
   override def hashCode: Int =
     31 * (a.hashCode +
