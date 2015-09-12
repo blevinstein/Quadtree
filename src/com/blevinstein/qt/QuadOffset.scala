@@ -70,7 +70,7 @@ class QuadOffset(val depth: Int, val x: Int, val y: Int) {
       y * (1 << (newDepth - depth)))
   }
 
-  def simplify: QuadOffset = if (x % 2 == 0 && y % 2 == 0) {
+  def simplify: QuadOffset = if (depth > 0 && x % 2 == 0 && y % 2 == 0) {
       new QuadOffset(depth - 1, x / 2, y / 2).simplify
     } else {
       this

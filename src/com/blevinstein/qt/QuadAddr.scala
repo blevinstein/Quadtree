@@ -5,6 +5,9 @@ class QuadAddr(val quads: List[Quadrant]) {
   // copy constructor
   def this(addr: QuadAddr) = this(addr.quads)
 
+  /**
+   * Returns the QuadOffset of the bottom left corner of the address.
+   */
   def toOffset: QuadOffset = {
     var bottomLeft = QuadOffset.zero
     for (i <- 0 until this.length) {

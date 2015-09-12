@@ -3,11 +3,11 @@ package com.blevinstein.qt
 import com.blevinstein.qt.Quadrant.{TopLeft,TopRight,BottomLeft,BottomRight}
 
 object QuadTree {
-  // returns a mapping from the unit Rectangle to the given quadrant
+  // returns a mapping from the unit rectangle to the given quadrant
   def zoomFunc(quad : Quadrant): (Point => Point) =
     (p) => (p + new Point(if (quad.x) 1 else 0, if (quad.y) 1 else 0)) / 2
 
-  // returns an approximation of the f over the unit Rectangle up to a maximum
+  // returns an approximation of the f over the unit rectangle up to a maximum
   // depth
   def approx(depth: Int, f: Point => Material): QuadTree = {
     if (depth <= 0) {
