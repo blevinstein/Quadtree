@@ -6,6 +6,7 @@ import scala.util.Random
 
 // TODO: add ReplacementRule.createRandom
 // TODO: add ReplacementRule.randomNode
+// TODO: add MaterialPool/MaterialPalette
 object ReplacementRule {
   // Choose random element from a list
   // TODO: refactor to util
