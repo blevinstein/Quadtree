@@ -8,7 +8,7 @@ object Decider {
   // Choose random element from a list
   def choose[T](list: List[T]): T = list.apply(Random.nextInt(list.length))
 
-  // TODO: handle negative probabilities
+  // TODO: handle negative weights
   def chooseWithWeight[T](list: List[T], weights: List[Float]): T = {
     require(list.length == weights.length)
     val totalWeight = weights.reduce(_ + _)
