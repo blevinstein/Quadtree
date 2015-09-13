@@ -1,5 +1,11 @@
 package com.blevinstein.qt
 
+import scala.language.implicitConversions
+
+object QuadAddr {
+  // delegate to quads
+  implicit def toQuadrantList(addr: QuadAddr): List[Quadrant] = addr.quads
+}
 class QuadAddr(val quads: List[Quadrant]) {
   def this(someQuads: Quadrant*) = this(someQuads.toList)
   // copy constructor
@@ -19,11 +25,7 @@ class QuadAddr(val quads: List[Quadrant]) {
     bottomLeft
   }
 
-  // delegate to quads
-  def apply(idx: Int): Quadrant = quads.apply(idx)
-  def iterator: Iterator[Quadrant] = quads.iterator
-  def length: Int = quads.length
-  def head: Quadrant = quads.head
+  // don't implicitly delegate tail, because we want a QuadAddr not List[Quadrant]
   def tail: QuadAddr = new QuadAddr(quads.tail)
 
   // (A inside B) iff (B isPrefixOf A)
