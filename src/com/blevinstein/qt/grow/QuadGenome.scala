@@ -2,6 +2,7 @@ package com.blevinstein.qt.grow
 
 import com.blevinstein.ga.Genome
 import com.blevinstein.qt.{QuadTree,QuadBranch,QuadLeaf}
+import com.blevinstein.util.Decider
 
 import scala.language.implicitConversions
 import scala.util.Random
@@ -12,10 +13,17 @@ object QuadGenome {
       genome.rules
 }
 class QuadGenome(val rules: List[ReplacementRule]) extends Genome[QuadGenome] {
+  val growProbability = 0.05f
   def mutate: QuadGenome = {
-    // choose a random rule
-    // replace with mutated version
-    this
+    if (Decider.withProb(growProbability)) {
+      new QuadGenome(rules :+ ReplacementRule.createRandom)
+    } else {
+      new QuadGenome(rules.updated(
+        // choose a random rule
+        Decider.choose(rules.indices),
+        // replace with mutated version
+        ReplacementRule.createRandom))
+    }
   }
   def crossover(other: QuadGenome): QuadGenome = {
     val crossoverIndex =
