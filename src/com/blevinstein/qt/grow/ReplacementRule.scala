@@ -1,23 +1,19 @@
 package com.blevinstein.qt.grow
 
 import com.blevinstein.qt.{QuadTree,QuadBranch,QuadLeaf}
-
-import scala.util.Random
+import com.blevinstein.util.Decider
 
 // TODO: add ReplacementRule.createRandom
 // TODO: add ReplacementRule.randomNode
 // TODO: add MaterialPool/MaterialPalette
 object ReplacementRule {
-  // Choose random element from a list
-  // TODO: refactor to util
-  def choose[T](list: List[T]): T = list.apply(Random.nextInt(list.length))
 
   def update(rules: List[ReplacementRule])(root : QuadTree): QuadTree = {
     def update_recur(qt: QuadTree): QuadTree = {
       val relevantRules = rules filter (_.before == qt)
       if (!relevantRules.isEmpty) {
         // make random replacement
-        choose(relevantRules).after
+        Decider.choose(relevantRules).after
       } else {
         qt match {
           case branch: QuadBranch => branch.map((tree, _) => update_recur(tree))
