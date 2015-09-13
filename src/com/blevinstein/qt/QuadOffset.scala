@@ -48,7 +48,6 @@ class QuadOffset(val depth: Int, val x: Int, val y: Int) {
 
   // Operators
 
-  // scalastyle:off method.name spaces.after.plus
   def +(other: QuadOffset): QuadOffset = {
     val maxDepth = math.max(depth, other.depth)
     val normed = atDepth(maxDepth)

@@ -31,7 +31,6 @@ class QuadAddr(val quads: List[Quadrant]) {
   // (A inside B) iff (B isPrefixOf A)
   def isInside(other: QuadAddr): Boolean = quads startsWith other.quads
 
-  // scalastyle:off method.name spaces.after.plus
   def +(other: QuadAddr): QuadAddr = new QuadAddr(quads ++ other.quads)
   def +(quad: Quadrant): QuadAddr = new QuadAddr(quads :+ quad)
 

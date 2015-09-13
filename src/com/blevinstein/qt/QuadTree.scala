@@ -46,7 +46,6 @@ object QuadTree {
     }
 
     def build: QuadTree = {
-      // scalastyle:off method.name
       def build_recur(addr: QuadAddr): QuadTree = {
         val exactPieces = pieces.filter(_._1 == addr)
         if (!exactPieces.isEmpty) {
