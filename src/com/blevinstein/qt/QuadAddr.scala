@@ -25,7 +25,9 @@ class QuadAddr(val quads: List[Quadrant]) {
     bottomLeft
   }
 
-  // don't implicitly delegate tail, because we want a QuadAddr not List[Quadrant]
+  def toRectangle: Rectangle = this.toOffset.toRectangle(this.length)
+
+  // don't implicitly delegate tail, we want a QuadAddr not List[Quadrant]
   def tail: QuadAddr = new QuadAddr(quads.tail)
 
   // (A inside B) iff (B isPrefixOf A)

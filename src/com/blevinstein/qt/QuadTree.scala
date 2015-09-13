@@ -82,7 +82,7 @@ abstract class QuadTree {
     case leaf: QuadLeaf => leaf.material
   }
 
-  type IterCallback = (QuadOffset, Material) => Unit
+  type IterCallback = (QuadAddr, Material) => Unit
   def iter(cb: IterCallback): Unit = {
     def iter_recur(cb: IterCallback, qt: QuadTree, addr: QuadAddr): Unit = {
       qt match {
@@ -90,7 +90,7 @@ abstract class QuadTree {
             iter_recur(cb,
               branch.getSubtree(quadrant),
               addr + quadrant))
-          case leaf: QuadLeaf => cb(addr.toOffset, leaf.material)
+          case leaf: QuadLeaf => cb(addr, leaf.material)
       }
     }
     iter_recur(cb, this, new QuadAddr())

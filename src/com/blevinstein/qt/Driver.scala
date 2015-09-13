@@ -115,9 +115,9 @@ object Driver extends App {
 
     // draw quadtree
     var rects = List[Rectangle]()
-    root.iter((offset, m) => {
+    root.iter((addr, m) => {
       if (m == Material.Full) {
-        rects = offset.toRectangle(offset.depth) :: rects
+        rects = addr.toRectangle :: rects
       }
     })
 
