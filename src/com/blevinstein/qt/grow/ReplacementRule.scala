@@ -6,11 +6,16 @@ import com.blevinstein.util.Decider
 
 // TODO: add MaterialPool/MaterialPalette
 object ReplacementRule {
+  /**
+   * Given a list of ReplacementRules, upate the given QuadTree. Tries to apply
+   * rules at the highest depth possible. If multiple rules are applicable at
+   * the same depth, randomly chooses one to apply.
+   */
   def update(rules: List[ReplacementRule])(root : QuadTree): QuadTree = {
     def update_recur(qt: QuadTree): QuadTree = {
       val relevantRules = rules filter (_.before == qt)
       if (!relevantRules.isEmpty) {
-        // make random replacement
+        // choose between applicable rules randomly
         Decider.choose(relevantRules).after
       } else {
         qt match {
@@ -22,13 +27,16 @@ object ReplacementRule {
     update_recur(root)
   }
 
+  /**
+   * Creates a random replacement rule. Only generates simple rules, more
+   * complex rules must be created through mutation.
+   */
   def createRandom: ReplacementRule =
     new ReplacementRule(randomNode, randomNode)
 
   /**
    * Creates a random node for use in a replacement rule. Only generates simple
-   * nodes (leaf or single-level branch), more complex rules must be created
-   * through mutation.
+   * nodes (leaf or single-level branch).
    */
   val leafProbability = 0.25f
   def randomNode: QuadTree =
