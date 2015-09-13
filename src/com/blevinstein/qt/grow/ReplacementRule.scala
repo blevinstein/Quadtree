@@ -42,5 +42,7 @@ object ReplacementRule {
   def randomMaterial: Material =
     Decider.choose(List(Material.Empty, Material.Full))
 }
-class ReplacementRule(val before: QuadTree, val after: QuadTree)
+class ReplacementRule(val before: QuadTree, val after: QuadTree) {
+  override def toString: String = s"ReplacementRule($before => $after)"
+}
 
