@@ -20,6 +20,7 @@ object Population {
 class Population[T <: Genome[T]](members: List[T],
     fitnessFunc: T => Float,
     val generation: Int = 0) {
+  require(members.length >= 2)
   val fitness: List[Float] = members map fitnessFunc
 
   def evolve: Population[T] = {

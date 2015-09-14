@@ -1,5 +1,9 @@
 package com.blevinstein.qt
 
+import com.blevinstein.ga.Population
+import com.blevinstein.qt.grow.GrowthSim
+import com.blevinstein.qt.grow.QuadGenome
+import com.blevinstein.util.RateLimiter
 import com.blevinstein.util.Throttle
 
 import com.jogamp.opengl.GL.GL_COLOR_BUFFER_BIT
@@ -57,7 +61,7 @@ object Driver extends App {
   frame.setVisible(true)
 
   // setup game
-  val root = QuadTree.approx(4, (p) =>
+  var sample = QuadTree.approx(4, (p) =>
       if ((p - new Point(0.5f, 0.5f)).mag < 0.5f) {
         Material.Full
       } else {
@@ -67,8 +71,22 @@ object Driver extends App {
   run
 
   def run : Unit  = {
+    val popSize = 15
+    val initGenomeSize = 10
+    val sampleLimiter = new RateLimiter(1000) // 1 second
     val throttle = new Throttle(FPS)
+    var pop = Population.create(popSize,
+        (_) => QuadGenome.create(initGenomeSize),
+        (genome: QuadGenome) => {
+          val r = GrowthSim(genome)._2 /* fitness = number of growth steps */
+          Console.println(s"grow $r")
+          r
+        })
     while (true) {
+      pop = pop.evolve
+      if (sampleLimiter.check) {
+        sample = GrowthSim(pop.sample)._1
+      }
       glCanvas.display()
       throttle.sleep
     }
@@ -115,7 +133,7 @@ object Driver extends App {
 
     // draw quadtree
     var rects = List[Rectangle]()
-    root.iter((addr, m) => {
+    sample.iter((addr, m) => {
       if (m == Material.Full) {
         rects = addr.toRectangle :: rects
       }
