@@ -7,7 +7,7 @@ import com.blevinstein.qt.Quadrant.{TopLeft,TopRight,BottomLeft,BottomRight}
 import org.scalatest._
 
 class GrowTest extends FunSuite with Matchers {
-  test("Deterministic growth") {
+  test("update - deterministic growth") {
     val rules = List(
       new ReplacementRule(
         new QuadBranch(new QuadLeaf(Material.Empty),
@@ -35,5 +35,22 @@ class GrowTest extends FunSuite with Matchers {
       new QuadLeaf(Material.Full),
       new QuadLeaf(Material.Empty))
     q3 shouldEqual new QuadLeaf(Material.Full)
+  }
+
+  test("GrowthSim - deterministic growth") {
+    val genome = new QuadGenome(List(
+      new ReplacementRule(
+        new QuadBranch(new QuadLeaf(Material.Empty),
+          new QuadLeaf(Material.Full),
+          new QuadLeaf(Material.Empty),
+          new QuadLeaf(Material.Empty)),
+        new QuadLeaf(Material.Full))))
+
+    GrowthSim(genome) shouldEqual
+        (new QuadBranch(new QuadLeaf(Material.Empty),
+          new QuadLeaf(Material.Empty),
+          new QuadLeaf(Material.Full),
+          new QuadLeaf(Material.Empty)),
+        GrowthSim.environmentSize - 1)
   }
 }
