@@ -8,8 +8,13 @@ trait Genome[G <: Genome[G]] {
 }
 
 object Population {
-  val crossover_rate = 0.7f;
-  val mutate_rate = 0.05f;
+  val crossover_rate = 0.7f
+  val mutate_rate = 0.05f
+
+  def create[T <: Genome[T]](size: Int,
+      createFunc: Int => T,
+      fitnessFunc: T => Float): Population[T] =
+    new Population(List.tabulate(size)(createFunc), fitnessFunc)
 }
 // TODO: prune members with negative fitness
 class Population[T <: Genome[T]](members: List[T],
