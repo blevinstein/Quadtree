@@ -11,6 +11,9 @@ object QuadGenome {
   // delegate to rules
   implicit def toRuleList(genome: QuadGenome): List[ReplacementRule] =
       genome.rules
+
+  def create(size: Int): QuadGenome = new QuadGenome(
+      List.tabulate(size)((_) => ReplacementRule.createRandom))
 }
 class QuadGenome(val rules: List[ReplacementRule]) extends Genome[QuadGenome] {
   val growProbability = 0.05f
