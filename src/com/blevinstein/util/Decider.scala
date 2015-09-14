@@ -6,7 +6,7 @@ import scala.util.Random
 // TODO: add test that checks for deviations from expected probabilities
 object Decider {
   // Choose random element from a list
-  def choose[T](list: Seq[T]): T = list.apply(Random.nextInt(list.length))
+  def choose[T](list: Seq[T]): T = list(Random.nextInt(list.length))
 
   // TODO: handle negative weights
   def chooseWithWeight[T](list: Seq[T], weights: Seq[Float]): T = {

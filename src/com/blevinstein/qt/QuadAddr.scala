@@ -17,7 +17,7 @@ class QuadAddr(val quads: List[Quadrant]) {
   def toOffset: QuadOffset = {
     var bottomLeft = QuadOffset.zero
     for (i <- 0 until this.length) {
-      val quadrant = this.apply(i)
+      val quadrant = this(i)
       bottomLeft = bottomLeft + new QuadOffset(i + 1,
         if (quadrant.x) 1 else 0,
         if (quadrant.y) 1 else 0)
