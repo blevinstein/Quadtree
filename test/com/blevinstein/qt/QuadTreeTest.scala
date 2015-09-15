@@ -153,5 +153,42 @@ class QuadTreeTest extends FunSuite with Matchers {
     (new QuadOffset(2, 3, 2).toRectangle(2)
       shouldEqual new Rectangle(new Point(0.75f, 0.5f), new Point(1, 0.75f)))
   }
+
+  test("Transform") {
+    val q1 = new QuadBranch(new QuadLeaf(Material.Full),
+        new QuadLeaf(Material.Empty),
+        new QuadLeaf(Material.Empty),
+        new QuadBranch(new QuadLeaf(Material.Full),
+          new QuadLeaf(Material.Empty),
+          new QuadLeaf(Material.Empty),
+          new QuadLeaf(Material.Full)))
+
+    Transform.rotateLeft(q1) shouldEqual
+        new QuadBranch(new QuadLeaf(Material.Empty),
+          new QuadBranch(new QuadLeaf(Material.Empty),
+            new QuadLeaf(Material.Full),
+            new QuadLeaf(Material.Full),
+            new QuadLeaf(Material.Empty)),
+          new QuadLeaf(Material.Full),
+          new QuadLeaf(Material.Empty))
+
+    Transform.rotateRight(q1) shouldEqual
+        new QuadBranch(new QuadLeaf(Material.Empty),
+          new QuadLeaf(Material.Full),
+          new QuadBranch(new QuadLeaf(Material.Empty),
+            new QuadLeaf(Material.Full),
+            new QuadLeaf(Material.Full),
+            new QuadLeaf(Material.Empty)),
+          new QuadLeaf(Material.Empty))
+
+    Transform.mirror(q1) shouldEqual
+        new QuadBranch(new QuadLeaf(Material.Empty),
+          new QuadLeaf(Material.Full),
+          new QuadBranch(new QuadLeaf(Material.Empty),
+            new QuadLeaf(Material.Full),
+            new QuadLeaf(Material.Full),
+            new QuadLeaf(Material.Empty)),
+          new QuadLeaf(Material.Empty))
+  }
 }
 
