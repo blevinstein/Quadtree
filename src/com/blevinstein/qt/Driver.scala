@@ -77,11 +77,8 @@ object Driver extends App {
     val throttle = new Throttle(FPS)
     var pop = Population.create(popSize,
         (_) => QuadGenome.create(initGenomeSize),
-        (genome: QuadGenome) => {
-          val r = GrowthSim(genome)._2 /* fitness = number of growth steps */
-          Console.println(s"grow $r")
-          r
-        })
+        (genome: QuadGenome) =>
+          GrowthSim(genome)._2 /* fitness = number of growth steps */)
     while (true) {
       pop = pop.evolve
       if (sampleLimiter.check) {

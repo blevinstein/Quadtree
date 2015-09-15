@@ -22,7 +22,8 @@ object GrowthSim {
     var steps = 0
     var done = false
     val maxSteps = 50
-    val maxGrowth = new RateLimiter(100)
+    val maxMillis = 100
+    val maxGrowth = new RateLimiter(maxMillis)
     while (!done && steps < maxSteps && !maxGrowth.check) {
       val newTree = ReplacementRule.update(genome)(currentTree)
       if (newTree == currentTree) {
