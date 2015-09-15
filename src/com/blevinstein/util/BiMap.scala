@@ -11,4 +11,5 @@ class BiMap[X, Y](map: Map[X, Y]) {
 
   // delegate to Map
   def apply(x: X): Y = map(x)
+  def size: Int = map.size
 }

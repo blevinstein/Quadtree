@@ -13,4 +13,8 @@ class BiMapTest extends FunSuite with Matchers {
     b(1) shouldEqual 2
     b.inverse(3) shouldEqual 2
   }
+  test("BiMap fails with duplicate values") {
+    an [IllegalArgumentException] should be thrownBy
+        new BiMap(1 -> 2, 2 -> 2).inverse
+  }
 }
