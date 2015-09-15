@@ -4,6 +4,7 @@ package com.blevinstein.util
 // http://stackoverflow.com/questions/9850786/is-there-such-a-thing-as-bidirectional-maps-in-scala
 
 class BiMap[X, Y](map: Map[X, Y]) {
+  // TODO: throw exception if tuples contains duplicate keys
   def this(tuples: (X, Y)*) = this(tuples.toMap)
 
   val inverse = map map (_.swap)
