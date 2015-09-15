@@ -1,6 +1,7 @@
 package com.blevinstein.qt
 
 import com.blevinstein.qt.Quadrant.{TopLeft,TopRight,BottomLeft,BottomRight}
+import com.blevinstein.qt.grow.ReplacementRule
 import com.blevinstein.util.BiMap
 
 object Transform {
@@ -16,7 +17,10 @@ class Transform(map: BiMap[Quadrant, Quadrant]) {
 
   def apply(tree: QuadTree): QuadTree = tree match {
     case branch: QuadBranch => QuadBranch.create((quadrant) =>
-        this.apply(branch.getSubtree(map.inverse(quadrant))))
+        apply(branch.getSubtree(map.inverse(quadrant))))
     case leaf: QuadLeaf => leaf
   }
+
+  def apply(rule: ReplacementRule): ReplacementRule =
+      new ReplacementRule(apply(rule.before), apply(rule.after))
 }
