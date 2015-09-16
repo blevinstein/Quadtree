@@ -22,6 +22,7 @@ object QuadTree {
   type Operator = (Material, Material) => Material
 
   // Used for constructing operators on QuadTrees
+  // TODO: rename
   def apply(op: Operator)(q1: QuadTree, q2: QuadTree): QuadTree = {
     def applyBranchLeaf(branch: QuadBranch, leaf: QuadLeaf): QuadTree = {
       branch.map((tree, quadrant) => apply(op)(tree, leaf)).tryMerge
@@ -76,12 +77,16 @@ abstract class QuadTree {
     }
   }
 
+  // TODO: return List[Material]
   def getMaterial(addr: QuadAddr): Material = this match {
     case branch: QuadBranch =>
       branch.getSubtree(addr.head).getMaterial(addr.tail)
     case leaf: QuadLeaf => leaf.material
   }
 
+  /**
+   * For each QuadLeaf in this QuadTree, emits its address and material
+   */
   type IterCallback = (QuadAddr, Material) => Unit
   def iter(cb: IterCallback): Unit = {
     def iter_recur(cb: IterCallback, qt: QuadTree, addr: QuadAddr): Unit = {
@@ -119,6 +124,11 @@ class QuadBranch(val a: QuadTree,
     case BottomLeft => c
     case BottomRight => d
   }
+
+  /**
+   * If this is a QuadBranch with 4 identical QuadLeafs, merge into one QuadLeaf
+   * Else, return this
+   */
   def tryMerge: QuadTree = {
     a match {
       case leaf: QuadLeaf => if (a == b && a == c && a == d) {
