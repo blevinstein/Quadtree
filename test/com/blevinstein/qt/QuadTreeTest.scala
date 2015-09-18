@@ -190,5 +190,22 @@ class QuadTreeTest extends FunSuite with Matchers {
             new QuadLeaf(Material.Empty)),
           new QuadLeaf(Material.Empty))
   }
+
+  test("QuadTree#maxDepth") {
+    new QuadLeaf(Material.Empty).maxDepth shouldEqual 0
+
+    new QuadBranch(new QuadLeaf(Material.Empty),
+      new QuadLeaf(Material.Empty),
+      new QuadLeaf(Material.Empty),
+      new QuadLeaf(Material.Empty)).maxDepth shouldEqual 1
+
+    new QuadBranch(new QuadLeaf(Material.Empty),
+      new QuadLeaf(Material.Empty),
+      new QuadBranch(new QuadLeaf(Material.Empty),
+        new QuadLeaf(Material.Empty),
+        new QuadLeaf(Material.Empty),
+        new QuadLeaf(Material.Empty)),
+      new QuadLeaf(Material.Empty)).maxDepth shouldEqual 2
+  }
 }
 

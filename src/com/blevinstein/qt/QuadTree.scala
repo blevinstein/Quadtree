@@ -83,6 +83,15 @@ abstract class QuadTree {
     case leaf: QuadLeaf => leaf.material
   }
 
+  // Maximum depth of this QuadTree.
+  def maxDepth: Int = this match {
+    case branch: QuadBranch => List(branch.a.maxDepth + 1,
+      branch.b.maxDepth + 1,
+      branch.c.maxDepth + 1,
+      branch.d.maxDepth + 1).max
+    case leaf: QuadLeaf => 0
+  }
+
   /**
    * For each QuadLeaf in this QuadTree, emits its address and material
    */
