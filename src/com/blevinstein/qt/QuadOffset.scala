@@ -68,6 +68,14 @@ class QuadOffset(val depth: Int, val x: Int, val y: Int) {
 
   def *(k: Int): QuadOffset = new QuadOffset(depth, x*k, y*k).simplify
 
+  // Shift operators are used for multiplying the offset by a power of 2,
+  //   effectively changing its depth. This is used to handle QuadTrees of
+  //   different sizes.
+  def <<(levels: Int): QuadOffset =
+      new QuadOffset(depth - levels, x, y).simplify
+  def >>(levels: Int): QuadOffset =
+      new QuadOffset(depth + levels, x, y).simplify
+
   def atDepth(newDepth: Int): QuadOffset = {
     require(newDepth >= depth)
     new QuadOffset(newDepth,

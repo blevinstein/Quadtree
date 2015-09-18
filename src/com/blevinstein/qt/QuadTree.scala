@@ -22,6 +22,8 @@ object QuadTree {
   type Operator = (Material, Material) => Material
 
   // Used for constructing operators on QuadTrees
+  // TODO: handle offset: QuadOffset of q2 with respect to q1
+  // TODO: handle differently-sized QuadTrees? 'depth offset'?
   def merge(op: Operator)(q1: QuadTree, q2: QuadTree): QuadTree = {
     def mergeBranchLeaf(branch: QuadBranch, leaf: QuadLeaf): QuadTree = {
       branch.map((tree, quadrant) => merge(op)(tree, leaf)).tryMerge
