@@ -31,7 +31,7 @@ class QuadOffset(val depth: Int, val x: Int, val y: Int) {
       val currentGridSize = 1 << (depth - 1 - currentDepth)
       // find which quadrant we are in, and subtract from currentX/Y
       val quadrant = new Quadrant(currentX >= currentGridSize,
-        currentY >= currentGridSize)
+          currentY >= currentGridSize)
       currentX = currentX - (if (quadrant.x) currentGridSize else 0)
       currentY = currentY - (if (quadrant.y) currentGridSize else 0)
       addr = addr + quadrant
