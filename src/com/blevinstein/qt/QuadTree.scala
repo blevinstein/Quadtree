@@ -22,17 +22,16 @@ object QuadTree {
   type Operator = (Material, Material) => Material
 
   // Used for constructing operators on QuadTrees
-  // TODO: rename
-  def apply(op: Operator)(q1: QuadTree, q2: QuadTree): QuadTree = {
-    def applyBranchLeaf(branch: QuadBranch, leaf: QuadLeaf): QuadTree = {
-      branch.map((tree, quadrant) => apply(op)(tree, leaf)).tryMerge
+  def merge(op: Operator)(q1: QuadTree, q2: QuadTree): QuadTree = {
+    def mergeBranchLeaf(branch: QuadBranch, leaf: QuadLeaf): QuadTree = {
+      branch.map((tree, quadrant) => merge(op)(tree, leaf)).tryMerge
     }
     (q1, q2) match {
       case (b1: QuadBranch, b2: QuadBranch) =>
-        b1.map((tree, quadrant) => apply(op)(tree, b2.getSubtree(quadrant)))
+        b1.map((tree, quadrant) => merge(op)(tree, b2.getSubtree(quadrant)))
           .tryMerge
-      case (branch: QuadBranch, leaf: QuadLeaf) => applyBranchLeaf(branch, leaf)
-      case (leaf: QuadLeaf, branch: QuadBranch) => applyBranchLeaf(branch, leaf)
+      case (branch: QuadBranch, leaf: QuadLeaf) => mergeBranchLeaf(branch, leaf)
+      case (leaf: QuadLeaf, branch: QuadBranch) => mergeBranchLeaf(branch, leaf)
       case (l1: QuadLeaf, l2: QuadLeaf) =>
         new QuadLeaf(op(l1.material, l2.material))
     }
