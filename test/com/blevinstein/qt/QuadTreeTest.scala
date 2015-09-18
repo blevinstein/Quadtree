@@ -208,5 +208,20 @@ class QuadTreeTest extends FunSuite with Matchers {
         new QuadLeaf(Material.Empty)),
       new QuadLeaf(Material.Empty)).maxDepth shouldEqual 2
   }
+
+  test("QuadRectangle#prune") {
+    val a = new QuadRectangle(new QuadOffset(1, -1, -1),
+        new QuadOffset(1, 1, 1))
+    val b = new QuadRectangle(new QuadOffset(1, 0, 0).simplify,
+        new QuadOffset(1, 2, 2).simplify)
+    val c = new QuadRectangle(new QuadOffset(1, 1, 1),
+        new QuadOffset(1, 3, 3))
+
+    b.prune(a) shouldEqual new QuadRectangle(new QuadOffset(1, 0, 0).simplify,
+        new QuadOffset(1, 1, 1))
+
+    b.prune(c) shouldEqual new QuadRectangle(new QuadOffset(1, 1, 1),
+        new QuadOffset(1, 2, 2).simplify)
+  }
 }
 

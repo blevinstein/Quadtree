@@ -9,7 +9,6 @@ class QuadRectangle(val min: QuadOffset, val max: QuadOffset) {
       new Point(1f * max.x / (1 << max.depth), 1f * max.y / (1 << max.depth)))
 
   // Returns the intersection of two QuadRectangles
-  // TODO implement test
   def prune(other: QuadRectangle): QuadRectangle = {
     def min2d(a: QuadOffset, b: QuadOffset): QuadOffset = {
       QuadOffset.normalize(a, b) match {
@@ -44,4 +43,15 @@ class QuadRectangle(val min: QuadOffset, val max: QuadOffset) {
       new QuadRectangle(min << levels, max << levels)
   def >>(levels: Int): QuadRectangle =
       new QuadRectangle(min >> levels, max >> levels)
+
+  override def hashCode : Int =
+    31 * (min.hashCode +
+      31 * max.hashCode)
+
+  override def equals(o: Any): Boolean = o match {
+    case other: QuadRectangle => min == other.min && max == other.max
+    case _ => false
+  }
+
+  override def toString: String = s"QuadRectangle($min, $max)"
 }

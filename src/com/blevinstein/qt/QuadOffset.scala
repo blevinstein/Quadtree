@@ -105,13 +105,12 @@ class QuadOffset(val depth: Int, val x: Int, val y: Int) {
         31 * (y.hashCode)))
 
   override def equals(o: Any): Boolean = o match {
-    case other: QuadOffset => {
-      depth == other.depth &&
+    case other: QuadOffset =>
+        depth == other.depth &&
         x == other.x &&
         y == other.y
-    }
     case _ => false
   }
 
-  override def toString: String = s"($x / 2^$depth, $y / 2^$depth)"
+  override def toString: String = s"QuadOffset($x, $y) / 2^$depth"
 }
