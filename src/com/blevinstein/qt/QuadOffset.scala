@@ -14,15 +14,23 @@ package com.blevinstein.qt
  */
 object QuadOffset {
   val zero = new QuadOffset(0, 0, 0)
+
+  def normalize(a: QuadOffset, b: QuadOffset): (Int, QuadOffset, QuadOffset) = {
+    val maxDepth = math.max(a.depth, b.depth)
+    val aNorm = a.atDepth(maxDepth)
+    val bNorm = b.atDepth(maxDepth)
+    (maxDepth, aNorm, bNorm)
+  }
 }
 class QuadOffset(val depth: Int, val x: Int, val y: Int) {
   // copy constructor
   def this(offset: QuadOffset) = this(offset.depth, offset.x, offset.y)
 
+  def isValid: Boolean = (x < (1 << depth)) && (y < (1 << depth))
+
   // d = depth (specificity) of the node at the address
   def toAddress(d: Int): QuadAddr = {
-    require(x < (1 << depth))
-    require(y < (1 << depth))
+    require(isValid)
     var currentX = x
     var currentY = y
     var addr = new QuadAddr()
@@ -42,21 +50,21 @@ class QuadOffset(val depth: Int, val x: Int, val y: Int) {
   // Operators
 
   def +(other: QuadOffset): QuadOffset = {
-    val maxDepth = math.max(depth, other.depth)
-    val normed = atDepth(maxDepth)
-    val otherNormed = other.atDepth(maxDepth)
-    new QuadOffset(maxDepth,
-      normed.x + otherNormed.x,
-      normed.y + otherNormed.y).simplify
+    QuadOffset.normalize(this, other) match {
+      case (maxDepth, normed, otherNormed) =>
+        new QuadOffset(maxDepth,
+          normed.x + otherNormed.x,
+          normed.y + otherNormed.y).simplify
+    }
   }
 
   def -(other: QuadOffset): QuadOffset = {
-    val maxDepth = math.max(depth, other.depth)
-    val normed = atDepth(maxDepth)
-    val otherNormed = other.atDepth(maxDepth)
-    new QuadOffset(maxDepth,
-      normed.x - otherNormed.x,
-      normed.y - otherNormed.y).simplify
+    QuadOffset.normalize(this, other) match {
+      case (maxDepth, normed, otherNormed) =>
+        new QuadOffset(maxDepth,
+          normed.x - otherNormed.x,
+          normed.y - otherNormed.y).simplify
+    }
   }
 
   def *(k: Int): QuadOffset = new QuadOffset(depth, x*k, y*k).simplify
