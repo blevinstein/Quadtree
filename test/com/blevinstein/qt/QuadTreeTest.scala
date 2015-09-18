@@ -149,9 +149,10 @@ class QuadTreeTest extends FunSuite with Matchers {
       shouldEqual new QuadAddr(TopRight, BottomRight))
   }
 
-  test("QuadOffset#toRectangle") {
-    (new QuadOffset(2, 3, 2).toRectangle(2)
-      shouldEqual new Rectangle(new Point(0.75f, 0.5f), new Point(1, 0.75f)))
+  test("QuadRectangle#toRectangle") {
+    new QuadRectangle(new QuadOffset(2, 3, 2), new QuadOffset(2, 4, 3))
+      .toRectangle shouldEqual
+      (new Rectangle(new Point(0.75f, 0.5f), new Point(1, 0.75f)))
   }
 
   test("Transform") {

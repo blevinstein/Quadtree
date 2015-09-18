@@ -25,7 +25,11 @@ class QuadAddr(val quads: List[Quadrant]) {
     bottomLeft
   }
 
-  def toRectangle: Rectangle = this.toOffset.toRectangle(this.length)
+  def toRectangle: Rectangle = {
+    val bottomLeft = this.toOffset
+    val topRight = bottomLeft + new QuadOffset(this.length, 1, 1)
+    new QuadRectangle(bottomLeft, topRight).toRectangle
+  }
 
   // don't implicitly delegate tail, we want a QuadAddr not List[Quadrant]
   def tail: QuadAddr = new QuadAddr(quads.tail)

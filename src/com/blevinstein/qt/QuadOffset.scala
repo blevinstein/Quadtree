@@ -39,13 +39,6 @@ class QuadOffset(val depth: Int, val x: Int, val y: Int) {
     addr
   }
 
-  // d = depth (size) of the node to be outlined
-  def toRectangle(d: Int): Rectangle = {
-    val bottomLeft = new Point(1f * x / (1 << depth), 1f * y / (1 << depth))
-    val size = new Point(1f / (1 << d), 1f / (1 << d))
-    new Rectangle(bottomLeft, bottomLeft + size)
-  }
-
   // Operators
 
   def +(other: QuadOffset): QuadOffset = {
