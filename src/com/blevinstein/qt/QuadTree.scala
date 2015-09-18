@@ -92,6 +92,10 @@ abstract class QuadTree {
     case leaf: QuadLeaf => 0
   }
 
+  // TODO: Implement prune(depth: Int): QuadTree such that r.maxDepth == depth
+  // PROBEM: need a way of merging materials? can take merge function of type
+  //   (Material x 4) => Material, e.g. "mode", but sampling must be recursive?
+
   /**
    * For each QuadLeaf in this QuadTree, emits its address and material
    */
