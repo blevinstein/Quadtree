@@ -29,7 +29,19 @@ class QuadRectangle(val min: QuadOffset, val max: QuadOffset) {
     new QuadRectangle(max2d(min, other.min), min2d(max, other.max))
   }
 
-  // TODO def allAddresses(depth: Int): List[QuadAddr] = {
+  // Returns all addresses in the contained area at a given depth
+  // TODO: add tests
+  def allAddresses(depth: Int): List[QuadAddr] = {
+    val minNormed = min.atDepth(depth)
+    val maxNormed = max.atDepth(depth)
+    var addresses = List[QuadAddr]()
+    for (i <- minNormed.x until maxNormed.x) {
+      for (j <- minNormed.y until maxNormed.y) {
+        addresses = new QuadOffset(depth, i, j).toAddress(depth) :: addresses
+      }
+    }
+    addresses
+  }
 
   // Operators
 
