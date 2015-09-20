@@ -77,6 +77,8 @@ class BranchRule(a: ReplacementRule, b: ReplacementRule, c: ReplacementRule,
     }
     case _ => None
   }
+
+  override def toString: String = s"BranchRule($a, $b, $c, $d)"
 }
 
 class LeafRule(f: Material => Option[Material]) extends ReplacementRule {
@@ -87,7 +89,16 @@ class LeafRule(f: Material => Option[Material]) extends ReplacementRule {
     }
     case _ => None
   }
+
+  override def toString: String = s"LeafRule($f)"
 }
+
+object WildcardRule extends ReplacementRule {
+  def apply(tree: QuadTree[Material]): Option[QuadTree[Material]] = Some(tree)
+
+  override def toString: String = s"WildcardRule"
+}
+
 
 // Simple LeafRule functions
 // TODO: add conditional behavior (e.g. fill space iff empty)
@@ -104,8 +115,3 @@ object MatchMaterial {
 object AnyMaterial {
   def apply(): Material => Option[Material] = (m: Material) => Some(m)
 }
-
-object WildcardRule extends ReplacementRule {
-  def apply(tree: QuadTree[Material]): Option[QuadTree[Material]] = Some(tree)
-}
-

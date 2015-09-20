@@ -35,4 +35,6 @@ class QuadGenome(val rules: List[ReplacementRule]) extends Genome[QuadGenome] {
     new QuadGenome(rules.slice(0, crossoverIndex) ++
         other.rules.slice(crossoverIndex, other.rules.length))
   }
+
+  override def toString: String = s"QuadGenome($rules)"
 }
