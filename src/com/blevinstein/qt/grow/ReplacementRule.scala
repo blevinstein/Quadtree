@@ -13,15 +13,16 @@ object ReplacementRule {
    *
    * TODO: consider refactoring out of ReplacementRule
    */
-  def update(rules: List[ReplacementRule])(root : QuadTree): QuadTree = {
-    def update_recur(qt: QuadTree): QuadTree = {
+  def update(rules: List[ReplacementRule])
+      (root : QuadTree[Material]): QuadTree[Material] = {
+    def update_recur(qt: QuadTree[Material]): QuadTree[Material] = {
       val results = (rules map (_(qt))).flatten
       if (!results.isEmpty) {
         Decider.choose(results)
       } else {
         qt match {
-          case branch: QuadBranch => branch.map((tree, _) => update_recur(tree))
-          case leaf: QuadLeaf => leaf
+          case branch: QuadBranch[Material] => branch.map((tree, _) => update_recur(tree))
+          case leaf: QuadLeaf[Material] => leaf
         }
       }
     }
@@ -55,13 +56,13 @@ object ReplacementRule {
     Decider.choose(List(Material.Empty, Material.Full))
 }
 trait ReplacementRule {
-  def apply(tree: QuadTree): Option[QuadTree]
+  def apply(tree: QuadTree[Material]): Option[QuadTree[Material]]
 }
 
 class BranchRule(a: ReplacementRule, b: ReplacementRule, c: ReplacementRule,
     d: ReplacementRule) extends ReplacementRule {
-  def apply(tree: QuadTree): Option[QuadTree] = tree match {
-    case branch: QuadBranch => {
+  def apply(tree: QuadTree[Material]): Option[QuadTree[Material]] = tree match {
+    case branch: QuadBranch[Material] => {
       // Apply all sub-rules
       val maybeA = a.apply(branch.a)
       val maybeB = b.apply(branch.b)
@@ -79,8 +80,8 @@ class BranchRule(a: ReplacementRule, b: ReplacementRule, c: ReplacementRule,
 }
 
 class LeafRule(f: Material => Option[Material]) extends ReplacementRule {
-  def apply(tree: QuadTree): Option[QuadTree] = tree match {
-    case leaf: QuadLeaf => f(leaf.material) match {
+  def apply(tree: QuadTree[Material]): Option[QuadTree[Material]] = tree match {
+    case leaf: QuadLeaf[Material] => f(leaf.data) match {
       case Some(newMaterial) => Some(new QuadLeaf(newMaterial))
       case _ => None
     }
@@ -105,6 +106,6 @@ object AnyMaterial {
 }
 
 object WildcardRule extends ReplacementRule {
-  def apply(tree: QuadTree): Option[QuadTree] = Some(tree)
+  def apply(tree: QuadTree[Material]): Option[QuadTree[Material]] = Some(tree)
 }
 

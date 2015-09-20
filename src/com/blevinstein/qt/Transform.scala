@@ -14,9 +14,9 @@ object Transform {
 class Transform(map: BiMap[Quadrant, Quadrant]) {
   def this(tuples: (Quadrant, Quadrant)*) = this(new BiMap(tuples : _*))
 
-  def apply(tree: QuadTree): QuadTree = tree match {
-    case branch: QuadBranch => QuadBranch.create((quadrant) =>
+  def apply[T](tree: QuadTree[T]): QuadTree[T] = tree match {
+    case branch: QuadBranch[T] => QuadBranch.create((quadrant) =>
         apply(branch.getSubtree(map.inverse(quadrant))))
-    case leaf: QuadLeaf => leaf
+    case leaf: QuadLeaf[T] => leaf
   }
 }

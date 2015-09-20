@@ -1,135 +1,139 @@
 package com.blevinstein.qt
 
 import com.blevinstein.qt.Quadrant.{TopLeft,TopRight,BottomLeft,BottomRight}
+import com.blevinstein.qt.Material.{Empty,Full}
 
 import org.scalatest._
 
 class QuadTreeTest extends FunSuite with Matchers {
   test("QuadTree.Builder") {
-    (new QuadTree.Builder().build shouldEqual new QuadLeaf(Material.Empty))
-
-    (new QuadTree.Builder().add(new QuadAddr(TopLeft), Material.Full).build
+    (new QuadTree.Builder[Material](Empty).build
       shouldEqual
-        new QuadBranch(new QuadLeaf(Material.Full),
-          new QuadLeaf(Material.Empty),
-          new QuadLeaf(Material.Empty),
-          new QuadLeaf(Material.Empty)))
+      new QuadLeaf(Empty))
 
-    (new QuadTree.Builder()
-        .add(new QuadAddr(TopLeft), Material.Full)
-        .add(new QuadAddr(TopRight, TopLeft), Material.Full)
+    (new QuadTree.Builder[Material](Empty).add(new QuadAddr(TopLeft), Full)
+      .build
+      shouldEqual
+        new QuadBranch(new QuadLeaf(Full),
+          new QuadLeaf(Empty),
+          new QuadLeaf(Empty),
+          new QuadLeaf(Empty)))
+
+    (new QuadTree.Builder[Material](Empty)
+        .add(new QuadAddr(TopLeft), Full)
+        .add(new QuadAddr(TopRight, TopLeft), Full)
         .build
       shouldEqual
         new QuadBranch(
-          new QuadLeaf(Material.Full),
+          new QuadLeaf(Full),
           new QuadBranch(
-            new QuadLeaf(Material.Full),
-            new QuadLeaf(Material.Empty),
-            new QuadLeaf(Material.Empty),
-            new QuadLeaf(Material.Empty)),
-          new QuadLeaf(Material.Empty),
-          new QuadLeaf(Material.Empty)))
+            new QuadLeaf(Full),
+            new QuadLeaf(Empty),
+            new QuadLeaf(Empty),
+            new QuadLeaf(Empty)),
+          new QuadLeaf(Empty),
+          new QuadLeaf(Empty)))
   }
 
   test("QuadTree.approx") {
-    (QuadTree.approx(0, (_) => Material.Full)
+    (QuadTree.approx(0, (_) => Full)
       shouldEqual
-        new QuadLeaf(Material.Full))
+        new QuadLeaf(Full))
 
     (QuadTree.approx(1, (p) =>
-        if(p.x + p.y >= 1) Material.Full else Material.Empty)
+        if(p.x + p.y >= 1) Full else Empty)
       shouldEqual
         new QuadBranch(
-          new QuadLeaf(Material.Full),
-          new QuadLeaf(Material.Full),
-          new QuadLeaf(Material.Empty),
-          new QuadLeaf(Material.Full)))
+          new QuadLeaf(Full),
+          new QuadLeaf(Full),
+          new QuadLeaf(Empty),
+          new QuadLeaf(Full)))
 
     (QuadTree.approx(2, (p) =>
-        if(p.x + p.y >= 1) Material.Full else Material.Empty)
+        if(p.x + p.y >= 1) Full else Empty)
       shouldEqual
         new QuadBranch(
           new QuadBranch(
-            new QuadLeaf(Material.Full),
-            new QuadLeaf(Material.Full),
-            new QuadLeaf(Material.Empty),
-            new QuadLeaf(Material.Full)),
-          new QuadLeaf(Material.Full),
-          new QuadLeaf(Material.Empty),
+            new QuadLeaf(Full),
+            new QuadLeaf(Full),
+            new QuadLeaf(Empty),
+            new QuadLeaf(Full)),
+          new QuadLeaf(Full),
+          new QuadLeaf(Empty),
           new QuadBranch(
-            new QuadLeaf(Material.Full),
-            new QuadLeaf(Material.Full),
-            new QuadLeaf(Material.Empty),
-            new QuadLeaf(Material.Full))))
+            new QuadLeaf(Full),
+            new QuadLeaf(Full),
+            new QuadLeaf(Empty),
+            new QuadLeaf(Full))))
 
     // tests merging
     (QuadTree.approx(3, (p) =>
-        if (p.x > 0.5f) Material.Full else Material.Empty)
+        if (p.x > 0.5f) Full else Empty)
       shouldEqual
         new QuadBranch(
-          new QuadLeaf(Material.Empty),
-          new QuadLeaf(Material.Full),
-          new QuadLeaf(Material.Empty),
-          new QuadLeaf(Material.Full)))
+          new QuadLeaf(Empty),
+          new QuadLeaf(Full),
+          new QuadLeaf(Empty),
+          new QuadLeaf(Full)))
   }
 
   test("QuadTree.merge") {
-    val andFunc = QuadTree.merge((m1, m2) =>
-        if (m1 == Material.Full && m2 == Material.Full)
-          Material.Full
-        else Material.Empty) _
-    val orFunc = QuadTree.merge((m1, m2) =>
-        if (m1 == Material.Full || m2 == Material.Full)
-          Material.Full
-        else Material.Empty) _
+    val andFunc = QuadTree.merge((m1: Material, m2: Material) =>
+        if (m1 == Full && m2 == Full)
+          Full
+        else Empty) _
+    val orFunc = QuadTree.merge((m1: Material, m2: Material) =>
+        if (m1 == Full || m2 == Full)
+          Full
+        else Empty) _
 
     val q1 = new QuadBranch(
-      new QuadLeaf(Material.Empty),
-      new QuadLeaf(Material.Full),
-      new QuadLeaf(Material.Empty),
-      new QuadLeaf(Material.Full))
+      new QuadLeaf(Empty),
+      new QuadLeaf(Full),
+      new QuadLeaf(Empty),
+      new QuadLeaf(Full))
     val q2 = new QuadBranch(
-      new QuadLeaf(Material.Empty),
-      new QuadLeaf(Material.Empty),
-      new QuadLeaf(Material.Full),
-      new QuadLeaf(Material.Full))
-    val q3 = new QuadLeaf(Material.Empty)
-    val q4 = new QuadLeaf(Material.Full)
+      new QuadLeaf(Empty),
+      new QuadLeaf(Empty),
+      new QuadLeaf(Full),
+      new QuadLeaf(Full))
+    val q3 = new QuadLeaf(Empty)
+    val q4 = new QuadLeaf(Full)
 
     andFunc(q1, q2) shouldEqual
       new QuadBranch(
-        new QuadLeaf(Material.Empty),
-        new QuadLeaf(Material.Empty),
-        new QuadLeaf(Material.Empty),
-        new QuadLeaf(Material.Full))
+        new QuadLeaf(Empty),
+        new QuadLeaf(Empty),
+        new QuadLeaf(Empty),
+        new QuadLeaf(Full))
     andFunc(q1, q4) shouldEqual q1
     andFunc(q1, q3) shouldEqual q3
 
     orFunc(q1, q2) shouldEqual
       new QuadBranch(
-        new QuadLeaf(Material.Empty),
-        new QuadLeaf(Material.Full),
-        new QuadLeaf(Material.Full),
-        new QuadLeaf(Material.Full))
+        new QuadLeaf(Empty),
+        new QuadLeaf(Full),
+        new QuadLeaf(Full),
+        new QuadLeaf(Full))
     orFunc(q1, q3) shouldEqual q1
     orFunc(q1, q4) shouldEqual q4
   }
 
-  test("QuadTree#getMaterial") {
+  test("QuadTree#getData") {
     val q1 = new QuadBranch(
-      new QuadLeaf(Material.Empty),
-      new QuadLeaf(Material.Full),
-      new QuadLeaf(Material.Empty),
-      new QuadLeaf(Material.Full))
+      new QuadLeaf(Empty),
+      new QuadLeaf(Full),
+      new QuadLeaf(Empty),
+      new QuadLeaf(Full))
 
-    // getMaterial by Point
-    q1.getMaterial(new Point(0.1f, 0.1f)) shouldEqual Material.Empty
-    q1.getMaterial(new Point(0.9f, 0.1f)) shouldEqual Material.Full
+    // getData by Point
+    q1.getData(new Point(0.1f, 0.1f)) shouldEqual Empty
+    q1.getData(new Point(0.9f, 0.1f)) shouldEqual Full
 
-    // getMaterial by address
-    q1.getMaterial(new QuadAddr(BottomLeft)) shouldEqual Material.Empty
-    q1.getMaterial(new QuadAddr(BottomRight)) shouldEqual Material.Full
-    q1.getMaterial(new QuadAddr(BottomRight, BottomLeft)) shouldEqual Material.Full
+    // getData by address
+    q1.getData(new QuadAddr(BottomLeft)) shouldEqual Empty
+    q1.getData(new QuadAddr(BottomRight)) shouldEqual Full
+    q1.getData(new QuadAddr(BottomRight, BottomLeft)) shouldEqual Full
   }
 
   test("QuadOffset#simplify") {
@@ -156,57 +160,57 @@ class QuadTreeTest extends FunSuite with Matchers {
   }
 
   test("Transform") {
-    val q1 = new QuadBranch(new QuadLeaf(Material.Full),
-        new QuadLeaf(Material.Empty),
-        new QuadLeaf(Material.Empty),
-        new QuadBranch(new QuadLeaf(Material.Full),
-          new QuadLeaf(Material.Empty),
-          new QuadLeaf(Material.Empty),
-          new QuadLeaf(Material.Full)))
+    val q1 = new QuadBranch(new QuadLeaf(Full),
+        new QuadLeaf(Empty),
+        new QuadLeaf(Empty),
+        new QuadBranch(new QuadLeaf(Full),
+          new QuadLeaf(Empty),
+          new QuadLeaf(Empty),
+          new QuadLeaf(Full)))
 
     Transform.rotateLeft(q1) shouldEqual
-        new QuadBranch(new QuadLeaf(Material.Empty),
-          new QuadBranch(new QuadLeaf(Material.Empty),
-            new QuadLeaf(Material.Full),
-            new QuadLeaf(Material.Full),
-            new QuadLeaf(Material.Empty)),
-          new QuadLeaf(Material.Full),
-          new QuadLeaf(Material.Empty))
+        new QuadBranch(new QuadLeaf(Empty),
+          new QuadBranch(new QuadLeaf(Empty),
+            new QuadLeaf(Full),
+            new QuadLeaf(Full),
+            new QuadLeaf(Empty)),
+          new QuadLeaf(Full),
+          new QuadLeaf(Empty))
 
     Transform.rotateRight(q1) shouldEqual
-        new QuadBranch(new QuadLeaf(Material.Empty),
-          new QuadLeaf(Material.Full),
-          new QuadBranch(new QuadLeaf(Material.Empty),
-            new QuadLeaf(Material.Full),
-            new QuadLeaf(Material.Full),
-            new QuadLeaf(Material.Empty)),
-          new QuadLeaf(Material.Empty))
+        new QuadBranch(new QuadLeaf(Empty),
+          new QuadLeaf(Full),
+          new QuadBranch(new QuadLeaf(Empty),
+            new QuadLeaf(Full),
+            new QuadLeaf(Full),
+            new QuadLeaf(Empty)),
+          new QuadLeaf(Empty))
 
     Transform.mirror(q1) shouldEqual
-        new QuadBranch(new QuadLeaf(Material.Empty),
-          new QuadLeaf(Material.Full),
-          new QuadBranch(new QuadLeaf(Material.Empty),
-            new QuadLeaf(Material.Full),
-            new QuadLeaf(Material.Full),
-            new QuadLeaf(Material.Empty)),
-          new QuadLeaf(Material.Empty))
+        new QuadBranch(new QuadLeaf(Empty),
+          new QuadLeaf(Full),
+          new QuadBranch(new QuadLeaf(Empty),
+            new QuadLeaf(Full),
+            new QuadLeaf(Full),
+            new QuadLeaf(Empty)),
+          new QuadLeaf(Empty))
   }
 
   test("QuadTree#maxDepth") {
-    new QuadLeaf(Material.Empty).maxDepth shouldEqual 0
+    new QuadLeaf(Empty).maxDepth shouldEqual 0
 
-    new QuadBranch(new QuadLeaf(Material.Empty),
-      new QuadLeaf(Material.Empty),
-      new QuadLeaf(Material.Empty),
-      new QuadLeaf(Material.Empty)).maxDepth shouldEqual 1
+    new QuadBranch(new QuadLeaf(Empty),
+      new QuadLeaf(Empty),
+      new QuadLeaf(Empty),
+      new QuadLeaf(Empty)).maxDepth shouldEqual 1
 
-    new QuadBranch(new QuadLeaf(Material.Empty),
-      new QuadLeaf(Material.Empty),
-      new QuadBranch(new QuadLeaf(Material.Empty),
-        new QuadLeaf(Material.Empty),
-        new QuadLeaf(Material.Empty),
-        new QuadLeaf(Material.Empty)),
-      new QuadLeaf(Material.Empty)).maxDepth shouldEqual 2
+    new QuadBranch(new QuadLeaf(Empty),
+      new QuadLeaf(Empty),
+      new QuadBranch(new QuadLeaf(Empty),
+        new QuadLeaf(Empty),
+        new QuadLeaf(Empty),
+        new QuadLeaf(Empty)),
+      new QuadLeaf(Empty)).maxDepth shouldEqual 2
   }
 
   test("QuadRectangle#prune") {

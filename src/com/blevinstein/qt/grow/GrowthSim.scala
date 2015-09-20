@@ -16,8 +16,8 @@ object GrowthSim {
    * Given a genome, grows a QuadTree
    * Returns (resulting QuadTree, number of steps to grow)
    */
-  def apply(genome: QuadGenome): (QuadTree, Int) = {
-    var currentTree = new QuadTree.Builder()
+  def apply(genome: QuadGenome): (QuadTree[Material], Int) = {
+    var currentTree = new QuadTree.Builder[Material](Material.Empty)
         .add(startAddress, Material.Full).build
     var steps = 0
     var done = false

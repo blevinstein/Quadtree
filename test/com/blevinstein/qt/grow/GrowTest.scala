@@ -16,7 +16,7 @@ class GrowTest extends FunSuite with Matchers {
         new LeafRule(MatchMaterial(Full)),
         new LeafRule(ChangeMaterial(Empty, Full))))
 
-    val q1 = new QuadTree.Builder()
+    val q1 = new QuadTree.Builder[Material](Empty)
       .add(new QuadAddr(BottomLeft, BottomLeft), Full)
       .build
 
