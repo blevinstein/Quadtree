@@ -66,6 +66,8 @@ object QuadTree {
 }
 
 abstract class QuadTree[+T] {
+  // TODO: def transform(T -> O): QuadTree[O]
+
   def getData(p: Point): T = {
     require(p.x >= 0 && p.x <= 1)
     require(p.y >= 0 && p.y <= 1)
