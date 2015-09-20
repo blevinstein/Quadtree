@@ -13,19 +13,20 @@ object QuadGenome {
       genome.rules
 
   def create(size: Int): QuadGenome = new QuadGenome(
-      List.tabulate(size)((_) => ReplacementRule.createRandom))
+      List.tabulate(size)((_) => ReplacementRule.randomRule))
 }
 class QuadGenome(val rules: List[ReplacementRule]) extends Genome[QuadGenome] {
   val growProbability = 0.05f
   def mutate: QuadGenome = {
     if (Decider.withProb(growProbability)) {
-      new QuadGenome(rules :+ ReplacementRule.createRandom)
+      new QuadGenome(rules :+ ReplacementRule.randomRule)
     } else {
+      val index = Decider.choose(rules.indices)
       new QuadGenome(rules.updated(
         // choose a random rule
-        Decider.choose(rules.indices),
-        // replace with mutated version
-        ReplacementRule.createRandom))
+        index,
+        // TODO: replace with mutated version of rules(index)
+        ReplacementRule.randomRule))
     }
   }
   def crossover(other: QuadGenome): QuadGenome = {
