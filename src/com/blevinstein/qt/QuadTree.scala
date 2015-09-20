@@ -19,24 +19,20 @@ object QuadTree {
     }
   }
 
-  type Operator[T] = (T, T) => T
-
   // Used for constructing operators on QuadTrees
   // TODO: handle offset: QuadOffset of q2 with respect to q1
   // TODO: handle differently-sized QuadTrees? 'depth offset'?
-  def merge[T](op: Operator[T])(q1: QuadTree[T],
-      q2: QuadTree[T]): QuadTree[T] = {
-    def mergeBranchLeaf(branch: QuadBranch[T],
-        leaf: QuadLeaf[T]): QuadTree[T] = {
-      branch.map((tree, quadrant) => merge(op)(tree, leaf)).tryMerge
-    }
+  def merge[X,Y,Z](op: (X, Y) => Z)(q1: QuadTree[X],
+      q2: QuadTree[Y]): QuadTree[Z] = {
     (q1, q2) match {
-      case (b1: QuadBranch[T], b2: QuadBranch[T]) =>
+      case (b1: QuadBranch[X], b2: QuadBranch[Y]) =>
         b1.map((tree, quadrant) => merge(op)(tree, b2.getSubtree(quadrant)))
           .tryMerge
-      case (branch: QuadBranch[T], leaf: QuadLeaf[T]) => mergeBranchLeaf(branch, leaf)
-      case (leaf: QuadLeaf[T], branch: QuadBranch[T]) => mergeBranchLeaf(branch, leaf)
-      case (l1: QuadLeaf[T], l2: QuadLeaf[T]) =>
+      case (branch: QuadBranch[X], leaf: QuadLeaf[Y]) =>
+        branch.map((subtree, quadrant) => merge(op)(subtree, leaf)).tryMerge
+      case (leaf: QuadLeaf[X], branch: QuadBranch[Y]) =>
+        branch.map((subtree, quadrant) => merge(op)(leaf, subtree)).tryMerge
+      case (l1: QuadLeaf[X], l2: QuadLeaf[Y]) =>
         new QuadLeaf(op(l1.data, l2.data))
     }
   }
@@ -69,7 +65,7 @@ object QuadTree {
   }
 }
 
-abstract class QuadTree[T] {
+abstract class QuadTree[+T] {
   def getData(p: Point): T = {
     require(p.x >= 0 && p.x <= 1)
     require(p.y >= 0 && p.y <= 1)
@@ -157,7 +153,7 @@ class QuadBranch[T](val a: QuadTree[T],
     }
   }
 
-  def map(f: (QuadTree[T], Quadrant) => QuadTree[T]): QuadBranch[T] =
+  def map[O](f: (QuadTree[T], Quadrant) => QuadTree[O]): QuadBranch[O] =
       new QuadBranch(f(a, TopLeft),
         f(b, TopRight),
         f(c, BottomLeft),
