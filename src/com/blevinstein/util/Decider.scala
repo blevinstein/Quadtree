@@ -10,17 +10,18 @@ object Decider {
 
   // TODO: handle negative weights
   def chooseWithWeight[T](list: Seq[T], weights: Seq[Float]): T = {
+    require(!list.isEmpty)
     require(list.length == weights.length)
     val totalWeight = weights.reduce(_ + _)
     var randomWeight = Random.nextFloat() * totalWeight
-    var chosenItem = list.head
+    var chosenItem: Option[T] = None
     (list, weights).zipped.foreach { case (item, weight) =>
-      if (weight > randomWeight) {
-        chosenItem = item
+      if (chosenItem.isEmpty && weight >= randomWeight) {
+        chosenItem = Some(item)
       }
       randomWeight = randomWeight - weight
     }
-    chosenItem
+    chosenItem.get
   }
 
   // Give true with probability p
