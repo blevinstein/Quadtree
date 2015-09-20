@@ -119,6 +119,26 @@ class QuadTreeTest extends FunSuite with Matchers {
     orFunc(q1, q4) shouldEqual q4
   }
 
+  test("QuadTree.merge for calculating area") {
+    def getArea(tree: QuadTree[Boolean]): Float = {
+      var totalArea = 0f
+      tree.iter { case (addr, bool) =>
+          totalArea += (if (bool) addr.toRectangle.area else 0)
+      }
+      totalArea
+    }
+
+    val q1 = new QuadBranch(new QuadLeaf(Empty), new QuadLeaf(Empty),
+        new QuadLeaf(Full), new QuadLeaf(Full))
+    val q2 = new QuadBranch(new QuadLeaf(Empty), new QuadLeaf(Full),
+        new QuadLeaf(Empty), new QuadLeaf(Full))
+
+    val matchFunc = QuadTree.merge((m1: Material, m2: Material) =>
+        if (m1 == m2) true else false) _
+
+    getArea(matchFunc(q1, q2)) shouldEqual 0.5f
+  }
+
   test("QuadTree#getData") {
     val q1 = new QuadBranch(
       new QuadLeaf(Empty),

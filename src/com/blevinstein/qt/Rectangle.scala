@@ -10,6 +10,8 @@ class Rectangle(val min: Point, val max: Point) {
 
   val center = (min + max) / 2
 
+  val area = (max.x - min.x) * (max.y - min.y)
+
   def contains(p: Point): Boolean = {
     p.x > min.x && p.x < max.x && p.y > min.y && p.y < max.y
   }
