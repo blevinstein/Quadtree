@@ -119,7 +119,7 @@ class QuadTreeTest extends FunSuite with Matchers {
     orFunc(q1, q4) shouldEqual q4
   }
 
-  test("QuadTree.merge for calculating area") {
+  test("QuadTree.merge and calculate overlapping area") {
     def getArea(tree: QuadTree[Boolean]): Float = {
       var totalArea = 0f
       tree.iter { case (addr, bool) =>
@@ -137,6 +137,26 @@ class QuadTreeTest extends FunSuite with Matchers {
         if (m1 == m2) true else false) _
 
     getArea(matchFunc(q1, q2)) shouldEqual 0.5f
+  }
+
+  test("QuadTree.transform and .reduce to calculate area") {
+    val avgFunc = QuadTree.reduce((xs: List[Float]) => {
+      require(xs.length == 4)
+      xs.reduceLeft(_ + _) / 4
+    }) _
+    val countFunc = QuadTree.transform((m: Material) => m match {
+      case Full => 1f
+      case Empty => 0f
+    }) _
+
+    val q1 = new QuadBranch(new QuadLeaf(Empty), new QuadLeaf(Full),
+      new QuadBranch(new QuadLeaf(Empty), new QuadLeaf(Full),
+        new QuadLeaf(Full), new QuadLeaf(Empty)),
+      new QuadLeaf(Empty))
+
+    val areaOf = (tree: QuadTree[Material]) => avgFunc(countFunc(tree))
+
+    areaOf(q1) shouldEqual 3.0/8
   }
 
   test("QuadTree#getData") {

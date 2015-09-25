@@ -37,6 +37,17 @@ object QuadTree {
     }
   }
 
+  def transform[X,Y](op: X => Y)(arg: QuadTree[X]): QuadTree[Y] = arg match {
+    case branch: QuadBranch[X] =>
+      branch.map((tree, _) => transform(op)(tree)).tryMerge
+    case leaf: QuadLeaf[X] => new QuadLeaf(op(leaf.data))
+  }
+
+  def reduce[X](op: List[X] => X)(arg: QuadTree[X]): X = arg match {
+    case branch: QuadBranch[X] => op(branch.subtrees.map(reduce(op)(_)))
+    case leaf: QuadLeaf[X] => leaf.data
+  }
+
   class Builder[T](background: T) {
     var pieces: List[(QuadAddr, T)] = List()
 
@@ -129,10 +140,19 @@ object QuadBranch {
   def create[T](f: Quadrant => QuadTree[T]): QuadBranch[T] = new QuadBranch(
     f(TopLeft), f(TopRight), f(BottomLeft), f(BottomRight))
 }
+/**
+ * +y
+ * ^^
+ * [ a b ]
+ * [ c d ] -> +x
+ */
 class QuadBranch[T](val a: QuadTree[T],
     val b: QuadTree[T],
     val c: QuadTree[T],
     val d: QuadTree[T]) extends QuadTree[T] {
+
+  val subtrees = List(a, b, c, d)
+
   def getSubtree(quadrant : Quadrant): QuadTree[T] = quadrant match {
     case TopLeft => a
     case TopRight => b
