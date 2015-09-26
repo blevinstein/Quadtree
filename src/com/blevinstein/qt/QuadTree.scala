@@ -93,7 +93,7 @@ abstract class QuadTree[+T] {
   }
 
   // Maximum depth of this QuadTree.
-  def maxDepth: Int = this match {
+  val maxDepth: Int = this match {
     case branch: QuadBranch[T] => List(branch.a.maxDepth + 1,
       branch.b.maxDepth + 1,
       branch.c.maxDepth + 1,
@@ -120,6 +120,21 @@ abstract class QuadTree[+T] {
       }
     }
     iter_recur(cb, this, new QuadAddr())
+  }
+
+  def shrink[T2 >: T](levels: Int, offset: QuadOffset, bg: T2): QuadTree[T2] = {
+    val newMaxDepth = maxDepth + levels
+    val scanSize = 1 << maxDepth
+    var builder = new QuadTree.Builder[T2](bg)
+    for (i <- 0 until scanSize) {
+      for (j <- 0 until scanSize) {
+        val fromAddr = new QuadOffset(maxDepth, i, j).toAddress(maxDepth)
+        val toAddr =
+          (new QuadOffset(newMaxDepth, i, j) + offset).toAddress(newMaxDepth)
+        builder.add(toAddr, getData(fromAddr))
+      }
+    }
+    builder.build
   }
 
   override def toString: String = {
