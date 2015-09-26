@@ -31,15 +31,24 @@ class QuadOffset(val depth: Int, val x: Int, val y: Int) {
   // d = depth (specificity) of the node at the address
   def toAddress(d: Int): QuadAddr = {
     require(isValid)
+    require(d >= depth)
     var currentX = x
     var currentY = y
     var addr = new QuadAddr()
     for (currentDepth <- 0 until d) {
+      val gridDepth = depth - 1 - currentDepth
       // calculate grid size from depth
-      val currentGridSize = 1 << (depth - 1 - currentDepth)
+      val currentGridSize = if (gridDepth >= 0) {
+          1 << gridDepth
+        } else {
+          0
+        }
       // find which quadrant we are in, and subtract from currentX/Y
-      val quadrant = new Quadrant(currentX >= currentGridSize,
-          currentY >= currentGridSize)
+      val quadrant = if (gridDepth >= 0) {
+          new Quadrant(currentX >= currentGridSize, currentY >= currentGridSize)
+        } else {
+          Quadrant.BottomLeft
+        }
       currentX = currentX - (if (quadrant.x) currentGridSize else 0)
       currentY = currentY - (if (quadrant.y) currentGridSize else 0)
       addr = addr + quadrant

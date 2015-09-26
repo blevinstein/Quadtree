@@ -186,11 +186,15 @@ class QuadTreeTest extends FunSuite with Matchers {
   }
 
   test("QuadAddr <=> QuadOffset") {
-    (new QuadAddr(TopRight, BottomRight).toOffset
-      shouldEqual new QuadOffset(2, 3, 2))
+    new QuadAddr(TopRight, BottomRight).toOffset shouldEqual
+        new QuadOffset(2, 3, 2)
 
-    (new QuadOffset(2, 3, 2).toAddress(2)
-      shouldEqual new QuadAddr(TopRight, BottomRight))
+    new QuadOffset(2, 3, 2).toAddress(2) shouldEqual
+        new QuadAddr(TopRight, BottomRight)
+
+    new QuadOffset(0, 0, 0).toAddress(1) shouldEqual new QuadAddr(BottomLeft)
+    new QuadOffset(0, 0, 0).toAddress(2) shouldEqual
+        new QuadAddr(BottomLeft, BottomLeft)
   }
 
   test("QuadRectangle#toRectangle") {
