@@ -20,8 +20,6 @@ object QuadTree {
   }
 
   // Used for constructing operators on QuadTrees
-  // TODO: handle offset: QuadOffset of q2 with respect to q1
-  // TODO: handle differently-sized QuadTrees? 'depth offset'?
   def merge[X,Y,Z](op: (X, Y) => Z)(q1: QuadTree[X],
       q2: QuadTree[Y]): QuadTree[Z] = {
     (q1, q2) match {
@@ -77,8 +75,6 @@ object QuadTree {
 }
 
 abstract class QuadTree[+T] {
-  // TODO: def transform(T -> O): QuadTree[O]
-
   def getData(p: Point): T = {
     require(p.x >= 0 && p.x <= 1)
     require(p.y >= 0 && p.y <= 1)
@@ -106,8 +102,7 @@ abstract class QuadTree[+T] {
   }
 
   // TODO: Implement prune(depth: Int): QuadTree such that r.maxDepth == depth
-  // PROBEM: need a way of merging? can take merge function of type
-  //   (Material x 4) => Material, e.g. "mode", but sampling must be recursive?
+  // use QuadTree.reduce to simplify below that depth
 
   /**
    * For each QuadLeaf in this QuadTree, emits its address and data

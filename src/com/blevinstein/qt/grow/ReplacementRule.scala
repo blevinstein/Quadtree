@@ -32,8 +32,6 @@ object ReplacementRule {
   /**
    * Creates a random replacement rule. Only generates simple rules, more
    * complex rules must be created through mutation.
-   * TODO: tweak weights
-   * TODO: refactor random creator functions out of ReplacementRule
    */
   def randomRule: ReplacementRule = new ReplacementRule(randomTransformTree)
   val leafWeight = 3
@@ -74,6 +72,7 @@ class ReplacementRule(rule: QuadTree[Material => Option[Material]]) {
 
 // Simple transform functions
 // TODO: add conditional behavior (e.g. fill space iff empty)
+// TODO: to make tryMerge work, these function factories should be memoized
 object ChangeMaterial {
   def apply(before: Material, after: Material): Material => Option[Material] =
       (m: Material) =>
@@ -87,3 +86,4 @@ object MatchMaterial {
 object AnyMaterial {
   def apply(): Material => Option[Material] = (m: Material) => Some(m)
 }
+
