@@ -11,10 +11,11 @@ class GrowTest extends FunSuite with Matchers {
   test("update - deterministic growth") {
     val rules = List(
       // expand from bottom left corner into empty space
-      new BranchRule(new LeafRule(ChangeMaterial(Empty, Full)),
-        new LeafRule(ChangeMaterial(Empty, Full)),
-        new LeafRule(MatchMaterial(Full)),
-        new LeafRule(ChangeMaterial(Empty, Full))))
+      new ReplacementRule(
+        new QuadBranch(new QuadLeaf(ChangeMaterial(Empty, Full)),
+          new QuadLeaf(ChangeMaterial(Empty, Full)),
+          new QuadLeaf(MatchMaterial(Full)),
+          new QuadLeaf(ChangeMaterial(Empty, Full)))))
 
     val q1 = new QuadTree.Builder[Material](Empty)
       .add(new QuadAddr(BottomLeft, BottomLeft), Full)
@@ -40,10 +41,11 @@ class GrowTest extends FunSuite with Matchers {
   test("GrowthSim - deterministic growth") {
     val genome = new QuadGenome(List(
       // expand from top right corner into empty space
-      new BranchRule(new LeafRule(ChangeMaterial(Empty, Full)),
-        new LeafRule(MatchMaterial(Full)),
-        new LeafRule(ChangeMaterial(Empty, Full)),
-        new LeafRule(ChangeMaterial(Empty, Full)))))
+      new ReplacementRule(
+        new QuadBranch(new QuadLeaf(ChangeMaterial(Empty, Full)),
+          new QuadLeaf(MatchMaterial(Full)),
+          new QuadLeaf(ChangeMaterial(Empty, Full)),
+          new QuadLeaf(ChangeMaterial(Empty, Full))))))
 
     GrowthSim(genome) shouldEqual
         (new QuadBranch(new QuadLeaf(Empty),
