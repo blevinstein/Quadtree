@@ -272,26 +272,26 @@ class QuadTreeTest extends FunSuite with Matchers {
         new QuadOffset(1, 2, 2).simplify)
   }
 
-  test("QuadTree#shrink") {
+  test("QuadTree#shrink (grow with levels < 0)") {
     val q1 = new QuadBranch(new QuadLeaf(Empty), new QuadLeaf(Full),
       new QuadLeaf(Full), new QuadLeaf(Empty))
     //val q1 = new QuadBranch(new QuadLeaf(Empty), new QuadLeaf(Full),
     //  new QuadLeaf(Full), new QuadLeaf(Empty));
 
-    q1.shrink(1, new QuadOffset(1, 0, 1), Empty) shouldEqual
+    q1.grow(-1, new QuadOffset(1, 0, 1), Empty) shouldEqual
       new QuadBranch(q1, new QuadLeaf(Empty),
         new QuadLeaf(Empty), new QuadLeaf(Empty))
 
-    q1.shrink(1, new QuadOffset(1, 1, 1), Empty) shouldEqual
+    q1.grow(-1, new QuadOffset(1, 1, 1), Empty) shouldEqual
       new QuadBranch(new QuadLeaf(Empty), q1,
         new QuadLeaf(Empty), new QuadLeaf(Empty))
 
-    q1.shrink(1, new QuadOffset(0, 0, 0), Empty) shouldEqual
+    q1.grow(-1, new QuadOffset(0, 0, 0), Empty) shouldEqual
       new QuadBranch(new QuadLeaf(Empty), new QuadLeaf(Empty),
         q1, new QuadLeaf(Empty))
 
     // New location crosses existing boundaries
-    q1.shrink(1, new QuadOffset(2, 1, 1), Empty) shouldEqual
+    q1.grow(-1, new QuadOffset(2, 1, 1), Empty) shouldEqual
       new QuadBranch(new QuadLeaf(Empty),
         new QuadBranch(new QuadLeaf(Empty), new QuadLeaf(Empty),
           new QuadLeaf(Full), new QuadLeaf(Empty)),
@@ -300,7 +300,7 @@ class QuadTreeTest extends FunSuite with Matchers {
         new QuadLeaf(Empty))
 
     // New location lies partially out of bounds
-    q1.shrink(1, new QuadOffset(2, 3, 3), Empty) shouldEqual
+    q1.grow(-1, new QuadOffset(2, 3, 3), Empty) shouldEqual
       new QuadBranch(new QuadLeaf(Empty),
         new QuadBranch(new QuadLeaf(Empty), new QuadLeaf(Full),
           new QuadLeaf(Empty), new QuadLeaf(Empty)),

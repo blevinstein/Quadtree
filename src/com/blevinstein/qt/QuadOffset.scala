@@ -31,7 +31,7 @@ class QuadOffset(val depth: Int, val x: Int, val y: Int) {
   // d = depth (specificity) of the node at the address
   def toAddress(d: Int): QuadAddr = {
     require(isValid)
-    require(d >= depth)
+    require(d >= simplify.depth, s"$this is more specific than depth $d")
     var currentX = x
     var currentY = y
     var addr = new QuadAddr()

@@ -122,10 +122,10 @@ abstract class QuadTree[+T] {
     iter_recur(cb, this, new QuadAddr())
   }
 
-  def shrink[T2 >: T](levels: Int, offset: QuadOffset, bg: T2): QuadTree[T2] = {
-    val newMaxDepth = maxDepth + levels
+  def grow[T2 >: T](levels: Int, offset: QuadOffset, bg: T2): QuadTree[T2] = {
+    val newMaxDepth = maxDepth - levels
     val scanSize = 1 << maxDepth
-    var builder = new QuadTree.Builder[T2](bg)
+    val builder = new QuadTree.Builder[T2](bg)
     for (i <- 0 until scanSize) {
       for (j <- 0 until scanSize) {
         val fromAddr = new QuadOffset(maxDepth, i, j).toAddress(maxDepth)
