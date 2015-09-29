@@ -78,7 +78,7 @@ object Driver extends App {
     var pop = Population.create(popSize,
         (_) => QuadGenome.create(initGenomeSize),
         (genome: QuadGenome) =>
-          GrowthSim(genome)._2 /* fitness = number of growth steps */)
+          GrowthSim(genome)._1.maxDepth /* fitness = max depth */)
     while (true) {
       pop = pop.evolve
       Console.println(s"$pop")

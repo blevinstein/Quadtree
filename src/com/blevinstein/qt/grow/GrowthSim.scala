@@ -21,7 +21,7 @@ object GrowthSim {
         .add(startAddress, Material.Full).build
     var steps = 0
     var done = false
-    val maxSteps = 50
+    val maxSteps = 100
     val maxMillis = 100
     val maxGrowth = new RateLimiter(maxMillis)
     while (!done && steps < maxSteps && !maxGrowth.check) {
