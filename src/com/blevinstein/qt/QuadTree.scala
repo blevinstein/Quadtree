@@ -85,7 +85,6 @@ abstract class QuadTree[+T] {
     }
   }
 
-  // TODO: return List[T]
   def getData(addr: QuadAddr): T = this match {
     case branch: QuadBranch[T] =>
       branch.getSubtree(addr.head).getData(addr.tail)
