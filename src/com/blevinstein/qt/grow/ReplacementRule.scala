@@ -34,13 +34,12 @@ object ReplacementRule {
    * complex rules must be created through mutation.
    */
   def randomRule: ReplacementRule = new ReplacementRule(randomTransformTree)
-  val leafWeight = 3
+  val leafWeight = 6
   val branchWeight=  1
-  val wildcardWeight = 3
   def randomTransformTree: QuadTree[Material => Option[Material]] =
       Decider.chooseWithWeight(
-        List('leaf, 'branch, 'wildcard),
-        List(leafWeight, branchWeight, wildcardWeight)) match {
+        List('leaf, 'branch),
+        List(leafWeight, branchWeight)) match {
     case 'leaf => new QuadLeaf(randomTransform)
     case 'branch => new QuadBranch(randomTransformTree, randomTransformTree,
       randomTransformTree, randomTransformTree)
