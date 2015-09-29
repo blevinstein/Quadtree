@@ -70,6 +70,12 @@ object Driver extends App {
 
   run
 
+  def leaves(tree: QuadTree[Any]): Int = tree match {
+    case branch: QuadBranch[Any] => leaves(branch.a) + leaves(branch.b) +
+        leaves(branch.c) + leaves(branch.d)
+    case leaf: QuadLeaf[Any] => 1
+  }
+
   def run : Unit  = {
     val popSize = 20
     val initGenomeSize = 10
@@ -77,8 +83,7 @@ object Driver extends App {
     val throttle = new Throttle(FPS)
     var pop = Population.create(popSize,
         (_) => QuadGenome.create(initGenomeSize),
-        (genome: QuadGenome) =>
-          GrowthSim(genome)._1.maxDepth /* fitness = max depth */)
+        (genome: QuadGenome) => leaves(GrowthSim(genome)._1))
     while (true) {
       pop = pop.evolve
       Console.println(s"$pop")
