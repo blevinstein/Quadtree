@@ -71,7 +71,7 @@ object Driver extends App {
   run
 
   def run : Unit  = {
-    val popSize = 15
+    val popSize = 20
     val initGenomeSize = 10
     val sampleLimiter = new RateLimiter(1000) // 1 second
     val throttle = new Throttle(FPS)
@@ -81,6 +81,7 @@ object Driver extends App {
           GrowthSim(genome)._2 /* fitness = number of growth steps */)
     while (true) {
       pop = pop.evolve
+      Console.println(s"$pop")
       if (sampleLimiter.check) {
         sample = GrowthSim(pop.sample)._1
       }

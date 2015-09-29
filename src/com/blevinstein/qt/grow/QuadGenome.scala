@@ -26,7 +26,7 @@ class QuadGenome(val rules: List[ReplacementRule]) extends Genome[QuadGenome] {
         // choose a random rule
         index,
         // TODO: replace with mutated version of rules(index)
-        ReplacementRule.randomRule))
+        rules(index).mutate))
     }
   }
   def crossover(other: QuadGenome): QuadGenome = {

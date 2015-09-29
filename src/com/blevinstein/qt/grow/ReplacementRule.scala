@@ -34,15 +34,13 @@ object ReplacementRule {
    * complex rules must be created through mutation.
    */
   def randomRule: ReplacementRule = new ReplacementRule(randomTransformTree)
-  val leafWeight = 6
-  val branchWeight=  1
   def randomTransformTree: QuadTree[Material => Option[Material]] =
       Decider.chooseWithWeight(
         List('leaf, 'branch),
-        List(leafWeight, branchWeight)) match {
+        List(6, 1)) match {
     case 'leaf => new QuadLeaf(randomTransform)
     case 'branch => new QuadBranch(randomTransformTree, randomTransformTree,
-      randomTransformTree, randomTransformTree)
+        randomTransformTree, randomTransformTree)
   }
   def randomTransform: Material => Option[Material] = Decider.choose(List(
       ChangeMaterial(randomMaterial, randomMaterial),
@@ -66,6 +64,33 @@ class ReplacementRule(rule: QuadTree[Material => Option[Material]]) {
     } catch {
       case e: NoMatchException => None
     }
+  }
+
+  def mutate: ReplacementRule = {
+    def mutate_recur(tree: QuadTree[Material => Option[Material]]):
+        QuadTree[Material => Option[Material]] = {
+      tree match {
+        case branch: QuadBranch[Material => Option[Material]] =>
+            Decider.chooseWithWeight(
+              List('recur, 'replace),
+              List(1, 1)) match {
+          case 'replace => ReplacementRule.randomTransformTree
+          case 'recur => Decider.choose(List('a, 'b, 'c, 'd)) match {
+            case 'a => new QuadBranch(mutate_recur(branch.a), branch.b,
+                branch.c, branch.d)
+            case 'b => new QuadBranch(branch.a, mutate_recur(branch.b),
+                branch.c, branch.d)
+            case 'c => new QuadBranch(branch.a, branch.b,
+                mutate_recur(branch.c), branch.d)
+            case 'd => new QuadBranch(branch.a, branch.b,
+                branch.c, mutate_recur(branch.d))
+          }
+        }
+        case leaf: QuadLeaf[Material => Option[Material]] =>
+            new QuadLeaf(ReplacementRule.randomTransform)
+      }
+    }
+    new ReplacementRule(mutate_recur(rule))
   }
 }
 

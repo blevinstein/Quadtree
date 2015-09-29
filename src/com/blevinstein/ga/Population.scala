@@ -46,5 +46,8 @@ class Population[T <: Genome[T]](members: List[T],
       chosenMember
     }
   }
+
+  override def toString: String =
+      s"Population(generation $generation, fitness $fitness)"
 }
 
