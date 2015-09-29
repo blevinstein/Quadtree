@@ -26,7 +26,8 @@ class QuadOffset(val depth: Int, val x: Int, val y: Int) {
   // copy constructor
   def this(offset: QuadOffset) = this(offset.depth, offset.x, offset.y)
 
-  def isValid: Boolean = (x < (1 << depth)) && (y < (1 << depth))
+  def isValid: Boolean = x >= 0 && x < (1 << depth) &&
+      y >= 0 && y < (1 << depth)
 
   // d = depth (specificity) of the node at the address
   def toAddress(d: Int): QuadAddr = {

@@ -306,5 +306,29 @@ class QuadTreeTest extends FunSuite with Matchers {
           new QuadLeaf(Empty), new QuadLeaf(Empty)),
         new QuadLeaf(Empty), new QuadLeaf(Empty))
   }
+
+  test("QuadTree#grow") {
+    // 4x4 checkerboard
+    val q1 = new QuadBranch(
+      new QuadBranch(new QuadLeaf(Empty), new QuadLeaf(Full),
+        new QuadLeaf(Full), new QuadLeaf(Empty)),
+      new QuadBranch(new QuadLeaf(Empty), new QuadLeaf(Full),
+        new QuadLeaf(Full), new QuadLeaf(Empty)),
+      new QuadBranch(new QuadLeaf(Empty), new QuadLeaf(Full),
+        new QuadLeaf(Full), new QuadLeaf(Empty)),
+      new QuadBranch(new QuadLeaf(Empty), new QuadLeaf(Full),
+        new QuadLeaf(Full), new QuadLeaf(Empty)))
+
+    // zoom in on bottom left squares
+    q1.grow(2, new QuadOffset(0, 0, 0), Empty) shouldEqual new QuadLeaf(Full)
+    q1.grow(2, new QuadOffset(0, -1, 0), Empty) shouldEqual new QuadLeaf(Empty)
+    q1.grow(2, new QuadOffset(0, 0, -1), Empty) shouldEqual new QuadLeaf(Empty)
+    q1.grow(2, new QuadOffset(0, -1, -1), Empty) shouldEqual new QuadLeaf(Full)
+
+    // zoom in on bottom left quadrant
+    q1.grow(1, QuadOffset.zero, Empty) shouldEqual
+      new QuadBranch(new QuadLeaf(Empty), new QuadLeaf(Full),
+        new QuadLeaf(Full), new QuadLeaf(Empty))
+  }
 }
 
