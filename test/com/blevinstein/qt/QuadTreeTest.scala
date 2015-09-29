@@ -290,6 +290,7 @@ class QuadTreeTest extends FunSuite with Matchers {
       new QuadBranch(new QuadLeaf(Empty), new QuadLeaf(Empty),
         q1, new QuadLeaf(Empty))
 
+    // New location crosses existing boundaries
     q1.shrink(1, new QuadOffset(2, 1, 1), Empty) shouldEqual
       new QuadBranch(new QuadLeaf(Empty),
         new QuadBranch(new QuadLeaf(Empty), new QuadLeaf(Empty),
@@ -297,6 +298,13 @@ class QuadTreeTest extends FunSuite with Matchers {
         new QuadBranch(new QuadLeaf(Empty), new QuadLeaf(Full),
           new QuadLeaf(Empty), new QuadLeaf(Empty)),
         new QuadLeaf(Empty))
+
+    // New location lies partially out of bounds
+    q1.shrink(1, new QuadOffset(2, 3, 3), Empty) shouldEqual
+      new QuadBranch(new QuadLeaf(Empty),
+        new QuadBranch(new QuadLeaf(Empty), new QuadLeaf(Full),
+          new QuadLeaf(Empty), new QuadLeaf(Empty)),
+        new QuadLeaf(Empty), new QuadLeaf(Empty))
   }
 }
 

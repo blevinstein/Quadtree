@@ -129,9 +129,11 @@ abstract class QuadTree[+T] {
     for (i <- 0 until scanSize) {
       for (j <- 0 until scanSize) {
         val fromAddr = new QuadOffset(maxDepth, i, j).toAddress(maxDepth)
-        val toAddr =
-          (new QuadOffset(newMaxDepth, i, j) + offset).toAddress(newMaxDepth)
-        builder.add(toAddr, getData(fromAddr))
+        val toOffset = new QuadOffset(newMaxDepth, i, j) + offset
+        if (toOffset.isValid) {
+          val toAddr = toOffset.toAddress(newMaxDepth)
+          builder.add(toAddr, getData(fromAddr))
+        } // else toAddr would be out of bounds
       }
     }
     builder.build
