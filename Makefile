@@ -25,7 +25,9 @@ default: compile style tests
 compile: ${SCALA_SRCS}
 	scalac -cp ${BUILDPATH} ${SCALAC_FLAGS} ${SCALA_SRCS} -d build
 
-run: compile
+run: compile quickrun
+
+quickrun:
 	scala -cp ${RUNPATH} ${DRIVER}
 
 shell:
