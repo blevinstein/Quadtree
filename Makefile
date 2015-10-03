@@ -32,7 +32,7 @@ shell:
 	scala -cp ${RUNPATH}
 
 style:
-	scalastyle -c scalastyle-config.xml src
+	${SCALASTYLE} -c scalastyle-config.xml src
 
 tests: compile
 	scala -cp ${TESTPATH} org.scalatest.run ${TESTS}
