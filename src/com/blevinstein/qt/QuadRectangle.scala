@@ -1,5 +1,7 @@
 package com.blevinstein.qt
 
+import com.blevinstein.geom.{Point,Rectangle}
+
 object QuadRectangle {
   val unit = new QuadRectangle(new QuadOffset(0, 0, 0), new QuadOffset(0, 1, 1))
 }

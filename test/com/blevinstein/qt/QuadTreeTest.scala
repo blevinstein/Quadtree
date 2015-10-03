@@ -1,5 +1,6 @@
 package com.blevinstein.qt
 
+import com.blevinstein.geom.{Point,Rectangle}
 import com.blevinstein.qt.Quadrant.{TopLeft,TopRight,BottomLeft,BottomRight}
 import com.blevinstein.qt.Material.{Empty,Full}
 

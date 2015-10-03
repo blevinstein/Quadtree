@@ -1,5 +1,7 @@
 package com.blevinstein.qt
 
+import com.blevinstein.geom.Point
+
 object Quadrant {
   val BottomLeft = new Quadrant(false, false)
   val BottomRight = new Quadrant(true, false)

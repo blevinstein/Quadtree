@@ -1,5 +1,7 @@
 package com.blevinstein.qt
 
+import com.blevinstein.geom.Rectangle
+
 import scala.language.implicitConversions
 
 object QuadAddr {

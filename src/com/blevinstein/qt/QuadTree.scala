@@ -1,5 +1,6 @@
 package com.blevinstein.qt
 
+import com.blevinstein.geom.{Point}
 import com.blevinstein.qt.Quadrant.{TopLeft,TopRight,BottomLeft,BottomRight}
 
 object QuadTree {

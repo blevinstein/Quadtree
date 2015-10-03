@@ -1,4 +1,4 @@
-package com.blevinstein.qt
+package com.blevinstein.geom
 
 object Point {
   val zero = new Point(0, 0)

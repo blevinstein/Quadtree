@@ -8,7 +8,7 @@ RUNPATH = build:${JARS}
 
 SCALAC_FLAGS = -feature
 
-DRIVER = com.blevinstein.qt.Driver
+DRIVER = com.blevinstein.qt.grow.Driver
 
 SCALA_SRCS = \
 		$(wildcard src/*/*/*/*.scala) \
