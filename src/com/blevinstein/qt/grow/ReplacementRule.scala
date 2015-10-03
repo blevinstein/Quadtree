@@ -34,7 +34,7 @@ object ReplacementRule {
    * complex rules must be created through mutation.
    */
   def randomRule: ReplacementRule = new ReplacementRule(randomTransformTree)
-  def randomTransformTree: QuadTree[Material => Option[Material]] =
+  def randomTransformTree: QuadTree[QuadTransform] =
       Decider.chooseWithWeight(
         List('leaf, 'branch),
         List(6, 1)) match {
@@ -42,7 +42,7 @@ object ReplacementRule {
     case 'branch => new QuadBranch(randomTransformTree, randomTransformTree,
         randomTransformTree, randomTransformTree)
   }
-  def randomTransform: Material => Option[Material] = Decider.choose(List(
+  def randomTransform: QuadTransform = Decider.choose(List(
       ChangeMaterial(randomMaterial, randomMaterial),
       MatchMaterial(randomMaterial),
       AnyMaterial()))
@@ -51,11 +51,11 @@ object ReplacementRule {
   def randomMaterial: Material =
     Decider.choose(List(Material.Empty, Material.Full))
 }
-class ReplacementRule(rule: QuadTree[Material => Option[Material]]) {
+class ReplacementRule(rule: QuadTree[QuadTransform]) {
   class NoMatchException extends RuntimeException
   def apply(tree: QuadTree[Material]): Option[QuadTree[Material]] = {
     val tryFunc = QuadTree.merge(
-      (m: Material, f: Material => Option[Material]) => f(m) match {
+      (m: Material, f: QuadTransform) => f(m) match {
         case Some(m) => m
         case None => throw new NoMatchException()
       }) _
@@ -67,10 +67,10 @@ class ReplacementRule(rule: QuadTree[Material => Option[Material]]) {
   }
 
   def mutate: ReplacementRule = {
-    def mutate_recur(tree: QuadTree[Material => Option[Material]]):
-        QuadTree[Material => Option[Material]] = {
+    def mutate_recur(tree: QuadTree[QuadTransform]):
+        QuadTree[QuadTransform] = {
       tree match {
-        case branch: QuadBranch[Material => Option[Material]] =>
+        case branch: QuadBranch[QuadTransform] =>
             Decider.chooseWithWeight(
               List('recur, 'replace),
               List(1, 1)) match {
@@ -86,7 +86,7 @@ class ReplacementRule(rule: QuadTree[Material => Option[Material]]) {
                 branch.c, mutate_recur(branch.d))
           }
         }
-        case leaf: QuadLeaf[Material => Option[Material]] =>
+        case leaf: QuadLeaf[QuadTransform] =>
             new QuadLeaf(ReplacementRule.randomTransform)
       }
     }
@@ -98,16 +98,16 @@ class ReplacementRule(rule: QuadTree[Material => Option[Material]]) {
 // TODO: add conditional behavior (e.g. fill space iff empty)
 // TODO: to make tryMerge work, these function factories should be memoized
 object ChangeMaterial {
-  def apply(before: Material, after: Material): Material => Option[Material] =
+  def apply(before: Material, after: Material): QuadTransform =
       (m: Material) =>
         if (m == before) Some(after) else None
 }
 object MatchMaterial {
-  def apply(material: Material): Material => Option[Material] =
+  def apply(material: Material): QuadTransform =
       (m: Material) =>
         if (m == material) Some(m) else None
 }
 object AnyMaterial {
-  def apply(): Material => Option[Material] = (m: Material) => Some(m)
+  def apply(): QuadTransform = (m: Material) => Some(m)
 }
 

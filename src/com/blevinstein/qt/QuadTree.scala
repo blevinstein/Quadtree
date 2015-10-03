@@ -106,7 +106,6 @@ abstract class QuadTree[+T] {
   /**
    * For each QuadLeaf in this QuadTree, emits its address and data
    */
-  type IterCallback[T] = (QuadAddr, T) => Unit
   def iter(cb: IterCallback[T]): Unit = {
     def iter_recur(cb: IterCallback[T], qt: QuadTree[T],
         addr: QuadAddr): Unit = {
