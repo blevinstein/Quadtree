@@ -25,7 +25,6 @@ class QuadGenome(val rules: List[ReplacementRule]) extends Genome[QuadGenome] {
       new QuadGenome(rules.updated(
         // choose a random rule
         index,
-        // TODO: replace with mutated version of rules(index)
         rules(index).mutate))
     }
   }
