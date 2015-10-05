@@ -8,8 +8,6 @@ RUNPATH = build:${JARS}
 
 SCALAC_FLAGS = -feature
 
-DRIVER = com.blevinstein.qt.grow.Driver
-
 SCALA_SRCS = \
 		$(wildcard src/*/*/*/*.scala) \
 		$(wildcard src/*/*/*/*/*.scala) \
@@ -25,10 +23,11 @@ default: compile style tests
 compile: ${SCALA_SRCS}
 	scalac -cp ${BUILDPATH} ${SCALAC_FLAGS} ${SCALA_SRCS} -d build
 
-run: compile quickrun
+grow: compile
+	scala -cp ${RUNPATH} com.blevinstein.qt.grow.Driver
 
-quickrun:
-	scala -cp ${RUNPATH} ${DRIVER}
+sim: compile
+	scala -cp ${RUNPATH} com.blevinstein.qt.sim.Driver
 
 shell:
 	scala -cp ${RUNPATH}
