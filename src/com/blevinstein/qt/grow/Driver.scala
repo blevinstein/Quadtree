@@ -63,12 +63,7 @@ object Driver extends App {
   frame.setVisible(true)
 
   // setup game
-  var sample = QuadTree.approx(4, (p) =>
-      if ((p - new Point(0.5f, 0.5f)).mag < 0.5f) {
-        Material.Full
-      } else {
-        Material.Empty
-      })
+  var sample = QuadTree.approx(4, (p) => (p - new Point(0.5f, 0.5f)).mag < 0.5f)
 
   run
 
@@ -139,7 +134,7 @@ object Driver extends App {
     // draw quadtree
     var rects = List[Rectangle]()
     sample.iter((addr, m) => {
-      if (m == Material.Full) {
+      if (m) {
         rects = addr.toRectangle :: rects
       }
     })
