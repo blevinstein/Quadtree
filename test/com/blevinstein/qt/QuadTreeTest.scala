@@ -78,14 +78,8 @@ class QuadTreeTest extends FunSuite with Matchers {
   }
 
   test("QuadTree.merge") {
-    val andFunc = QuadTree.merge((m1: Boolean, m2: Boolean) =>
-        if (m1 == true && m2 == true)
-          true
-        else false) _
-    val orFunc = QuadTree.merge((m1: Boolean, m2: Boolean) =>
-        if (m1 == true || m2 == true)
-          true
-        else false) _
+    val andFunc = QuadTree.merge((b1: Boolean, b2: Boolean) => (b1 && b2)) _
+    val orFunc = QuadTree.merge((b1: Boolean, b2: Boolean) => (b1 || b2)) _
 
     val q1 = new QuadBranch(
       new QuadLeaf(false),
@@ -133,8 +127,7 @@ class QuadTreeTest extends FunSuite with Matchers {
     val q2 = new QuadBranch(new QuadLeaf(false), new QuadLeaf(true),
         new QuadLeaf(false), new QuadLeaf(true))
 
-    val matchFunc = QuadTree.merge((m1: Boolean, m2: Boolean) =>
-        if (m1 == m2) true else false) _
+    val matchFunc = QuadTree.merge((b1: Boolean, b2: Boolean) => (m1 == m2)) _
 
     getArea(matchFunc(q1, q2)) shouldEqual 0.5f
   }
