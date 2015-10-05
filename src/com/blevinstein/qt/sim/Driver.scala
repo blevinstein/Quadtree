@@ -62,14 +62,12 @@ object Driver extends App {
   frame.setVisible(true)
 
   // setup game
-  var sample = QuadTree.approx(4, (p) =>
-      if ((p - new Point(0.5f, 0.5f)).mag < 0.25f) {
+  var world = World.from(QuadTree.approx(5, (p) =>
+      if (p.y < math.sin(p.x * math.Pi)) {
         Material.Blue
-      } else if ((p - new Point(0.5f, 0.5f)).mag < 0.5f) {
-        Material.Gray
       } else {
         Material.Empty
-      })
+      }))
 
   run
 
@@ -123,7 +121,7 @@ object Driver extends App {
 
     // draw quadtree
     var rects = List[(Rectangle,Color)]()
-    sample.iter((addr, m) => m match {
+    world.view.iter((addr, m) => m match {
       case Some(mat) => rects = (addr.toRectangle, mat.color) :: rects
       case None => ()
     })
