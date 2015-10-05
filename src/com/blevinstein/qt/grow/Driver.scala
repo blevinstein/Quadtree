@@ -2,7 +2,6 @@ package com.blevinstein.qt.grow
 
 import com.blevinstein.ga.Population
 import com.blevinstein.geom.{Point,Rectangle}
-import com.blevinstein.qt.Material
 import com.blevinstein.qt.{QuadAddr,QuadOffset,Quadrant,QuadRectangle}
 import com.blevinstein.qt.{QuadTree,QuadLeaf,QuadBranch}
 import com.blevinstein.qt.Transform

@@ -1,4 +1,4 @@
-package com.blevinstein.qt
+package com.blevinstein.qt.grow
 
 object Material {
   val Empty = new Material

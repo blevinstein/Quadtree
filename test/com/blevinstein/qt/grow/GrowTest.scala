@@ -1,7 +1,6 @@
 package com.blevinstein.qt.grow
 
-import com.blevinstein.qt.Material
-import com.blevinstein.qt.Material.{Empty,Full}
+import com.blevinstein.qt.grow.Material.{Empty,Full}
 import com.blevinstein.qt.{QuadTree,QuadBranch,QuadLeaf,QuadAddr}
 import com.blevinstein.qt.Quadrant.{TopLeft,TopRight,BottomLeft,BottomRight}
 

@@ -1,6 +1,5 @@
 package com.blevinstein.qt.grow
 
-import com.blevinstein.qt.Material
 import com.blevinstein.qt.{QuadTree,QuadBranch,QuadLeaf}
 import com.blevinstein.util.Decider
 
