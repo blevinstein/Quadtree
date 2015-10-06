@@ -122,17 +122,18 @@ abstract class QuadTree[+T] {
   }
 
   def grow[T2 >: T](levels: Int, offset: QuadOffset, bg: T2): QuadTree[T2] = {
-    val newMaxDepth = maxDepth - levels
-    val scanSize = 1 << maxDepth
+    val newMaxDepth = math.max(maxDepth - levels, offset.depth)
+    val scanSize = 1 << (newMaxDepth + levels)
     val builder = new QuadTree.Builder[T2](bg)
     for (i <- 0 until scanSize) {
       for (j <- 0 until scanSize) {
-        val fromAddr = new QuadOffset(maxDepth, i, j).toAddress(maxDepth)
+        val fromOffset = new QuadOffset(newMaxDepth + levels, i, j)
         val toOffset = new QuadOffset(newMaxDepth, i, j) + offset
-        if (toOffset.isValid) {
+        if (fromOffset.isValid && toOffset.isValid) {
+          val fromAddr = fromOffset.toAddress(newMaxDepth + levels)
           val toAddr = toOffset.toAddress(newMaxDepth)
           builder.add(toAddr, getData(fromAddr))
-        } // else toAddr would be out of bounds
+        }
       }
     }
     builder.build

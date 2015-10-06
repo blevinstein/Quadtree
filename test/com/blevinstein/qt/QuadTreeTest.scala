@@ -268,8 +268,6 @@ class QuadTreeTest extends FunSuite with Matchers {
   test("QuadTree#shrink (grow with levels < 0)") {
     val q1 = new QuadBranch(new QuadLeaf(false), new QuadLeaf(true),
       new QuadLeaf(true), new QuadLeaf(false))
-    //val q1 = new QuadBranch(new QuadLeaf(false), new QuadLeaf(true),
-    //  new QuadLeaf(true), new QuadLeaf(false));
 
     q1.grow(-1, new QuadOffset(1, 0, 1), false) shouldEqual
       new QuadBranch(q1, new QuadLeaf(false),
@@ -282,8 +280,12 @@ class QuadTreeTest extends FunSuite with Matchers {
     q1.grow(-1, new QuadOffset(0, 0, 0), false) shouldEqual
       new QuadBranch(new QuadLeaf(false), new QuadLeaf(false),
         q1, new QuadLeaf(false))
+  }
 
-    // New location crosses existing boundaries
+  test("QuadTree#shrink - crosses existing boundaries") {
+    val q1 = new QuadBranch(new QuadLeaf(false), new QuadLeaf(true),
+      new QuadLeaf(true), new QuadLeaf(false))
+
     q1.grow(-1, new QuadOffset(2, 1, 1), false) shouldEqual
       new QuadBranch(new QuadLeaf(false),
         new QuadBranch(new QuadLeaf(false), new QuadLeaf(false),
@@ -291,13 +293,41 @@ class QuadTreeTest extends FunSuite with Matchers {
         new QuadBranch(new QuadLeaf(false), new QuadLeaf(true),
           new QuadLeaf(false), new QuadLeaf(false)),
         new QuadLeaf(false))
+  }
 
-    // New location lies partially out of bounds
+  test("QuadTree#shrink - new location partially out of bounds") {
+    val q1 = new QuadBranch(new QuadLeaf(false), new QuadLeaf(true),
+      new QuadLeaf(true), new QuadLeaf(false))
+
     q1.grow(-1, new QuadOffset(2, 3, 3), false) shouldEqual
       new QuadBranch(new QuadLeaf(false),
         new QuadBranch(new QuadLeaf(false), new QuadLeaf(true),
           new QuadLeaf(false), new QuadLeaf(false)),
         new QuadLeaf(false), new QuadLeaf(false))
+  }
+
+  test("QuadTree#shrink - new location is axis-aligned") {
+    val q1 = new QuadBranch(new QuadLeaf(false), new QuadLeaf(true),
+      new QuadLeaf(true), new QuadLeaf(false))
+
+    new QuadLeaf(true).grow(-2, new QuadOffset(1, 1, 1), false) shouldEqual
+      new QuadBranch(new QuadLeaf(false),
+        new QuadBranch(new QuadLeaf(false), new QuadLeaf(false),
+          new QuadLeaf(true), new QuadLeaf(false)),
+        new QuadLeaf(false), new QuadLeaf(false))
+  }
+
+  test("QuadTree#grow - offset.depth > maxDepth") {
+    new QuadLeaf(true).grow(-1, new QuadOffset(2, 1, 1), false) shouldEqual
+      new QuadBranch(
+        new QuadBranch(new QuadLeaf(false), new QuadLeaf(false),
+          new QuadLeaf(false), new QuadLeaf(true)),
+        new QuadBranch(new QuadLeaf(false), new QuadLeaf(false),
+          new QuadLeaf(true), new QuadLeaf(false)),
+        new QuadBranch(new QuadLeaf(false), new QuadLeaf(true),
+          new QuadLeaf(false), new QuadLeaf(false)),
+        new QuadBranch(new QuadLeaf(true), new QuadLeaf(false),
+          new QuadLeaf(false), new QuadLeaf(false)))
   }
 
   test("QuadTree#grow") {
