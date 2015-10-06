@@ -26,6 +26,8 @@ import com.jogamp.opengl.util.awt.TextRenderer
 import java.awt.Color
 import java.awt.Font
 import java.awt.Frame
+import java.awt.event.KeyAdapter
+import java.awt.event.KeyEvent
 import java.awt.event.MouseAdapter
 import java.awt.event.MouseEvent
 import java.awt.event.MouseMotionAdapter
@@ -51,6 +53,7 @@ object Driver extends App {
   glCanvas.addGLEventListener(EventListener)
   // scalastyle:off magic.number
   val textRenderer = new TextRenderer(new Font("Arial", Font.PLAIN, 10))
+  glCanvas.addKeyListener(KeyListener)
   glCanvas.addMouseListener(MouseListener)
   glCanvas.addMouseMotionListener(MouseMotionListener)
 
@@ -142,21 +145,29 @@ object Driver extends App {
     gl.glFlush()
   }
 
+  object KeyListener extends KeyAdapter {
+    var keysDown: Set[Integer] = Set()
+
+    def keyDown(keyCode: Integer): Boolean = keysDown.contains(keyCode)
+    override def keyPressed(e: KeyEvent): Unit = keysDown += e.getKeyCode()
+    override def keyReleased(e: KeyEvent): Unit = keysDown -= e.getKeyCode()
+  }
+
   object MouseListener extends MouseAdapter {
-    override def mouseClicked(e : MouseEvent): Unit = {}
+    override def mouseClicked(e: MouseEvent): Unit = {}
   }
 
   object MouseMotionListener extends MouseMotionAdapter {
-    override def mouseMoved(e : MouseEvent): Unit = {}
+    override def mouseMoved(e: MouseEvent): Unit = {}
   }
 
   object EventListener extends GLEventListener {
     // Respond to changes in width or height
     def reshape(drawable : GLAutoDrawable,
-        x : Int,
-        y : Int,
-        w : Int,
-        h : Int) : Unit = {
+        x: Int,
+        y: Int,
+        w: Int,
+        h: Int) : Unit = {
       // update screen dimensions
       width = w
       height = h
