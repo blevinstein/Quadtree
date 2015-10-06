@@ -9,7 +9,7 @@ object World {
 class World(val env: QuadTree[Option[Material]],
     val objs: List[QuadObject]) {
   // TODO: def view -> val view
-  def view: QuadTree[Option[Material]] = {
+  val view: QuadTree[Option[Material]] = {
     val addOp = QuadTree.merge((m1: Option[Material], m2: Option[Material]) =>
         m2 match {
           case Some(mat) => m2
