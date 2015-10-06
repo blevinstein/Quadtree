@@ -66,9 +66,17 @@ object Driver extends App {
   frame.setVisible(true)
 
   // setup game
-  var figure = new QuadObject(-3,
-      new QuadOffset(1, 1, 1),
-      new QuadLeaf(Material.Blue))
+  def checkerboard(depth: Int): QuadTree[Option[Material]] = depth match {
+    case 1 => new QuadBranch(new QuadLeaf(Material.Empty),
+      new QuadLeaf(Material.Blue),
+      new QuadLeaf(Material.Blue),
+      new QuadLeaf(Material.Empty))
+    case other => new QuadBranch(checkerboard(other - 1),
+      checkerboard(other - 1),
+      checkerboard(other - 1),
+      checkerboard(other - 1))
+  }
+  var figure = new QuadObject(-3, new QuadOffset(1, 1, 1), checkerboard(3))
   var world = World.from(QuadTree.approx(5, (p) =>
       if (p.y < math.sin(p.x * math.Pi)) {
         Material.Gray
@@ -85,7 +93,7 @@ object Driver extends App {
     }
   }
 
-  val moveDepth = 6
+  val moveDepth = 7
   val down = new QuadOffset(moveDepth, 0, -1)
   val left = new QuadOffset(moveDepth, -1, 0)
   val right = new QuadOffset(moveDepth, 1, 0)
