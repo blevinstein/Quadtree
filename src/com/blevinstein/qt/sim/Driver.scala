@@ -85,10 +85,11 @@ object Driver extends App {
     }
   }
 
-  val down = new QuadOffset(5, 0, -1)
-  val left = new QuadOffset(5, -1, 0)
-  val right = new QuadOffset(5, 1, 0)
-  val up = new QuadOffset(5, 0, 1)
+  val moveDepth = 6
+  val down = new QuadOffset(moveDepth, 0, -1)
+  val left = new QuadOffset(moveDepth, -1, 0)
+  val right = new QuadOffset(moveDepth, 1, 0)
+  val up = new QuadOffset(moveDepth, 0, 1)
   def mainLoop: Unit = {
     if (KeyListener.keyDown(VK_DOWN)) {
       world = world.update((obj) => obj + down)
