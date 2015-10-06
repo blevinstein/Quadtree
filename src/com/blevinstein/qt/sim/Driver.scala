@@ -28,6 +28,7 @@ import java.awt.Font
 import java.awt.Frame
 import java.awt.event.KeyAdapter
 import java.awt.event.KeyEvent
+import java.awt.event.KeyEvent.{VK_DOWN,VK_LEFT,VK_RIGHT,VK_UP}
 import java.awt.event.MouseAdapter
 import java.awt.event.MouseEvent
 import java.awt.event.MouseMotionAdapter
@@ -35,13 +36,13 @@ import java.awt.event.WindowAdapter
 import java.awt.event.WindowEvent
 
 object Driver extends App {
-  val FPS : Int = 60
+  val FPS: Int = 60
   // dimensions of the screen
-  var height : Int = 1
-  var width : Int = 1
+  var height: Int = 1
+  var width: Int = 1
   // size and offset of the screen
-  var size : Int = 1
-  var offset : Point = Point.zero
+  var size: Int = 1
+  var offset: Point = Point.zero
 
   // setup OpenGL
   val glProfile = GLProfile.getDefault()
@@ -75,20 +76,37 @@ object Driver extends App {
         Material.Empty
       })).withObjects(List(figure))
 
-  run
-
-  def run : Unit  = {
+  def run: Unit = {
     val throttle = new Throttle(FPS)
     while (true) {
-      // main loop
+      mainLoop
       glCanvas.display()
       throttle.sleep
     }
   }
 
-  def getCanvas : GLCanvas = glCanvas
+  val down = new QuadOffset(5, 0, -1)
+  val left = new QuadOffset(5, -1, 0)
+  val right = new QuadOffset(5, 1, 0)
+  val up = new QuadOffset(5, 0, 1)
+  def mainLoop: Unit = {
+    if (KeyListener.keyDown(VK_DOWN)) {
+      world = world.update((obj) => obj + down)
+    }
+    if (KeyListener.keyDown(VK_LEFT)) {
+      world = world.update((obj) => obj + left)
+    }
+    if (KeyListener.keyDown(VK_RIGHT)) {
+      world = world.update((obj) => obj + right)
+    }
+    if (KeyListener.keyDown(VK_UP)) {
+      world = world.update((obj) => obj + up)
+    }
+  }
 
-  def setup(gl : GL2) : Unit = {
+  def getCanvas: GLCanvas = glCanvas
+
+  def setup(gl: GL2): Unit = {
     gl.glMatrixMode(GL_PROJECTION)
     gl.glLoadIdentity
 
@@ -101,18 +119,18 @@ object Driver extends App {
     gl.glViewport(0, 0, width, height)
   }
 
-  def render(gl : GL2) : Unit = {
+  def render(gl: GL2): Unit = {
     // drawing subroutines
-    def setColor(c : Color): Unit = {
+    def setColor(c: Color): Unit = {
       gl.glColor4d(c.getRed() / 255.0,
         c.getGreen() / 255.0,
         c.getBlue() / 255.0,
         c.getAlpha() / 255.0)
     }
-    def setFill(fill : Boolean): Unit = {
+    def setFill(fill: Boolean): Unit = {
       gl.glPolygonMode(GL_FRONT_AND_BACK, if (fill) GL_FILL else GL_LINE)
     }
-    def drawRect(rect : Rectangle): Unit = {
+    def drawRect(rect: Rectangle): Unit = {
       val screenRect = rect * size + offset
       gl.glRectf(screenRect.min.x, screenRect.min.y,
           screenRect.max.x, screenRect.max.y)
@@ -163,11 +181,11 @@ object Driver extends App {
 
   object EventListener extends GLEventListener {
     // Respond to changes in width or height
-    def reshape(drawable : GLAutoDrawable,
+    def reshape(drawable: GLAutoDrawable,
         x: Int,
         y: Int,
         w: Int,
-        h: Int) : Unit = {
+        h: Int): Unit = {
       // update screen dimensions
       width = w
       height = h
@@ -182,22 +200,24 @@ object Driver extends App {
       setup(drawable.getGL().getGL2())
     }
 
-    def init(drawable : GLAutoDrawable) : Unit =
+    def init(drawable: GLAutoDrawable): Unit =
         setup(drawable.getGL().getGL2())
 
-    def dispose(drawable : GLAutoDrawable) : Unit = ()
+    def dispose(drawable: GLAutoDrawable): Unit = ()
 
-    def display(drawable : GLAutoDrawable) : Unit =
+    def display(drawable: GLAutoDrawable): Unit =
         render(drawable.getGL().getGL2())
   }
 
   object WindowListener extends WindowAdapter {
     // When window is closed, exit program
-    override def windowClosing(e : WindowEvent) : Unit = {
+    override def windowClosing(e: WindowEvent): Unit = {
       frame.remove(glCanvas)
       frame.dispose()
       System.exit(0)
     }
   }
+
+  run
 }
 
