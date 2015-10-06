@@ -22,4 +22,8 @@ class World(val env: QuadTree[Option[Material]],
     }
     viewTree
   }
+
+  def withObjects(objs: List[QuadObject]): World = new World(env, objs)
+
+  def update(f: QuadObject => QuadObject): World = new World(env, objs map f)
 }

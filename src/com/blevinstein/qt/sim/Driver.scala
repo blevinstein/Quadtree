@@ -62,12 +62,15 @@ object Driver extends App {
   frame.setVisible(true)
 
   // setup game
+  var figure = new QuadObject(-3,
+      new QuadOffset(1, 1, 1),
+      new QuadLeaf(Material.Blue))
   var world = World.from(QuadTree.approx(5, (p) =>
       if (p.y < math.sin(p.x * math.Pi)) {
-        Material.Blue
+        Material.Gray
       } else {
         Material.Empty
-      }))
+      })).withObjects(List(figure))
 
   run
 
