@@ -10,6 +10,6 @@ class QuadObject(val position: QuadRectangle,
   def +(offset: QuadOffset): QuadObject =
       new QuadObject(position + offset, shape)
 
-  def toQuadTree: QuadTree[Option[Material]] =
+  val toQuadTree: QuadTree[Option[Material]] =
       shape.grow(position.perfectLog.get, position.min, Material.Empty)
 }

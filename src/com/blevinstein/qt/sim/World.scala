@@ -24,7 +24,8 @@ class World(val env: QuadTree[Option[Material]],
 
   def withObjects(objs: List[QuadObject]): World = new World(env, objs)
 
-  def update(f: QuadObject => QuadObject): World = new World(env, objs map f)
+  def update(f: (World, QuadObject) => QuadObject): World =
+      new World(env, objs.map((obj) => f(this, obj)))
 
   override def toString: String = s"World(env=$env, objs=$objs)"
 }

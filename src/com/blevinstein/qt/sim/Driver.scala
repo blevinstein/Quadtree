@@ -76,7 +76,8 @@ object Driver extends App {
       checkerboard(other - 1),
       checkerboard(other - 1))
   }
-  var figure = new QuadObject((QuadRectangle.unit >> 3) + QuadOffset.half, checkerboard(3))
+  var figure = new QuadObject(
+    (QuadRectangle.unit >> 3) + QuadOffset.half, checkerboard(2))
   var world = World.from(QuadTree.approx(5, (p) =>
       if ((p - new Point(0.5f, 0.5f)).mag >= 0.5f) {
         Material.Gray
@@ -100,16 +101,34 @@ object Driver extends App {
   val up = new QuadOffset(QuadLen.zero, moveLen)
   def mainLoop: Unit = {
     if (KeyListener.keyDown(VK_DOWN)) {
-      world = world.update((obj) => obj + down)
+      world = world.update(moveIfPossible(down) _)
     }
     if (KeyListener.keyDown(VK_LEFT)) {
-      world = world.update((obj) => obj + left)
+      world = world.update(moveIfPossible(left) _)
     }
     if (KeyListener.keyDown(VK_RIGHT)) {
-      world = world.update((obj) => obj + right)
+      world = world.update(moveIfPossible(right) _)
     }
     if (KeyListener.keyDown(VK_UP)) {
-      world = world.update((obj) => obj + up)
+      world = world.update(moveIfPossible(up) _)
+    }
+  }
+
+  val collideOp = QuadTree.merge((m1: Option[Material], m2: Option[Material]) =>
+      (m1, m2) match {
+        case (Some(_), Some(_)) => true
+        case _ => false
+      }) _
+  val anyOp = QuadTree.reduce((bs: List[Boolean]) => {
+        bs.exists((b) => b)
+      }) _
+  def moveIfPossible(offset: QuadOffset)(world: World, obj: QuadObject) = {
+    // NOTE: only implements collision with the environment
+    val newObj = obj + offset
+    if (anyOp(collideOp(newObj.toQuadTree, world.env))) { // detect any collision
+      obj
+    } else {
+      newObj
     }
   }
 
