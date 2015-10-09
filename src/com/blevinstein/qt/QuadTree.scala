@@ -122,7 +122,7 @@ abstract class QuadTree[+T] {
   }
 
   def grow[T2 >: T](levels: Int, offset: QuadOffset, bg: T2): QuadTree[T2] = {
-    val newMaxDepth = math.max(maxDepth - levels, offset.depth)
+    val newMaxDepth = math.max(maxDepth - levels, offset.maxDepth)
     val scanSize = 1 << (newMaxDepth + levels)
     val builder = new QuadTree.Builder[T2](bg)
     for (i <- 0 until scanSize) {

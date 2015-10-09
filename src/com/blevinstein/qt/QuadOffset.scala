@@ -16,15 +16,17 @@ object QuadOffset {
   val zero = new QuadOffset(0, 0, 0)
 
   def normalize(a: QuadOffset, b: QuadOffset): (Int, QuadOffset, QuadOffset) = {
-    val maxDepth = math.max(a.depth, b.depth)
-    val aNorm = a.atDepth(maxDepth)
-    val bNorm = b.atDepth(maxDepth)
-    (maxDepth, aNorm, bNorm)
+    val depth = math.max(a.depth, b.depth)
+    val aNorm = a.atDepth(depth)
+    val bNorm = b.atDepth(depth)
+    (depth, aNorm, bNorm)
   }
 }
-class QuadOffset(val depth: Int, val x: Int, val y: Int) {
-  // copy constructor
-  def this(offset: QuadOffset) = this(offset.depth, offset.x, offset.y)
+class QuadOffset(private val depth: Int, val x: Int, val y: Int) {
+  val fx = 1f * x / (1 << depth)
+  val fy = 1f * y / (1 << depth)
+
+  val maxDepth = depth
 
   def isValid: Boolean = x >= 0 && x < (1 << depth) &&
       y >= 0 && y < (1 << depth)

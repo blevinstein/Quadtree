@@ -7,8 +7,8 @@ object QuadRectangle {
 }
 class QuadRectangle(val min: QuadOffset, val max: QuadOffset) {
   def toRectangle: Rectangle = new Rectangle(
-      new Point(1f * min.x / (1 << min.depth), 1f * min.y / (1 << min.depth)),
-      new Point(1f * max.x / (1 << max.depth), 1f * max.y / (1 << max.depth)))
+      new Point(1f * min.fx, 1f * min.fy),
+      new Point(1f * max.fx, 1f * max.fy))
 
   // Returns the intersection of two QuadRectangles
   def prune(other: QuadRectangle): QuadRectangle = {
