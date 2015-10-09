@@ -78,8 +78,8 @@ object Driver extends App {
   }
   var figure = new QuadObject(
     (QuadRectangle.unit >> 3) + QuadOffset.half, checkerboard(2))
-  var world = World.from(QuadTree.approx(5, (p) =>
-      if ((p - new Point(0.5f, 0.5f)).mag >= 0.5f) {
+  var world = World.from(QuadTree.approx(6, (p) =>
+      if ((p - new Point(0.5f, 0.5f)).mag >= 0.48f) {
         Material.Gray
       } else {
         Material.Empty
