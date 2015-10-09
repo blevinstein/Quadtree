@@ -4,12 +4,12 @@ import com.blevinstein.geom.{Point}
 import com.blevinstein.qt.Quadrant.{TopLeft,TopRight,BottomLeft,BottomRight}
 
 object QuadTree {
-  // returns a mapping from the unit rectangle to the given quadrant
+  // Returns a mapping from the unit rectangle to the given quadrant.
   def zoomFunc(quad : Quadrant): (Point => Point) =
     (p) => (p + new Point(if (quad.x) 1 else 0, if (quad.y) 1 else 0)) / 2
 
-  // returns an approximation of the f over the unit rectangle up to a maximum
-  // depth
+  // Returns an approximation of the f over the unit rectangle up to a maximum
+  // depth.
   def approx[T](depth: Int, f: Point => T): QuadTree[T] = {
     if (depth <= 0) {
       new QuadLeaf(f(new Point(0.5f, 0.5f)))
