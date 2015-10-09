@@ -13,116 +13,67 @@ package com.blevinstein.qt
  * appropriate depth.
  */
 object QuadOffset {
-  val zero = new QuadOffset(0, 0, 0)
-
-  def normalize(a: QuadOffset, b: QuadOffset): (Int, QuadOffset, QuadOffset) = {
-    val depth = math.max(a.depth, b.depth)
-    val aNorm = a.atDepth(depth)
-    val bNorm = b.atDepth(depth)
-    (depth, aNorm, bNorm)
-  }
+  val zero = new QuadOffset(QuadLen.zero, QuadLen.zero)
+  val half = new QuadOffset(QuadLen.half, QuadLen.half)
+  val one = new QuadOffset(QuadLen.one, QuadLen.one)
 }
-class QuadOffset(private val depth: Int, val x: Int, val y: Int) {
-  val fx = 1f * x / (1 << depth)
-  val fy = 1f * y / (1 << depth)
+class QuadOffset(val x: QuadLen, val y: QuadLen) {
+  val fx = x.toFloat
+  val fy = y.toFloat
 
-  val maxDepth = depth
+  val minExp = QuadLen.normalize(x, y) match {
+    case (a: Int, b: Int, exp: Int) => exp
+  }
 
-  def isValid: Boolean = x >= 0 && x < (1 << depth) &&
-      y >= 0 && y < (1 << depth)
+  def isValid: Boolean = x >= QuadLen.zero && x < QuadLen.one &&
+      y >= QuadLen.zero && y < QuadLen.one
 
-  // d = depth (specificity) of the node at the address
-  def toAddress(d: Int): QuadAddr = {
+  // Returns an address of the given length
+  def toAddress(length: Int): QuadAddr = {
     require(isValid)
-    require(d >= simplify.depth, s"$this is more specific than depth $d")
     var currentX = x
     var currentY = y
-    var addr = new QuadAddr()
-    for (currentDepth <- 0 until d) {
-      val gridDepth = depth - 1 - currentDepth
-      // calculate grid size from depth
-      val currentGridSize = if (gridDepth >= 0) {
-          1 << gridDepth
-        } else {
-          0
-        }
-      // find which quadrant we are in, and subtract from currentX/Y
-      val quadrant = if (gridDepth >= 0) {
-          new Quadrant(currentX >= currentGridSize, currentY >= currentGridSize)
-        } else {
-          Quadrant.BottomLeft
-        }
-      currentX = currentX - (if (quadrant.x) currentGridSize else 0)
-      currentY = currentY - (if (quadrant.y) currentGridSize else 0)
-      addr = addr + quadrant
+    var addr = QuadAddr.empty
+    for (currentDepth <- 0 until length) {
+      val isTop = currentY >= QuadLen.half
+      val isRight = currentX >= QuadLen.half
+
+      // Add one quadrant to address
+      addr += new Quadrant(isRight, isTop)
+      // Subtract new origin
+      if (isTop) currentY -= QuadLen.half
+      if (isRight) currentX -= QuadLen.half
+      // Zoom in
+      currentX <<= 1
+      currentY <<= 1
     }
     addr
   }
 
   // Operators
 
-  def +(other: QuadOffset): QuadOffset = {
-    QuadOffset.normalize(this, other) match {
-      case (maxDepth, normed, otherNormed) =>
-        new QuadOffset(maxDepth,
-          normed.x + otherNormed.x,
-          normed.y + otherNormed.y).simplify
-    }
-  }
+  def +(other: QuadOffset): QuadOffset =
+      new QuadOffset(x + other.x, y + other.y)
 
-  def -(other: QuadOffset): QuadOffset = {
-    QuadOffset.normalize(this, other) match {
-      case (maxDepth, normed, otherNormed) =>
-        new QuadOffset(maxDepth,
-          normed.x - otherNormed.x,
-          normed.y - otherNormed.y).simplify
-    }
-  }
+  def -(other: QuadOffset): QuadOffset =
+      new QuadOffset(x - other.x, y - other.y)
 
-  def *(k: Int): QuadOffset = new QuadOffset(depth, x*k, y*k).simplify
+  def *(k: Int): QuadOffset = new QuadOffset(x*k, y*k)
 
-  // Shift operators are used for multiplying the offset by a power of 2,
-  //   effectively changing its depth. This is used to handle QuadTrees of
-  //   different sizes.
-  def <<(levels: Int): QuadOffset =
-      new QuadOffset(depth - levels, x, y).simplify
-  def >>(levels: Int): QuadOffset =
-      new QuadOffset(depth + levels, x, y).simplify
+  def unary_- : QuadOffset = new QuadOffset(-x, -y)
 
-  def atDepth(newDepth: Int): QuadOffset = {
-    require(newDepth >= depth)
-    new QuadOffset(newDepth,
-      x * (1 << (newDepth - depth)),
-      y * (1 << (newDepth - depth)))
-  }
-
-  def simplify: QuadOffset = if (depth > 0 && x % 2 == 0 && y % 2 == 0) {
-      new QuadOffset(depth - 1, x / 2, y / 2).simplify
-    } else {
-      this
-    }
-
-  // Like equals, but simplifies before checking equality
-  // NOTE: this could work for equals, but would require that we simplify before
-  //   calculating hashCode. Might not be efficient.
-  def isEqualTo(other: QuadOffset): Boolean = {
-    val thisSimple = simplify
-    val otherSimple = other.simplify
-    thisSimple == otherSimple
-  }
+  // Shift operators are used for scaling by powers of 2.
+  def <<(levels: Int): QuadOffset = new QuadOffset(x << levels, y << levels)
+  def >>(levels: Int): QuadOffset = new QuadOffset(x >> levels, y >> levels)
 
   override def hashCode: Int =
-    31 * (depth.hashCode +
-      31 * (x.hashCode +
-        31 * (y.hashCode)))
+    31 * (x.hashCode +
+      31 * y.hashCode)
 
   override def equals(o: Any): Boolean = o match {
-    case other: QuadOffset =>
-        depth == other.depth &&
-        x == other.x &&
-        y == other.y
+    case other: QuadOffset => x == other.x && y == other.y
     case _ => false
   }
 
-  override def toString: String = s"QuadOffset($x, $y) / 2^$depth"
+  override def toString: String = s"($x, $y)"
 }

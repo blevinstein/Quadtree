@@ -5,6 +5,7 @@ import com.blevinstein.geom.Rectangle
 import scala.language.implicitConversions
 
 object QuadAddr {
+  val empty = new QuadAddr()
   // delegate to quads
   implicit def toQuadrantList(addr: QuadAddr): List[Quadrant] = addr.quads
 }
@@ -13,23 +14,22 @@ class QuadAddr(val quads: List[Quadrant]) {
   // copy constructor
   def this(addr: QuadAddr) = this(addr.quads)
 
-  /**
-   * Returns the QuadOffset of the bottom left corner of the address.
-   */
+  // Returns the QuadOffset of the bottom left corner of the address.
   def toOffset: QuadOffset = {
     var bottomLeft = QuadOffset.zero
     for (i <- 0 until this.length) {
       val quadrant = this(i)
-      bottomLeft = bottomLeft + new QuadOffset(i + 1,
-        if (quadrant.x) 1 else 0,
-        if (quadrant.y) 1 else 0)
+      bottomLeft = bottomLeft + new QuadOffset(
+        new QuadLen(if (quadrant.x) 1 else 0, -(i + 1)),
+        new QuadLen(if (quadrant.y) 1 else 0, -(i + 1)))
     }
     bottomLeft
   }
 
   def toRectangle: Rectangle = {
+    val sideLen = new QuadLen(1, -this.length)
     val bottomLeft = this.toOffset
-    val topRight = bottomLeft + new QuadOffset(this.length, 1, 1)
+    val topRight = bottomLeft + new QuadOffset(sideLen, sideLen)
     new QuadRectangle(bottomLeft, topRight).toRectangle
   }
 

@@ -2,7 +2,7 @@ package com.blevinstein.qt.sim
 
 import com.blevinstein.ga.Population
 import com.blevinstein.geom.{Point,Rectangle}
-import com.blevinstein.qt.{QuadAddr,QuadOffset,Quadrant,QuadRectangle}
+import com.blevinstein.qt.{QuadAddr,QuadOffset,Quadrant,QuadRectangle,QuadLen}
 import com.blevinstein.qt.{QuadTree,QuadLeaf,QuadBranch}
 import com.blevinstein.util.RateLimiter
 import com.blevinstein.util.Throttle
@@ -71,12 +71,12 @@ object Driver extends App {
       new QuadLeaf(Material.Blue),
       new QuadLeaf(Material.Blue),
       new QuadLeaf(Material.Empty))
-    case other => new QuadBranch(checkerboard(other - 1),
+    case other: Int => new QuadBranch(checkerboard(other - 1),
       checkerboard(other - 1),
       checkerboard(other - 1),
       checkerboard(other - 1))
   }
-  var figure = new QuadObject(-3, new QuadOffset(1, 1, 1), checkerboard(3))
+  var figure = new QuadObject(-3, QuadOffset.half, checkerboard(3))
   var world = World.from(QuadTree.approx(5, (p) =>
       if (p.y < math.sin(p.x * math.Pi)) {
         Material.Gray
@@ -93,11 +93,11 @@ object Driver extends App {
     }
   }
 
-  val moveDepth = 7
-  val down = new QuadOffset(moveDepth, 0, -1)
-  val left = new QuadOffset(moveDepth, -1, 0)
-  val right = new QuadOffset(moveDepth, 1, 0)
-  val up = new QuadOffset(moveDepth, 0, 1)
+  val moveLen = new QuadLen(1, -7)
+  val down = new QuadOffset(QuadLen.zero, -moveLen)
+  val left = new QuadOffset(moveLen, QuadLen.zero)
+  val right = new QuadOffset(-moveLen, QuadLen.zero)
+  val up = new QuadOffset(QuadLen.zero, moveLen)
   def mainLoop: Unit = {
     if (KeyListener.keyDown(VK_DOWN)) {
       world = world.update((obj) => obj + down)

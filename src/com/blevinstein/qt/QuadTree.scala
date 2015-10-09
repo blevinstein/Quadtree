@@ -87,8 +87,10 @@ abstract class QuadTree[+T] {
   }
 
   def getData(addr: QuadAddr): T = this match {
-    case branch: QuadBranch[T] =>
+    case branch: QuadBranch[T] => {
+      require(!addr.isEmpty)
       branch.getSubtree(addr.head).getData(addr.tail)
+    }
     case leaf: QuadLeaf[T] => leaf.data
   }
 
@@ -121,18 +123,17 @@ abstract class QuadTree[+T] {
     iter_recur(cb, this, new QuadAddr())
   }
 
-  def grow[T2 >: T](levels: Int, offset: QuadOffset, bg: T2): QuadTree[T2] = {
-    val newMaxDepth = math.max(maxDepth - levels, offset.maxDepth)
-    val scanSize = 1 << (newMaxDepth + levels)
-    val builder = new QuadTree.Builder[T2](bg)
-    for (i <- 0 until scanSize) {
-      for (j <- 0 until scanSize) {
-        val fromOffset = new QuadOffset(newMaxDepth + levels, i, j)
-        val toOffset = new QuadOffset(newMaxDepth, i, j) + offset
-        if (fromOffset.isValid && toOffset.isValid) {
-          val fromAddr = fromOffset.toAddress(newMaxDepth + levels)
-          val toAddr = toOffset.toAddress(newMaxDepth)
-          builder.add(toAddr, getData(fromAddr))
+  def grow[T2 >: T](levels: Int, offset: QuadOffset, fill: T2): QuadTree[T2] = {
+    val minExp = math.min(levels - maxDepth, offset.minExp)
+    val scanRes = new QuadLen(1, minExp - levels)
+    val builder = new QuadTree.Builder[T2](fill)
+    for (i <- QuadLen.zero.untilBy(QuadLen.one, scanRes)) {
+      for (j <- QuadLen.zero.untilBy(QuadLen.one, scanRes)) {
+        val fromOffset = new QuadOffset(i, j)
+        val toOffset = (fromOffset << levels) + offset
+        if (toOffset.isValid) {
+          builder.add(toOffset.toAddress(-minExp),
+              getData(fromOffset.toAddress(-minExp + levels)))
         }
       }
     }

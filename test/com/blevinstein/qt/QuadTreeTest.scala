@@ -169,31 +169,44 @@ class QuadTreeTest extends FunSuite with Matchers {
     q1.getData(new QuadAddr(BottomRight, BottomLeft)) shouldEqual true
   }
 
-  test("QuadOffset#simplify") {
-    // explicit simplify
-    new QuadOffset(4, 8, 6).simplify shouldEqual new QuadOffset(3, 4, 3)
+  // TODO: test QuadLen#simplify
 
-    // equals should understand simplification
-    assert(new QuadOffset(4, 8, 6) isEqualTo new QuadOffset(3, 4, 3))
-    assert(new QuadOffset(3, 4, 3) isEqualTo new QuadOffset(4, 8, 6))
+  test("QuadLen comparisons") {
+    // basics: 3/4 and 1/4
+    new QuadLen(3, -2) > QuadLen.half shouldEqual true
+    new QuadLen(1, -2) > QuadLen.half shouldEqual false
+    new QuadLen(3, -2) > QuadLen.zero shouldEqual true
+    new QuadLen(1, -2) > QuadLen.zero shouldEqual true
+    new QuadLen(3, -2) > QuadLen.one shouldEqual false
+    new QuadLen(1, -2) > QuadLen.one shouldEqual false
+
+    // equality
+    new QuadLen(1, -1) > QuadLen.half shouldEqual false
+    new QuadLen(1, -1) >= QuadLen.half shouldEqual true
+    new QuadLen(1, -1) < QuadLen.half shouldEqual false
+    new QuadLen(1, -1) <= QuadLen.half shouldEqual true
   }
 
   test("QuadAddr <=> QuadOffset") {
     new QuadAddr(TopRight, BottomRight).toOffset shouldEqual
-        new QuadOffset(2, 3, 2)
+        new QuadOffset(new QuadLen(3, -2), new QuadLen(1, -1))
 
-    new QuadOffset(2, 3, 2).toAddress(2) shouldEqual
-        new QuadAddr(TopRight, BottomRight)
+    (new QuadOffset(new QuadLen(3, -2), new QuadLen(1, -1)).toAddress(2)
+        shouldEqual
+        new QuadAddr(TopRight, BottomRight))
 
-    new QuadOffset(0, 0, 0).toAddress(1) shouldEqual new QuadAddr(BottomLeft)
-    new QuadOffset(0, 0, 0).toAddress(2) shouldEqual
+    QuadOffset.zero.toAddress(1) shouldEqual new QuadAddr(BottomLeft)
+    QuadOffset.zero.toAddress(2) shouldEqual
         new QuadAddr(BottomLeft, BottomLeft)
   }
 
   test("QuadRectangle#toRectangle") {
-    new QuadRectangle(new QuadOffset(2, 3, 2), new QuadOffset(2, 4, 3))
-      .toRectangle shouldEqual
-      (new Rectangle(new Point(0.75f, 0.5f), new Point(1, 0.75f)))
+      (new QuadRectangle(
+          new QuadOffset(new QuadLen(3, -2), new QuadLen(1, -1)),
+          new QuadOffset(new QuadLen(1, 0), new QuadLen(3, -2)))
+          .toRectangle
+      shouldEqual
+          new Rectangle(new Point(0.75f, 0.5f), new Point(1, 0.75f)))
   }
 
   test("Transform") {
@@ -251,33 +264,28 @@ class QuadTreeTest extends FunSuite with Matchers {
   }
 
   test("QuadRectangle#prune") {
-    val a = new QuadRectangle(new QuadOffset(1, -1, -1),
-        new QuadOffset(1, 1, 1))
-    val b = new QuadRectangle(new QuadOffset(1, 0, 0).simplify,
-        new QuadOffset(1, 2, 2).simplify)
-    val c = new QuadRectangle(new QuadOffset(1, 1, 1),
-        new QuadOffset(1, 3, 3))
+    val a = new QuadRectangle(-QuadOffset.half, QuadOffset.half)
+    val b = new QuadRectangle(QuadOffset.zero, QuadOffset.one)
+    val c = new QuadRectangle(QuadOffset.half, QuadOffset.one + QuadOffset.half)
 
-    b.prune(a) shouldEqual new QuadRectangle(new QuadOffset(1, 0, 0).simplify,
-        new QuadOffset(1, 1, 1))
+    b.prune(a) shouldEqual new QuadRectangle(QuadOffset.zero, QuadOffset.half)
 
-    b.prune(c) shouldEqual new QuadRectangle(new QuadOffset(1, 1, 1),
-        new QuadOffset(1, 2, 2).simplify)
+    b.prune(c) shouldEqual new QuadRectangle(QuadOffset.half, QuadOffset.one)
   }
 
   test("QuadTree#shrink (grow with levels < 0)") {
     val q1 = new QuadBranch(new QuadLeaf(false), new QuadLeaf(true),
       new QuadLeaf(true), new QuadLeaf(false))
 
-    q1.grow(-1, new QuadOffset(1, 0, 1), false) shouldEqual
+    q1.grow(-1, new QuadOffset(QuadLen.zero, QuadLen.half), false) shouldEqual
       new QuadBranch(q1, new QuadLeaf(false),
         new QuadLeaf(false), new QuadLeaf(false))
 
-    q1.grow(-1, new QuadOffset(1, 1, 1), false) shouldEqual
+    q1.grow(-1, QuadOffset.half, false) shouldEqual
       new QuadBranch(new QuadLeaf(false), q1,
         new QuadLeaf(false), new QuadLeaf(false))
 
-    q1.grow(-1, new QuadOffset(0, 0, 0), false) shouldEqual
+    q1.grow(-1, QuadOffset.zero, false) shouldEqual
       new QuadBranch(new QuadLeaf(false), new QuadLeaf(false),
         q1, new QuadLeaf(false))
   }
@@ -286,7 +294,7 @@ class QuadTreeTest extends FunSuite with Matchers {
     val q1 = new QuadBranch(new QuadLeaf(false), new QuadLeaf(true),
       new QuadLeaf(true), new QuadLeaf(false))
 
-    q1.grow(-1, new QuadOffset(2, 1, 1), false) shouldEqual
+    q1.grow(-1, QuadOffset.half >> 1, false) shouldEqual
       new QuadBranch(new QuadLeaf(false),
         new QuadBranch(new QuadLeaf(false), new QuadLeaf(false),
           new QuadLeaf(true), new QuadLeaf(false)),
@@ -299,7 +307,7 @@ class QuadTreeTest extends FunSuite with Matchers {
     val q1 = new QuadBranch(new QuadLeaf(false), new QuadLeaf(true),
       new QuadLeaf(true), new QuadLeaf(false))
 
-    q1.grow(-1, new QuadOffset(2, 3, 3), false) shouldEqual
+    q1.grow(-1, (QuadOffset.one * 3) >> 2, false) shouldEqual
       new QuadBranch(new QuadLeaf(false),
         new QuadBranch(new QuadLeaf(false), new QuadLeaf(true),
           new QuadLeaf(false), new QuadLeaf(false)),
@@ -310,7 +318,7 @@ class QuadTreeTest extends FunSuite with Matchers {
     val q1 = new QuadBranch(new QuadLeaf(false), new QuadLeaf(true),
       new QuadLeaf(true), new QuadLeaf(false))
 
-    new QuadLeaf(true).grow(-2, new QuadOffset(1, 1, 1), false) shouldEqual
+    new QuadLeaf(true).grow(-2, QuadOffset.half, false) shouldEqual
       new QuadBranch(new QuadLeaf(false),
         new QuadBranch(new QuadLeaf(false), new QuadLeaf(false),
           new QuadLeaf(true), new QuadLeaf(false)),
@@ -318,7 +326,7 @@ class QuadTreeTest extends FunSuite with Matchers {
   }
 
   test("QuadTree#grow - offset.depth > maxDepth") {
-    new QuadLeaf(true).grow(-1, new QuadOffset(2, 1, 1), false) shouldEqual
+    new QuadLeaf(true).grow(-1, QuadOffset.half >> 1, false) shouldEqual
       new QuadBranch(
         new QuadBranch(new QuadLeaf(false), new QuadLeaf(false),
           new QuadLeaf(false), new QuadLeaf(true)),
@@ -343,10 +351,15 @@ class QuadTreeTest extends FunSuite with Matchers {
         new QuadLeaf(true), new QuadLeaf(false)))
 
     // zoom in on bottom left squares
-    q1.grow(2, new QuadOffset(0, 0, 0), false) shouldEqual new QuadLeaf(true)
-    q1.grow(2, new QuadOffset(0, -1, 0), false) shouldEqual new QuadLeaf(false)
-    q1.grow(2, new QuadOffset(0, 0, -1), false) shouldEqual new QuadLeaf(false)
-    q1.grow(2, new QuadOffset(0, -1, -1), false) shouldEqual new QuadLeaf(true)
+    // NOTE: the "fill" argument of grow should always be the opposite of what
+    //     you expect, to minimize false negatives
+    q1.grow(2, QuadOffset.zero, false) shouldEqual new QuadLeaf(true)
+    q1.grow(2, new QuadOffset(-QuadLen.one, QuadLen.zero), true) shouldEqual
+        new QuadLeaf(false)
+    q1.grow(2, new QuadOffset(QuadLen.zero, -QuadLen.one), true) shouldEqual
+        new QuadLeaf(false)
+    q1.grow(2, new QuadOffset(-QuadLen.one, -QuadLen.one), false) shouldEqual
+      new QuadLeaf(true)
 
     // zoom in on bottom left quadrant
     q1.grow(1, QuadOffset.zero, false) shouldEqual
