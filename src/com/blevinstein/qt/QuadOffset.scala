@@ -18,9 +18,6 @@ object QuadOffset {
   val one = new QuadOffset(QuadLen.one, QuadLen.one)
 }
 class QuadOffset(val x: QuadLen, val y: QuadLen) {
-  val fx = x.toFloat
-  val fy = y.toFloat
-
   val minExp = QuadLen.normalize(x, y) match {
     case (a: Int, b: Int, exp: Int) => exp
   }

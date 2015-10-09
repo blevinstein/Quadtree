@@ -15,8 +15,8 @@ class QuadRectangle(val min: QuadOffset, val max: QuadOffset) {
   def perfectLog: Option[Int] = (max - min).perfectLog
 
   def toRectangle: Rectangle = new Rectangle(
-      new Point(1f * min.fx, 1f * min.fy),
-      new Point(1f * max.fx, 1f * max.fy))
+      new Point(1f * min.x.toFloat, 1f * min.y.toFloat),
+      new Point(1f * max.x.toFloat, 1f * max.y.toFloat))
 
   // Returns the intersection of two QuadRectangles
   def prune(other: QuadRectangle): QuadRectangle = {
