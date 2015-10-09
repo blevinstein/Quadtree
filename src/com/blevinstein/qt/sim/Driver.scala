@@ -100,24 +100,16 @@ object Driver extends App {
   val up = new QuadOffset(QuadLen.zero, moveLen)
   def mainLoop: Unit = {
     if (KeyListener.keyDown(VK_DOWN)) {
-      println("down")
       world = world.update((obj) => obj + down)
-      printObjectPositions
     }
     if (KeyListener.keyDown(VK_LEFT)) {
-      println("left")
       world = world.update((obj) => obj + left)
-      printObjectPositions
     }
     if (KeyListener.keyDown(VK_RIGHT)) {
-      println("right")
       world = world.update((obj) => obj + right)
-      printObjectPositions
     }
     if (KeyListener.keyDown(VK_UP)) {
-      println("up")
       world = world.update((obj) => obj + up)
-      printObjectPositions
     }
   }
 
@@ -145,7 +137,6 @@ object Driver extends App {
   }
 
   def render(gl: GL2): Unit = {
-    print(".")
     // drawing subroutines
     def setColor(c: Color): Unit = {
       gl.glColor4d(c.getRed() / 255.0,
