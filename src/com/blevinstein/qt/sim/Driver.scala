@@ -95,8 +95,8 @@ object Driver extends App {
 
   val moveLen = new QuadLen(1, -7)
   val down = new QuadOffset(QuadLen.zero, -moveLen)
-  val left = new QuadOffset(moveLen, QuadLen.zero)
-  val right = new QuadOffset(-moveLen, QuadLen.zero)
+  val left = new QuadOffset(-moveLen, QuadLen.zero)
+  val right = new QuadOffset(moveLen, QuadLen.zero)
   val up = new QuadOffset(QuadLen.zero, moveLen)
   def mainLoop: Unit = {
     if (KeyListener.keyDown(VK_DOWN)) {
