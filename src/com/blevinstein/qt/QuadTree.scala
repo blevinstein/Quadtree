@@ -131,7 +131,7 @@ abstract class QuadTree[+T] {
       for (j <- QuadLen.zero.untilBy(QuadLen.one, scanRes)) {
         val fromOffset = new QuadOffset(i, j)
         val toOffset = (fromOffset << levels) + offset
-        if (toOffset.isValid) {
+        if (toOffset.isInUnitRectangle) {
           builder.add(toOffset.toAddress(-minExp),
               getData(fromOffset.toAddress(-minExp + levels)))
         }

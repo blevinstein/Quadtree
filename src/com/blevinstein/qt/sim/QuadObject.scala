@@ -5,7 +5,7 @@ import com.blevinstein.qt.{QuadTree,QuadOffset,QuadRectangle}
 class QuadObject(val position: QuadRectangle,
     val shape: QuadTree[Option[Material]]) {
 
-  require(position.isValid)
+  require(position.isPerfectSquare)
 
   def +(offset: QuadOffset): QuadObject =
       new QuadObject(position + offset, shape)

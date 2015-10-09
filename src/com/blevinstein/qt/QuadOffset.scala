@@ -22,12 +22,12 @@ class QuadOffset(val x: QuadLen, val y: QuadLen) {
     case (a: Int, b: Int, exp: Int) => exp
   }
 
-  def isValid: Boolean = x >= QuadLen.zero && x < QuadLen.one &&
+  def isInUnitRectangle: Boolean = x >= QuadLen.zero && x < QuadLen.one &&
       y >= QuadLen.zero && y < QuadLen.one
 
   // Returns an address of the given length
   def toAddress(length: Int): QuadAddr = {
-    require(isValid)
+    require(isInUnitRectangle)
     var currentX = x
     var currentY = y
     var addr = QuadAddr.empty

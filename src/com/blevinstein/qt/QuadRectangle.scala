@@ -7,10 +7,7 @@ object QuadRectangle {
 }
 class QuadRectangle(val min: QuadOffset, val max: QuadOffset) {
   // Returns true if this QuadRectangle has equal sides of the form (1 << x).
-  //
-  // If this is true, then it is possible to use QuadTree#grow to transform any
-  // QuadTree from the unit rectangle to this location.
-  def isValid: Boolean = !perfectLog.isEmpty
+  def isPerfectSquare: Boolean = !perfectLog.isEmpty
   // If this has equal sides of the form (1 << x), returns x.
   def perfectLog: Option[Int] = (max - min).perfectLog
 
