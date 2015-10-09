@@ -209,6 +209,16 @@ class QuadTreeTest extends FunSuite with Matchers {
           new Rectangle(new Point(0.75f, 0.5f), new Point(1, 0.75f)))
   }
 
+  test("QuadRectangle#prune") {
+    val a = new QuadRectangle(-QuadOffset.half, QuadOffset.half)
+    val b = new QuadRectangle(QuadOffset.zero, QuadOffset.one)
+    val c = new QuadRectangle(QuadOffset.half, QuadOffset.one + QuadOffset.half)
+
+    b.prune(a) shouldEqual new QuadRectangle(QuadOffset.zero, QuadOffset.half)
+
+    b.prune(c) shouldEqual new QuadRectangle(QuadOffset.half, QuadOffset.one)
+  }
+
   test("Transform") {
     val q1 = new QuadBranch(new QuadLeaf(true),
         new QuadLeaf(false),
@@ -261,16 +271,6 @@ class QuadTreeTest extends FunSuite with Matchers {
         new QuadLeaf(false),
         new QuadLeaf(false)),
       new QuadLeaf(false)).maxDepth shouldEqual 2
-  }
-
-  test("QuadRectangle#prune") {
-    val a = new QuadRectangle(-QuadOffset.half, QuadOffset.half)
-    val b = new QuadRectangle(QuadOffset.zero, QuadOffset.one)
-    val c = new QuadRectangle(QuadOffset.half, QuadOffset.one + QuadOffset.half)
-
-    b.prune(a) shouldEqual new QuadRectangle(QuadOffset.zero, QuadOffset.half)
-
-    b.prune(c) shouldEqual new QuadRectangle(QuadOffset.half, QuadOffset.one)
   }
 
   test("QuadTree#shrink (grow with levels < 0)") {
