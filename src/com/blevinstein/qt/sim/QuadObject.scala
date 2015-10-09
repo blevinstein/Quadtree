@@ -1,14 +1,15 @@
 package com.blevinstein.qt.sim
 
-import com.blevinstein.qt.{QuadTree,QuadOffset}
+import com.blevinstein.qt.{QuadTree,QuadOffset,QuadRectangle}
 
-class QuadObject(val size: Int,
-    val position: QuadOffset,
+class QuadObject(val position: QuadRectangle,
     val shape: QuadTree[Option[Material]]) {
 
+  require(position.isValid)
+
   def +(offset: QuadOffset): QuadObject =
-      new QuadObject(size, position + offset, shape)
+      new QuadObject(position, shape)
 
   def toQuadTree: QuadTree[Option[Material]] =
-      shape.grow(size, position, Material.Empty)
+      shape.grow(position.perfectLog.get, position.min, Material.Empty)
 }

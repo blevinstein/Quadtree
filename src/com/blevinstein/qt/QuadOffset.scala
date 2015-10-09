@@ -50,6 +50,13 @@ class QuadOffset(val x: QuadLen, val y: QuadLen) {
     addr
   }
 
+  // For "perfect" vectors, which can be represented as (1 << x, 1 << x),
+  // returns x.
+  def perfectLog: Option[Int] = (x.perfectLog, y.perfectLog) match {
+    case (Some(a), Some(b)) if a == b => Some(a)
+    case _ => None
+  }
+
   // Operators
 
   def +(other: QuadOffset): QuadOffset =

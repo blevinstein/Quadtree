@@ -76,7 +76,7 @@ object Driver extends App {
       checkerboard(other - 1),
       checkerboard(other - 1))
   }
-  var figure = new QuadObject(-3, QuadOffset.half, checkerboard(3))
+  var figure = new QuadObject((QuadRectangle.unit >> 3) + QuadOffset.half, checkerboard(3))
   var world = World.from(QuadTree.approx(5, (p) =>
       if (p.y < math.sin(p.x * math.Pi)) {
         Material.Gray

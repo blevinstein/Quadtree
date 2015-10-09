@@ -6,6 +6,14 @@ object QuadRectangle {
   val unit = new QuadRectangle(QuadOffset.zero, QuadOffset.one)
 }
 class QuadRectangle(val min: QuadOffset, val max: QuadOffset) {
+  // Returns true if this QuadRectangle has equal sides of the form (1 << x).
+  //
+  // If this is true, then it is possible to use QuadTree#grow to transform any
+  // QuadTree from the unit rectangle to this location.
+  def isValid: Boolean = !perfectLog.isEmpty
+  // If this has equal sides of the form (1 << x), returns x.
+  def perfectLog: Option[Int] = (max - min).perfectLog
+
   def toRectangle: Rectangle = new Rectangle(
       new Point(1f * min.fx, 1f * min.fy),
       new Point(1f * max.fx, 1f * max.fy))
@@ -40,6 +48,7 @@ class QuadRectangle(val min: QuadOffset, val max: QuadOffset) {
       new QuadRectangle(min + offset, max + offset)
   def -(offset: QuadOffset): QuadRectangle =
       new QuadRectangle(min - offset, max - offset)
+  // NOTE: * << >> all scale w.r.t. origin, NOT w.r.t. min
   def *(k: Int): QuadRectangle =
       new QuadRectangle(min * k, max * k)
   def <<(levels: Int): QuadRectangle =

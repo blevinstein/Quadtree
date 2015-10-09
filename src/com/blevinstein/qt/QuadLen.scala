@@ -58,6 +58,14 @@ class QuadLen(private val base: Int, private val exp: Int) {
     1f * base / (1 << -exp)
   }
 
+  // For "perfect" lengths of the form 1 << x, this will return x
+  def perfectLog: Option[Int] = base match {
+    case 1 => Some(exp)
+    case _ => None
+  }
+
+  def isSimplified: Boolean = base % 2 == 1 || base == 0
+
   private def simplify: QuadLen = if (base == 0) {
     QuadLen.zero
   } else if (base % 2 == 0) {
