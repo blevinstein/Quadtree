@@ -37,12 +37,9 @@ import java.awt.event.WindowEvent
 
 object Driver extends App {
   val FPS: Int = 60
-  // dimensions of the screen
+  // Dimensions of the screen
   var height: Int = 1
   var width: Int = 1
-  // size and offset of the screen
-  var size: Int = 1
-  var offset: Point = Point.zero
 
   // setup OpenGL
   val glProfile = GLProfile.getDefault()
@@ -167,7 +164,8 @@ object Driver extends App {
       gl.glPolygonMode(GL_FRONT_AND_BACK, if (fill) GL_FILL else GL_LINE)
     }
     def drawRect(rect: Rectangle): Unit = {
-      val screenRect = rect * size + offset
+      val screenRect =
+          rect * LayoutManager.screen.size + LayoutManager.screen.min
       gl.glRectf(screenRect.min.x, screenRect.min.y,
           screenRect.max.x, screenRect.max.y)
     }
@@ -199,6 +197,23 @@ object Driver extends App {
     gl.glFlush()
   }
 
+  object LayoutManager {
+    // Position of the screen
+    var screen = new Rectangle(Point.zero, new Point(1, 1))
+
+    def reshape(x: Int, y: Int, w: Int, h: Int) {
+      // Update view panel: center onscreen and maintain aspect ratio
+      val size = math.min(width, height)
+      val offsetDist = math.abs(width - height) / 2
+      val offset = if (width > height) {
+        new Point(offsetDist, 0)
+      } else {
+        new Point(0, offsetDist)
+      }
+      screen = new Rectangle(Point.zero, new Point(size, size)) + offset
+    }
+  }
+
   object KeyListener extends KeyAdapter {
     var keysDown: Set[Integer] = Set()
 
@@ -222,16 +237,10 @@ object Driver extends App {
         y: Int,
         w: Int,
         h: Int): Unit = {
-      // update screen dimensions
+      // Update screen dimensions
       width = w
       height = h
-      size = math.min(width, height)
-      val offsetDist = math.abs(width - height) / 2
-      offset = if (width > height) {
-        new Point(offsetDist, 0)
-      } else {
-        new Point(0, offsetDist)
-      }
+      LayoutManager.reshape(x, y, w, h)
 
       setup(drawable.getGL().getGL2())
     }

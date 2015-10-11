@@ -11,6 +11,8 @@ class Point(val x: Float, val y: Float) {
   def %(k: Float): Point = new Point(x % k, y % k)
   def mag: Float = math.sqrt(x * x + y * y).toFloat
 
+  def *(other: Point): Point = new Point(x * other.x, y * other.y)
+
   override def hashCode: Int =
     31 * (x.hashCode +
       31 * y.hashCode)
