@@ -35,7 +35,7 @@ object ReplacementRule {
   def randomTransformTree: QuadTree[QuadTransform] =
       Decider.chooseWithWeight(
         List('leaf, 'branch),
-        List(6, 1)) match {
+        List(6, 1)) match { // scalastyle:off magic.number
     case 'leaf => new QuadLeaf(randomTransform)
     case 'branch => new QuadBranch(randomTransformTree, randomTransformTree,
         randomTransformTree, randomTransformTree)
