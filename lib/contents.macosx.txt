@@ -1,1 +1,1 @@
-gluegen-rt-natives-macosx-universal.jar gluegen-rt.jar jogl-all-natives-macosx-universal.jar jogl-all.jar scalatest_2.11-2.2.4.jar
+gluegen-rt-natives-macosx-universal.jar gluegen-rt.jar jogl-all-natives-macosx-universal.jar jogl-all.jar
