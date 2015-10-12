@@ -14,10 +14,12 @@ class Rectangle(val min: Point, val max: Point) {
 
   val area = (max.x - min.x) * (max.y - min.y)
 
+  val size: Point = max - min
+
+  val isEmpty = area == 0f
+
   def contains(p: Point): Boolean =
       p.x > min.x && p.x < max.x && p.y > min.y && p.y < max.y
-
-  def size: Point = max - min
 
   override def hashCode: Int =
     31 * (min.hashCode +
