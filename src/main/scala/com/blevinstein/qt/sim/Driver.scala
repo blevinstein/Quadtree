@@ -119,7 +119,7 @@ object Driver extends App {
   val anyOp = QuadTree.reduce((bs: List[Boolean]) => {
         bs.exists((b) => b)
       }) _
-  def moveIfPossible(offset: QuadOffset)(world: World, obj: QuadObject) = {
+  def moveIfPossible(offset: QuadOffset)(world: World, obj: QuadObject): QuadObject = {
     // NOTE: only implements collision with the environment
     val newObj = obj + offset
     if (anyOp(collideOp(newObj.toQuadTree, world.env))) { // detect any collision
