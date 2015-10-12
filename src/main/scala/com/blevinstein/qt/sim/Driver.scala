@@ -153,6 +153,8 @@ object Driver extends App {
   }
 
   def render(gl: GL2): Unit = {
+    require (world != null)
+
     // drawing subroutines
     def setColor(c: Color): Unit = {
       gl.glColor4d(c.getRed() / 255.0,
