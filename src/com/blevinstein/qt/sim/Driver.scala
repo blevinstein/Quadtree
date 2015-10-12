@@ -205,14 +205,20 @@ object Driver extends App {
 
     def reshape(x: Int, y: Int, w: Int, h: Int) {
       // Update view panel: center onscreen and maintain aspect ratio
-      val size = math.min(width, height)
-      val offsetDist = math.abs(width - height) / 2
-      val offset = if (width > height) {
+      screen = centerSquare(new Rectangle(Point.zero, new Point(width, height)))
+    }
+
+    // Given a rectangle, finds the largest square that can be fit inside, and
+    // centers it in the available space.
+    def centerSquare(rect: Rectangle): Rectangle = {
+      val size = math.min(rect.size.x, rect.size.y)
+      val offsetDist = math.abs(rect.size.x - rect.size.y) / 2
+      val offset = if(rect.size.x > rect.size.y) {
         new Point(offsetDist, 0)
       } else {
         new Point(0, offsetDist)
       }
-      screen = new Rectangle(Point.zero, new Point(size, size)) + offset
+      new Rectangle(rect.min + offset, rect.max - offset)
     }
   }
 
