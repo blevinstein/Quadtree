@@ -2,6 +2,10 @@ scalaVersion := "2.11.4"
 
 libraryDependencies += "org.scalatest" % "scalatest_2.11" % "2.2.4"
 
+libraryDependencies += "com.typesafe.akka" %% "akka-actor" % "2.4-SNAPSHOT"
+
+resolvers += "Akka Snapshot Repository" at "http://repo.akka.io/snapshots/"
+
 scalaSource in Compile := baseDirectory.value / "src"
 
 scalaSource in Test := baseDirectory.value / "test"
