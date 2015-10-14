@@ -29,3 +29,4 @@ class World(val env: QuadTree[Option[Material]],
 
   override def toString: String = s"World(env=$env, objs=$objs)"
 }
+
