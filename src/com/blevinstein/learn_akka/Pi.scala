@@ -58,7 +58,7 @@ object Pi extends App {
         nrOfResults += 1
         if (nrOfResults == nrOfMessages) {
           val end = System.currentTimeMillis
-          listener ! PiApproximation(pi, duration = (end - start).millis)
+          listener ! PiApproximation(pi, (end - start).millis)
           context.stop(self)
         }
     }
