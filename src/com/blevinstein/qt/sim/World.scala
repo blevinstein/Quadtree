@@ -2,12 +2,13 @@ package com.blevinstein.qt.sim
 
 import com.blevinstein.qt.QuadTree
 
-object World {
-  def from(tree: QuadTree[Option[Material]]): World =
-    new World(tree, List())
-}
+/// Mutable class describing a region of fixed size.
+///
+/// Contains an [env] describing fixed geometry, and [objs] containing objects
+/// which can move about the region.
 class World(val env: QuadTree[Option[Material]],
     val objs: List[QuadObject]) {
+  def this(env: QuadTree[Option[Material]]) = this(env, List[QuadObject]())
   val view: QuadTree[Option[Material]] = {
     val addOp = QuadTree.merge((m1: Option[Material], m2: Option[Material]) =>
         m2 match {
@@ -21,6 +22,8 @@ class World(val env: QuadTree[Option[Material]],
     }
     viewTree
   }
+
+  def add(obj: QuadObject): World = new World(env, obj :: objs)
 
   def withObjects(objs: List[QuadObject]): World = new World(env, objs)
 
