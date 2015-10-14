@@ -6,6 +6,9 @@ import com.blevinstein.qt.QuadTree
 ///
 /// Contains an [env] describing fixed geometry, and [objs] containing objects
 /// which can move about the region.
+///
+/// TODO: Consider using Array or Vector, for performance reasons
+/// TODO: Write tests to assess speed of implementation
 class World(val env: QuadTree[Option[Material]],
     val objs: List[QuadObject]) {
   def this(env: QuadTree[Option[Material]]) = this(env, List[QuadObject]())
