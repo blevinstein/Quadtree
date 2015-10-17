@@ -75,7 +75,8 @@ object Driver extends App {
       checkerboard(other - 1))
   }
   val figure = new QuadObject(
-    (QuadRectangle.unit >> 3) + QuadOffset.half, checkerboard(3))
+    (QuadRectangle.unit >> 3) + QuadOffset.half,
+    checkerboard(3))
   val container = new QuadObject(QuadRectangle.unit,
     QuadTree.approx(6, (p) =>
       if ((p - new Point(0.5f, 0.5f)).mag >= 0.48f) {
