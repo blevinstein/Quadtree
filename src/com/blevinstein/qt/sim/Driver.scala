@@ -174,10 +174,6 @@ object Driver extends App {
   }
 
   def render(gl: GL2): Unit = {
-    if (world == null) {
-      return
-    }
-
     // drawing subroutines
     def setColor(c: Color): Unit = {
       gl.glColor4d(c.getRed() / 255.0,
@@ -196,6 +192,11 @@ object Driver extends App {
     }
 
     gl.glClear(GL_COLOR_BUFFER_BIT)
+
+    // Short-circuit if world is uninitialized
+    if (world == null) {
+      return
+    }
 
     // draw background
     setFill(true)
