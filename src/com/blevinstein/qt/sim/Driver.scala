@@ -63,6 +63,7 @@ object Driver extends App {
   frame.setSize(640, 800 + 25) // scalastyle:off magic.number
   frame.setVisible(true)
 
+  // TODO: refactor game logic out of Driver
   // setup game
   def checkerboard(depth: Int): QuadTree[Option[Material]] = depth match {
     case 1 => new QuadBranch(new QuadLeaf(Material.Empty),
@@ -95,6 +96,8 @@ object Driver extends App {
     }
   }
 
+  // TODO: refactor movement out of Driver
+  // TODO: move minimum resolution (-6) elsewhere?
   val moveLen = new QuadLen(1, -6)
   val down = new QuadOffset(QuadLen.zero, -moveLen)
   val left = new QuadOffset(-moveLen, QuadLen.zero)
@@ -115,6 +118,7 @@ object Driver extends App {
     }
   }
 
+  // TODO: refactor collision and behavior out of Driver
   val collideOp = QuadTree.merge((m1: Option[Material], m2: Option[Material]) =>
       (m1, m2) match {
         case (Some(_), Some(_)) => true
@@ -204,13 +208,12 @@ object Driver extends App {
     setColor(Color.WHITE)
     gl.glRectf(0, 0, width, height)
 
-    // draw quadtree
+    // draw world
     var rects = List[(Rectangle,Color)]()
     world.view.iter((addr, m) => m match {
       case Some(mat) => rects = (addr.toRectangle, mat.color) :: rects
       case None => ()
     })
-
     setFill(true)
     rects.foreach { case (rect, color) =>
       setColor(color)
