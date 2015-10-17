@@ -11,9 +11,13 @@ import com.blevinstein.qt.{QuadTree,QuadOffset,QuadRectangle}
 // TODO: Consider implementing Error(event: Event, reason: ?) extends Event
 //   - id not found
 sealed trait Event
-// Input: Create(object)
-// Output: Create(object, id)
-case class Create(obj: QuadObject, id: Int = -1) extends Event
+// Input: Create(pos, shape)
+// Output: Created(pos, shape, id)
+case class Create(pos: QuadRectangle,
+    shape: QuadTree[Option[Material]]) extends Event
+case class Created(pos: QuadRectangle,
+    shape: QuadTree[Option[Material]],
+    id: Id) extends Event
 // Input: Move(id, offset)
 // Output: Move(id, offset) OR Collide(id, otherId, offset)
 case class Move(id: Int, offset: QuadOffset) extends Event

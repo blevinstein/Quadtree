@@ -64,7 +64,6 @@ object Driver extends App {
   frame.setVisible(true)
 
   // TODO: refactor game logic out of Driver
-  // setup game
   def checkerboard(depth: Int): QuadTree[Option[Material]] = depth match {
     case 1 => new QuadBranch(new QuadLeaf(Material.Empty),
       new QuadLeaf(Material.Blue),
@@ -75,17 +74,20 @@ object Driver extends App {
       checkerboard(other - 1),
       checkerboard(other - 1))
   }
-  val figure = new QuadObject(
+
+  // setup game
+  var world = new World
+  val figureId = world.add(
     (QuadRectangle.unit >> 3) + QuadOffset.half,
     checkerboard(3))
-  val container = new QuadObject(QuadRectangle.unit,
+  val containerId = world.add(
+    QuadRectangle.unit,
     QuadTree.approx(6, (p) =>
         if (p.y < 0.1 || p.y < p.x - 0.5) {
           Material.Gray
         } else {
           Material.Empty
         }))
-  var world = new World(container, figure)
 
   def run: Unit = {
     val throttle = new Throttle(FPS)
@@ -105,60 +107,23 @@ object Driver extends App {
   val up = new QuadOffset(QuadLen.zero, moveLen)
   def mainLoop: Unit = {
     if (KeyListener.keyDown(VK_DOWN)) {
-      world = world.update(moveIfPossible(down) _)
+      world.moveIfPossible(figureId, down)
     }
     if (KeyListener.keyDown(VK_LEFT)) {
-      world = world.update(moveIfPossible(left) _)
+      world.moveIfPossible(figureId, left)
     }
     if (KeyListener.keyDown(VK_RIGHT)) {
-      world = world.update(moveIfPossible(right) _)
+      world.moveIfPossible(figureId, right)
     }
     if (KeyListener.keyDown(VK_UP)) {
-      world = world.update(moveIfPossible(up) _)
-    }
-  }
-
-  // TODO: refactor collision and behavior out of Driver
-  val collideOp = QuadTree.merge((m1: Option[Material], m2: Option[Material]) =>
-      (m1, m2) match {
-        case (Some(_), Some(_)) => true
-        case _ => false
-      }) _
-  val anyOp = QuadTree.reduce((bs: List[Boolean]) => {
-        bs.exists((b) => b)
-      }) _
-  def collidesWith(a: QuadObject, b: QuadObject): Boolean =
-      if (anyOp(collideOp(a.toQuadTree, b.toQuadTree))) {
-        true
-      } else {
-        false
-      }
-  def moveIfPossible(offset: QuadOffset)(world: World, obj: QuadObject):
-      QuadObject = {
-    if (obj == container) {
-      return obj
-    }
-
-    val newObj = obj + offset
-
-    var collision = false
-    for (otherObj <- world.objs) {
-      if (otherObj != obj && collidesWith(otherObj, newObj)) {
-        collision = true
-      }
-    }
-
-    if (collision) {
-      obj
-    } else {
-      newObj
+      world.moveIfPossible(figureId, up)
     }
   }
 
   // DEBUGGING ROUTINES
   def printObjectPositions: Unit = {
     println("object positions:")
-    for (obj <- world.objs) {
+    for (obj <- world.allObjs) {
       println(s"${obj.position}")
     }
   }
