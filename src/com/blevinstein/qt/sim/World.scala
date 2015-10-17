@@ -40,6 +40,8 @@ class World {
     viewTree
   }
 
+  // Modification functions
+
   def add(position: QuadRectangle,
       shape: QuadTree[Option[Material]]): Id = {
     val objId = getId
