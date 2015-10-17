@@ -2,12 +2,14 @@ package com.blevinstein.qt.sim
 
 import com.blevinstein.qt.{QuadTree,QuadLeaf}
 
-/// Immutable class describing a region of fixed size.
-///
-/// Contains [objs] which can be moved around.
-///
-/// TODO: Consider using Array or Vector, for performance reasons
-/// TODO: Write tests to assess speed of implementation
+// Immutable class describing a region of fixed size.
+//
+// Contains [objs] which can be moved around.
+//
+// TODO: Add index, some persistent way to reference a moving object
+//
+// TODO: Consider using Array or Vector, for performance reasons
+// TODO: Write tests to assess speed of implementation
 class World(val objs: List[QuadObject]) {
   def this(objs: QuadObject*) = this(objs.toList)
 
