@@ -6,7 +6,8 @@ import scala.collection.mutable.HashMap
 
 // Mutable class describing a group of [objs] in space.
 //
-// TODO: Add index, some persistent way to reference a moving object
+// Each object is defined as a QuadTree[Option[T]], so that we have a concept of
+// empty space.
 //
 // TODO: Write tests to assess speed of implementation?
 class World[T] {
