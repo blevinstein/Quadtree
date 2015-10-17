@@ -35,6 +35,7 @@ import java.awt.event.MouseMotionAdapter
 import java.awt.event.WindowAdapter
 import java.awt.event.WindowEvent
 
+// TODO: Think about better ways of handling degredation when framerate < [FPS]
 object Driver extends App {
   val FPS: Int = 60
   // Dimensions of the screen
@@ -73,14 +74,15 @@ object Driver extends App {
       checkerboard(other - 1),
       checkerboard(other - 1))
   }
-  var figure = new QuadObject(
-    (QuadRectangle.unit >> 3) + QuadOffset.half, checkerboard(2))
+  val figure = new QuadObject(
+    (QuadRectangle.unit >> 3) + QuadOffset.half, checkerboard(3))
   var world = new World(QuadTree.approx(6, (p) =>
       if ((p - new Point(0.5f, 0.5f)).mag >= 0.48f) {
         Material.Gray
       } else {
         Material.Empty
-      })).withObjects(List(figure))
+      }))
+      .add(figure)
 
   def run: Unit = {
     val throttle = new Throttle(FPS)

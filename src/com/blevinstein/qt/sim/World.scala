@@ -7,6 +7,8 @@ import com.blevinstein.qt.QuadTree
 /// Contains an [env] describing fixed geometry, and [objs] containing objects
 /// which can move about the region.
 ///
+/// TODO: Remove env, just use objs. Simplifies and generalizes code.
+///
 /// TODO: Consider using Array or Vector, for performance reasons
 /// TODO: Write tests to assess speed of implementation
 class World(val env: QuadTree[Option[Material]],
@@ -27,8 +29,6 @@ class World(val env: QuadTree[Option[Material]],
   }
 
   def add(obj: QuadObject): World = new World(env, obj :: objs)
-
-  def withObjects(objs: List[QuadObject]): World = new World(env, objs)
 
   def update(f: (World, QuadObject) => QuadObject): World =
       new World(env, objs.map((obj) => f(this, obj)))
