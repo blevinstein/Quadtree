@@ -76,13 +76,14 @@ object Driver extends App {
   }
   val figure = new QuadObject(
     (QuadRectangle.unit >> 3) + QuadOffset.half, checkerboard(3))
-  var world = new World(QuadTree.approx(6, (p) =>
+  val container = new QuadObject(QuadRectangle.unit,
+    QuadTree.approx(6, (p) =>
       if ((p - new Point(0.5f, 0.5f)).mag >= 0.48f) {
         Material.Gray
       } else {
         Material.Empty
       }))
-      .add(figure)
+  var world = new World(container, figure)
 
   def run: Unit = {
     val throttle = new Throttle(FPS)
@@ -121,11 +122,28 @@ object Driver extends App {
   val anyOp = QuadTree.reduce((bs: List[Boolean]) => {
         bs.exists((b) => b)
       }) _
+  def collidesWith(a: QuadObject, b: QuadObject): Boolean =
+      if (anyOp(collideOp(a.toQuadTree, b.toQuadTree))) {
+        true
+      } else {
+        false
+      }
   def moveIfPossible(offset: QuadOffset)(world: World, obj: QuadObject):
       QuadObject = {
-    // NOTE: only implements collision with the environment
+    if (obj == container) {
+      return obj
+    }
+
     val newObj = obj + offset
-    if (anyOp(collideOp(newObj.toQuadTree, world.env))) { // detect any collision
+
+    var collision = false
+    for (otherObj <- world.objs) {
+      if (otherObj != obj && collidesWith(otherObj, newObj)) {
+        collision = true
+      }
+    }
+
+    if (collision) {
       obj
     } else {
       newObj
@@ -156,7 +174,9 @@ object Driver extends App {
   }
 
   def render(gl: GL2): Unit = {
-    require (world != null)
+    if (world == null) {
+      return
+    }
 
     // drawing subroutines
     def setColor(c: Color): Unit = {
