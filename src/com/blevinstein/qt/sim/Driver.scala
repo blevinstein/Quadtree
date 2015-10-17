@@ -76,7 +76,7 @@ object Driver extends App {
   }
 
   // setup game
-  var world = new World
+  var world = new World[Material]
   val figureId = world.add(
     (QuadRectangle.unit >> 3) + QuadOffset.half,
     checkerboard(3))

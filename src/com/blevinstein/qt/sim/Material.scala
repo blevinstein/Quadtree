@@ -8,3 +8,4 @@ object Material {
   val Blue = Some(new Material(Color.BLUE))
 }
 class Material(val color: Color)
+

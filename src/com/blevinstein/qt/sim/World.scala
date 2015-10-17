@@ -9,7 +9,7 @@ import scala.collection.mutable.HashMap
 // TODO: Add index, some persistent way to reference a moving object
 //
 // TODO: Write tests to assess speed of implementation?
-class World {
+class World[T] {
   private val objs: HashMap[Id, QuadObject] = new HashMap
 
   private var nextId = 0
@@ -26,14 +26,14 @@ class World {
 
   def allObjs: Iterable[QuadObject] = objs.values
 
-  def view: QuadTree[Option[Material]] = {
-    val addOp = QuadTree.merge((m1: Option[Material], m2: Option[Material]) =>
+  def view: QuadTree[Option[T]] = {
+    val addOp = QuadTree.merge((m1: Option[T], m2: Option[T]) =>
         m2 match {
           case Some(mat) => m2
           case None => m1
         }) _
 
-    var viewTree: QuadTree[Option[Material]] = new QuadLeaf(Material.Empty)
+    var viewTree: QuadTree[Option[T]] = new QuadLeaf(None)
     for (obj <- allObjs) {
       viewTree = addOp(viewTree, obj.toQuadTree)
     }
@@ -43,7 +43,7 @@ class World {
   // Modification functions
 
   def add(position: QuadRectangle,
-      shape: QuadTree[Option[Material]]): Id = {
+      shape: QuadTree[Option[T]]): Id = {
     val objId = getId
     objs.put(objId, new QuadObject(position, shape))
     objId
@@ -74,7 +74,7 @@ class World {
 
   // Collision helpers
 
-  val collideOp = QuadTree.merge((m1: Option[Material], m2: Option[Material]) =>
+  val collideOp = QuadTree.merge((m1: Option[T], m2: Option[T]) =>
       (m1, m2) match {
         case (Some(_), Some(_)) => true
         case _ => false
@@ -93,11 +93,11 @@ class World {
 
   // Immutable container object for holding information about an object.
   class QuadObject(val position: QuadRectangle,
-      val shape: QuadTree[Option[Material]]) {
+      val shape: QuadTree[Option[T]]) {
     require(position.isPerfectSquare, s"not a square: $position")
 
-    val toQuadTree: QuadTree[Option[Material]] =
-        shape.grow(position.perfectLog.get, position.min, Material.Empty)
+    val toQuadTree: QuadTree[Option[T]] =
+        shape.grow(position.perfectLog.get, position.min, None)
   }
 }
 
