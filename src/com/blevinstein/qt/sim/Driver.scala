@@ -80,11 +80,11 @@ object Driver extends App {
     checkerboard(3))
   val container = new QuadObject(QuadRectangle.unit,
     QuadTree.approx(6, (p) =>
-      if ((p - new Point(0.5f, 0.5f)).mag >= 0.48f) {
-        Material.Gray
-      } else {
-        Material.Empty
-      }))
+        if (p.y < 0.1 || p.y < p.x - 0.5) {
+          Material.Gray
+        } else {
+          Material.Empty
+        }))
   var world = new World(container, figure)
 
   def run: Unit = {
