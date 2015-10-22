@@ -6,7 +6,7 @@ import com.blevinstein.qt.Quadrant.{TopLeft,TopRight,BottomLeft,BottomRight}
 object QuadTree {
   // Returns a mapping from the unit rectangle to the given quadrant.
   def zoomFunc(quad : Quadrant): (Point => Point) =
-    (p) => (p + new Point(if (quad.x) 1 else 0, if (quad.y) 1 else 0)) / 2
+      (p) => (p + new Point(if (quad.x) 1 else 0, if (quad.y) 1 else 0)) / 2
 
   // Returns an approximation of the f over the unit rectangle up to a maximum
   // depth.
