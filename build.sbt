@@ -10,6 +10,8 @@ scalaSource in Compile := baseDirectory.value / "src"
 
 scalaSource in Test := baseDirectory.value / "test"
 
+scalacOptions += "-deprecation"
+
 lazy val grow = taskKey[Unit](
   "Run qt grow, a cellular automata evolutionary algorithm.")
 
