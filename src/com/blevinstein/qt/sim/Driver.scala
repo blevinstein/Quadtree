@@ -193,6 +193,22 @@ object Driver extends App {
     })
     drawAll(rects)
 
+    // draw collisions
+    val figure = world.getObj(figureId).toQuadTree
+    val container = world.getObj(containerId).toQuadTree
+    var collisions = List[(Rectangle,Color)]()
+    figure.iter((a: QuadAddr, aMat: Option[Any]) => {
+      if (!aMat.isEmpty) {
+        container.iter((b: QuadAddr, bMat: Option[Any]) => {
+          if (!bMat.isEmpty && (a touches b)) {
+            collisions = (a.toRectangle, Color.RED) ::
+                (b.toRectangle, Color.RED) :: collisions
+          }
+        })
+      }
+    })
+    drawAll(collisions)
+
     // end drawing
     gl.glFlush()
   }
