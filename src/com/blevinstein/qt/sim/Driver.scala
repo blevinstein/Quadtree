@@ -199,8 +199,8 @@ object Driver extends App {
     val contacts = figure.contacts(container)
     var collisions = List[(Rectangle,Color)]()
     contacts.foreach { case (a: QuadAddr, b: QuadAddr) =>
-      collisions = (a.toRectangle, Color.RED) :: (b.toRectangle, Color.RED) ::
-          collisions
+      collisions = (a.toRectangle, Color.YELLOW) ::
+          (b.toRectangle, Color.RED) :: collisions
     }
     drawAll(collisions)
 
