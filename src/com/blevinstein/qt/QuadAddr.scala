@@ -8,6 +8,13 @@ object QuadAddr {
   val empty = new QuadAddr()
   // delegate to quads
   implicit def toQuadrantList(addr: QuadAddr): List[Quadrant] = addr.quads
+  // delegate to QuadRectangle
+  implicit def toQuadRectangle(addr: QuadAddr): QuadRectangle = {
+    val sideLen = new QuadLen(1, -addr.length)
+    val bottomLeft = addr.toOffset
+    val topRight = bottomLeft + new QuadOffset(sideLen, sideLen)
+    new QuadRectangle(bottomLeft, topRight)
+  }
 }
 class QuadAddr(val quads: List[Quadrant]) {
   def this(someQuads: Quadrant*) = this(someQuads.toList)
@@ -26,11 +33,6 @@ class QuadAddr(val quads: List[Quadrant]) {
     bottomLeft
   }
 
-  def toRectangle: Rectangle = {
-    val sideLen = new QuadLen(1, -this.length)
-    val bottomLeft = this.toOffset
-    val topRight = bottomLeft + new QuadOffset(sideLen, sideLen)
-    new QuadRectangle(bottomLeft, topRight).toRectangle
   }
 
   // don't implicitly delegate tail, we want a QuadAddr not List[Quadrant]
