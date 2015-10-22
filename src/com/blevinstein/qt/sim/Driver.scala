@@ -160,6 +160,18 @@ object Driver extends App {
       gl.glRectf(screenRect.min.x, screenRect.min.y,
           screenRect.max.x, screenRect.max.y)
     }
+    def drawAll(rects: List[(Rectangle, Color)]) {
+      // fill
+      setFill(true)
+      rects.foreach { case (rect, color) =>
+        setColor(color)
+        drawRect(rect)
+      }
+      // outline in black
+      setFill(false)
+      setColor(Color.BLACK)
+      rects.foreach { case (rect, color) => drawRect(rect) }
+    }
 
     gl.glClear(GL_COLOR_BUFFER_BIT)
 
@@ -179,14 +191,7 @@ object Driver extends App {
       case Some(mat) => rects = (addr.toRectangle, mat.color) :: rects
       case None => ()
     })
-    setFill(true)
-    rects.foreach { case (rect, color) =>
-      setColor(color)
-      drawRect(rect)
-    }
-    setFill(false)
-    setColor(Color.BLACK)
-    rects.foreach { case (rect, _) => drawRect(rect) }
+    drawAll(rects)
 
     // end drawing
     gl.glFlush()
