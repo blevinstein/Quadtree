@@ -68,7 +68,7 @@ object Pi extends App {
     def receive = {
       case PiApproximation(pi, duration) =>
         println(s"Pi = $pi\nDuration: $duration")
-        context.system.shutdown()
+        context.system.terminate()
     }
   }
 
