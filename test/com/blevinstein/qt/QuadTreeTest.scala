@@ -200,6 +200,14 @@ class QuadTreeTest extends FunSuite with Matchers {
         new QuadAddr(BottomLeft, BottomLeft)
   }
 
+  test("QuadAddr#touches") {
+    new QuadAddr(TopLeft) touches new QuadAddr(TopRight) shouldEqual true
+    new QuadAddr(TopLeft, TopRight) touches new QuadAddr(TopRight) shouldEqual
+        true
+    new QuadAddr(TopLeft, TopRight) touches new QuadAddr(BottomLeft) shouldEqual
+        false
+  }
+
   test("QuadRectangle#toRectangle") {
       (new QuadRectangle(
           new QuadOffset(new QuadLen(3, -2), new QuadLen(1, -1)),

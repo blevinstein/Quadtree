@@ -6,6 +6,7 @@ object QuadRectangle {
   val unit = new QuadRectangle(QuadOffset.zero, QuadOffset.one)
 }
 class QuadRectangle(val min: QuadOffset, val max: QuadOffset) {
+  val size: QuadOffset = max - min
   // Returns true if this QuadRectangle has equal sides of the form (1 << x).
   def isPerfectSquare: Boolean = !perfectLog.isEmpty
   // If this has equal sides of the form (1 << x), returns x.
