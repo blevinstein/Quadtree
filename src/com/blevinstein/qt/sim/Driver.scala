@@ -194,19 +194,14 @@ object Driver extends App {
     drawAll(rects)
 
     // draw collisions
-    val figure = world.getObj(figureId).toQuadTree
-    val container = world.getObj(containerId).toQuadTree
+    val figure = world.getObj(figureId)
+    val container = world.getObj(containerId)
+    val contacts = figure.contacts(container)
     var collisions = List[(Rectangle,Color)]()
-    figure.iter((a: QuadAddr, aMat: Option[Any]) => {
-      if (!aMat.isEmpty) {
-        container.iter((b: QuadAddr, bMat: Option[Any]) => {
-          if (!bMat.isEmpty && (a touches b)) {
-            collisions = (a.toRectangle, Color.RED) ::
-                (b.toRectangle, Color.RED) :: collisions
-          }
-        })
-      }
-    })
+    contacts.foreach { case (a: QuadAddr, b: QuadAddr) =>
+      collisions = (a.toRectangle, Color.RED) :: (b.toRectangle, Color.RED) ::
+          collisions
+    }
     drawAll(collisions)
 
     // end drawing

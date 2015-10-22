@@ -11,7 +11,7 @@ import scala.collection.mutable.HashMap
 //
 // TODO: Write tests to assess speed of implementation?
 class World[T] {
-  private val objs: HashMap[Id, QuadObject] = new HashMap
+  private val objs: HashMap[Id, QuadObject[T]] = new HashMap
 
   private var nextId = 0
   // returns nextId++
@@ -20,12 +20,12 @@ class World[T] {
     nextId - 1
   }
 
-  def getObj(id: Id): QuadObject = {
+  def getObj(id: Id): QuadObject[T] = {
     require(objs.contains(id), s"objs does not contain id: $id")
     objs.get(id).get
   }
 
-  def allObjs: Iterable[QuadObject] = objs.values
+  def allObjs: Iterable[QuadObject[T]] = objs.values
 
   def view: QuadTree[Option[T]] = {
     val addOp = QuadTree.merge((m1: Option[T], m2: Option[T]) =>
@@ -83,7 +83,7 @@ class World[T] {
   val anyOp = QuadTree.reduce((bs: List[Boolean]) => {
         bs.exists((b) => b)
       }) _
-  def collidesWith(a: QuadObject, b: QuadObject): Boolean =
+  def collidesWith(a: QuadObject[T], b: QuadObject[T]): Boolean =
       if (anyOp(collideOp(a.toQuadTree, b.toQuadTree))) {
         true
       } else {
@@ -91,14 +91,4 @@ class World[T] {
       }
 
   override def toString: String = s"World(objs=$objs)"
-
-  // Immutable container object for holding information about an object.
-  class QuadObject(val position: QuadRectangle,
-      val shape: QuadTree[Option[T]]) {
-    require(position.isPerfectSquare, s"not a square: $position")
-
-    val toQuadTree: QuadTree[Option[T]] =
-        shape.grow(position.perfectLog.get, position.min, None)
-  }
 }
-
