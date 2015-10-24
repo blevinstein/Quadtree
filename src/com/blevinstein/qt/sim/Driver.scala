@@ -32,6 +32,7 @@ import java.awt.event.KeyEvent.{VK_DOWN,VK_LEFT,VK_RIGHT,VK_UP}
 import java.awt.event.MouseAdapter
 import java.awt.event.MouseEvent
 import java.awt.event.MouseMotionAdapter
+import java.awt.event.MouseWheelEvent
 import java.awt.event.WindowAdapter
 import java.awt.event.WindowEvent
 
@@ -55,6 +56,7 @@ object Driver extends App {
   glCanvas.addKeyListener(KeyListener)
   glCanvas.addMouseListener(MouseListener)
   glCanvas.addMouseMotionListener(MouseMotionListener)
+  glCanvas.addMouseWheelListener(MouseListener)
 
   // setup window
   val frame = new Frame()
@@ -106,18 +108,29 @@ object Driver extends App {
   val right = new QuadOffset(moveLen, QuadLen.zero)
   val up = new QuadOffset(QuadLen.zero, moveLen)
   def mainLoop: Unit = {
-    if (KeyListener.keyDown(VK_DOWN)) {
+    val figure = world.getObj(figureId)
+    val container = world.getObj(containerId)
+    val contactsEnvironment = !figure.contacts(container).isEmpty
+    if (contactsEnvironment) {
+      if (KeyListener.keyDown(VK_DOWN)) {
+        world.moveIfPossible(figureId, down)
+      }
+      if (KeyListener.keyDown(VK_LEFT)) {
+        world.moveIfPossible(figureId, left)
+      }
+      if (KeyListener.keyDown(VK_RIGHT)) {
+        world.moveIfPossible(figureId, right)
+      }
+      if (KeyListener.keyDown(VK_UP)) {
+        world.moveIfPossible(figureId, up)
+      }
+    } else {
+      // gravity
       world.moveIfPossible(figureId, down)
     }
-    if (KeyListener.keyDown(VK_LEFT)) {
-      world.moveIfPossible(figureId, left)
-    }
-    if (KeyListener.keyDown(VK_RIGHT)) {
-      world.moveIfPossible(figureId, right)
-    }
-    if (KeyListener.keyDown(VK_UP)) {
-      world.moveIfPossible(figureId, up)
-    }
+
+    // Unbounded environment, need the Reaper
+    // TODO: If out of bounds, move object to back to origin
   }
 
   // DEBUGGING ROUTINES
@@ -143,6 +156,7 @@ object Driver extends App {
     gl.glViewport(0, 0, width, height)
   }
 
+  var zoom = 1.0
   def render(gl: GL2): Unit = {
     // drawing subroutines
     def setColor(c: Color): Unit = {
@@ -154,6 +168,8 @@ object Driver extends App {
     def setFill(fill: Boolean): Unit = {
       gl.glPolygonMode(GL_FRONT_AND_BACK, if (fill) GL_FILL else GL_LINE)
     }
+    // TODO: center on figure
+    // TODO: use zoom variable
     def drawRect(rect: Rectangle): Unit = {
       val screenRect =
           rect * LayoutManager.screen.size + LayoutManager.screen.min
@@ -239,8 +255,21 @@ object Driver extends App {
     override def keyReleased(e: KeyEvent): Unit = keysDown -= e.getKeyCode()
   }
 
+  val zoomUnit = 0.8;
   object MouseListener extends MouseAdapter {
     override def mouseClicked(e: MouseEvent): Unit = {}
+    override def mouseWheelMoved(e: MouseWheelEvent): Unit = {
+      println("mouseWheelMoved")
+      if (e.getWheelRotation() > 0) {
+        zoom *= zoomUnit
+        println(zoom)
+      } else if (e.getWheelRotation() < 0) {
+        zoom /= zoomUnit
+        println(zoom)
+      } else {
+        println(s"!!! mouseWheelMoved zero")
+      }
+    }
   }
 
   object MouseMotionListener extends MouseMotionAdapter {
