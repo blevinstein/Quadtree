@@ -1,5 +1,7 @@
 package com.blevinstein.qt
 
+import scala.language.implicitConversions
+
 /**
  * Represents an exact length in quad coords.
  *
@@ -9,6 +11,29 @@ object QuadLen {
   val zero = new QuadLen(0, 0)
   val one = new QuadLen(1, 0)
   val half = new QuadLen(1, -1)
+
+  def approx(float: Float, depth: Int): QuadLen = {
+    require(0 <= float && float <= 1, "approx only accepts floats in [0, 1]")
+
+    // Bisection method
+    var min = 0
+    var max = 1 << depth
+    while (max - min > 1) {
+      val mid = (min + max) / 2
+      if (new QuadLen(mid, -depth) <= float) {
+        min = mid
+      } else {
+        max = mid
+      }
+    }
+    new QuadLen(min, -depth).simplify
+  }
+
+  implicit def toFloat(len: QuadLen): Float = if (len.exp >= 0) {
+    1f * len.base * (1 << len.exp)
+  } else {
+    1f * len.base / (1 << -len.exp)
+  }
 
   def normalize(a: QuadLen, b: QuadLen): (Int, Int, Int) = {
     val newExp = if (a.base == 0 && b.base == 0) {
@@ -37,10 +62,14 @@ class QuadLen(private val base: Int, private val exp: Int) {
   def unary_- : QuadLen = new QuadLen(-base, exp)
 
   // Delegate comparisons to float
-  def >(other: QuadLen): Boolean = toFloat > other.toFloat
-  def <(other: QuadLen): Boolean = toFloat < other.toFloat
-  def >=(other: QuadLen): Boolean = toFloat >= other.toFloat
-  def <=(other: QuadLen): Boolean = toFloat <= other.toFloat
+  def >(other: QuadLen): Boolean =
+      QuadLen.toFloat(this) > QuadLen.toFloat(other)
+  def <(other: QuadLen): Boolean =
+      QuadLen.toFloat(this) < QuadLen.toFloat(other)
+  def >=(other: QuadLen): Boolean =
+      QuadLen.toFloat(this) >= QuadLen.toFloat(other)
+  def <=(other: QuadLen): Boolean =
+      QuadLen.toFloat(this) <= QuadLen.toFloat(other)
 
   def untilBy(until: QuadLen, by: QuadLen): List[QuadLen] = {
     var result = List[QuadLen]()
@@ -50,12 +79,6 @@ class QuadLen(private val base: Int, private val exp: Int) {
       current += by
     }
     result
-  }
-
-  def toFloat: Float = if (exp >= 0) {
-    1f * base * (1 << exp)
-  } else {
-    1f * base / (1 << -exp)
   }
 
   // For "perfect" lengths of the form 1 << x, this will return x
