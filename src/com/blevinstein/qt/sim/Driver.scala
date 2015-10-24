@@ -62,7 +62,7 @@ object Driver extends App {
   val frame = new Frame()
   frame.add(glCanvas)
   frame.addWindowListener(WindowListener)
-  frame.setSize(640, 800 + 25) // scalastyle:off magic.number
+  frame.setSize(1024, 1024 + 25) // scalastyle:off magic.number
   frame.setVisible(true)
 
   // TODO: refactor game logic out of Driver
@@ -170,6 +170,7 @@ object Driver extends App {
     }
     // TODO: center on figure
     // TODO: use zoom variable
+    // TODO: add isOnScreen check
     def drawRect(rect: Rectangle): Unit = {
       val screenRect =
           rect * LayoutManager.screen.size + LayoutManager.screen.min
