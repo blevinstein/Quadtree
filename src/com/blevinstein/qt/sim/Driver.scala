@@ -103,10 +103,13 @@ object Driver extends App {
   // TODO: refactor movement out of Driver
   val moveResolution = -6
   val moveLen = 1f / (1 << -moveResolution)
+
   val down = new Point(0, -moveLen)
   val left = new Point(-moveLen, 0)
   val right = new Point(moveLen, 0)
   val up = new Point(0, moveLen)
+
+  val gravity = new Point(0, -1f / (1 << 8))
 
   // TODO: implement basic velocity for figure, then refactor into QuadObject
   var velocity = Point.zero
@@ -130,10 +133,12 @@ object Driver extends App {
         velocity += up
       }
     } else {
-      // gravity
-      velocity = down
+      velocity += gravity
     }
-    world.moveIfPossible(figureId, QuadOffset.approx(velocity, moveResolution))
+    if(!world.moveIfPossible(
+        figureId, QuadOffset.approx(velocity, moveResolution))) {
+      velocity = Point.zero
+    }
 
     // Unbounded environment, need the Reaper
     // TODO: If out of bounds, move object to back to origin
