@@ -104,10 +104,9 @@ object Driver extends App {
   val moveResolution = -6
   val moveLen = 1f / (1 << -moveResolution)
 
-  val down = new Point(0, -moveLen)
   val left = new Point(-moveLen, 0)
   val right = new Point(moveLen, 0)
-  val up = new Point(0, moveLen)
+  val up = new Point(0, moveLen * 2)
 
   val gravity = new Point(0, -1f / (1 << 8))
 
@@ -120,9 +119,6 @@ object Driver extends App {
 
     if (contactsEnvironment) {
       velocity = Point.zero
-      if (KeyListener.keyDown(VK_DOWN)) {
-        velocity += down
-      }
       if (KeyListener.keyDown(VK_LEFT)) {
         velocity += left
       }
