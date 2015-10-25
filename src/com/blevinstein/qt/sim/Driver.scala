@@ -176,7 +176,6 @@ object Driver extends App {
       gl.glPolygonMode(GL_FRONT_AND_BACK, if (fill) GL_FILL else GL_LINE)
     }
     // TODO: center on figure
-    // TODO: use zoom variable
     // TODO: add isOnScreen check
     def drawRect(rect: Rectangle): Unit = {
       val screenRect =
