@@ -12,21 +12,26 @@ object QuadLen {
   val one = new QuadLen(1, 0)
   val half = new QuadLen(1, -1)
 
-  def approx(float: Float, depth: Int): QuadLen = {
-    require(0 <= float && float <= 1, "approx only accepts floats in [0, 1]")
+  // TODO: find a cleaner way to implement this method
+  def approx(float: Float, resolution: Int): QuadLen = {
+    val intPart = float.toInt
+    val floatPart = math.abs(float % 1) // NOTE: drops sign, adds back at end
 
-    // Bisection method
+    // Bisection method on float part
     var min = 0
-    var max = 1 << depth
+    var max = 1 << -resolution
     while (max - min > 1) {
       val mid = (min + max) / 2
-      if (new QuadLen(mid, -depth) <= float) {
+      if (new QuadLen(mid, resolution) <= floatPart) {
         min = mid
       } else {
         max = mid
       }
     }
-    new QuadLen(min, -depth).simplify
+    val quadIntPart = new QuadLen(intPart, 0)
+    val quadFloatPart = new QuadLen(min, resolution).simplify
+
+    quadIntPart + (quadFloatPart * math.signum(float).toInt)
   }
 
   implicit def toFloat(len: QuadLen): Float = if (len.exp >= 0) {

@@ -376,9 +376,14 @@ class QuadTreeTest extends FunSuite with Matchers {
   }
 
   test("QuadLen.approx") {
-    QuadLen.approx(0.5f, 6) shouldEqual new QuadLen(1, -1)
-    QuadLen.approx(0.25f, 6) shouldEqual new QuadLen(1, -2)
-    QuadLen.approx(0.75f, 6) shouldEqual new QuadLen(3, -2)
+    QuadLen.approx(0.5f, -6) shouldEqual new QuadLen(1, -1)
+    QuadLen.approx(0.25f, -6) shouldEqual new QuadLen(1, -2)
+    QuadLen.approx(0.75f, -6) shouldEqual new QuadLen(3, -2)
+
+    QuadLen.approx(1.5f, -6) shouldEqual new QuadLen(3, -1)
+    QuadLen.approx(2.5f, -6) shouldEqual new QuadLen(5, -1)
+    QuadLen.approx(-1.5f, -6) shouldEqual new QuadLen(-3, -1)
+    QuadLen.approx(-2.5f, -6) shouldEqual new QuadLen(-5, -1)
   }
 }
 
