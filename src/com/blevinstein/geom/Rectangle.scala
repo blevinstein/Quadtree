@@ -5,6 +5,7 @@ object Rectangle {
 }
 class Rectangle(val min: Point, val max: Point) {
   def *(k: Float): Rectangle = new Rectangle(min * k, max * k)
+  def /(k: Float): Rectangle = new Rectangle(min / k, max / k)
   def +(p: Point): Rectangle = new Rectangle(min + p, max + p)
   def -(p: Point): Rectangle = new Rectangle(min - p, max - p)
 
