@@ -13,6 +13,7 @@ class QuadObject[T](val position: QuadRectangle,
 
   val center: Point = position.toRectangle.center
 
+  // Returns a list of squares where [this] is touching [other]
   def contacts(other: QuadObject[T]): List[(QuadAddr, QuadAddr)] = {
     val thisTree = this.toQuadTree
     val otherTree = other.toQuadTree

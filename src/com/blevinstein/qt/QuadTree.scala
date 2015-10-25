@@ -106,9 +106,7 @@ abstract class QuadTree[+T] {
   // TODO: Implement prune(depth: Int): QuadTree such that r.maxDepth == depth
   // use QuadTree.reduce to simplify below that depth
 
-  /**
-   * For each QuadLeaf in this QuadTree, emits its address and data
-   */
+  // For each QuadLeaf in this QuadTree, emits its address and data
   def iter(cb: IterCallback[T]): Unit = {
     def iter_recur(cb: IterCallback[T], qt: QuadTree[T],
         addr: QuadAddr): Unit = {
