@@ -1,5 +1,7 @@
 package com.blevinstein.qt
 
+import com.blevinstein.geom.Point
+
 /**
  * Represents an offset between quadtrees *exactly*.
  * More accurate than a Point, which stores an offset as (x: Float, y: Float).
@@ -16,6 +18,10 @@ object QuadOffset {
   val zero = new QuadOffset(QuadLen.zero, QuadLen.zero)
   val half = new QuadOffset(QuadLen.half, QuadLen.half)
   val one = new QuadOffset(QuadLen.one, QuadLen.one)
+
+  def approx(point: Point, resolution: Int): QuadOffset =
+      new QuadOffset(QuadLen.approx(point.x, resolution),
+          QuadLen.approx(point.y, resolution))
 }
 class QuadOffset(val x: QuadLen, val y: QuadLen) {
   val minExp = QuadLen.normalize(x, y) match {
