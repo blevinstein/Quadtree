@@ -110,7 +110,7 @@ object Driver extends App {
 
   val gravity = new Point(0, -1f / (1 << 8))
 
-  // TODO: implement basic velocity for figure, then refactor into QuadObject
+  // TODO: refactor velocity into QuadObject
   var velocity = Point.zero
   def mainLoop: Unit = {
     val figure = world.getObj(figureId)
