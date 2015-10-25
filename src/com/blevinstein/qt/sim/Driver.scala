@@ -114,6 +114,7 @@ object Driver extends App {
   var velocity = Point.zero
   def mainLoop: Unit = {
     val figure = world.getObj(figureId)
+    center = figure.center
     val container = world.getObj(containerId)
     val contactsEnvironment = !figure.contacts(container).isEmpty
 
@@ -164,6 +165,7 @@ object Driver extends App {
   }
 
   var zoom = 1f
+  var center = Point.zero
   def render(gl: GL2): Unit = {
     // drawing subroutines
     def setColor(c: Color): Unit = {
@@ -179,7 +181,8 @@ object Driver extends App {
     // TODO: add isOnScreen check
     def drawRect(rect: Rectangle): Unit = {
       val screenRect =
-          rect * LayoutManager.screen.size / zoom + LayoutManager.screen.min
+          (rect - center) * LayoutManager.screen.size / zoom +
+              LayoutManager.screen.center
       gl.glRectf(screenRect.min.x, screenRect.min.y,
           screenRect.max.x, screenRect.max.y)
     }
