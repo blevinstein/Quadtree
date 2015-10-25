@@ -1,5 +1,6 @@
 package com.blevinstein.qt.sim
 
+import com.blevinstein.geom.Point
 import com.blevinstein.qt.{QuadTree,QuadRectangle,QuadAddr}
 
 // Immutable container object for holding information about an object.
@@ -9,6 +10,8 @@ class QuadObject[T](val position: QuadRectangle,
 
   val toQuadTree: QuadTree[Option[T]] =
       shape.grow(position.perfectLog.get, position.min, None)
+
+  val center: Point = position.toRectangle.center
 
   def contacts(other: QuadObject[T]): List[(QuadAddr, QuadAddr)] = {
     val thisTree = this.toQuadTree
