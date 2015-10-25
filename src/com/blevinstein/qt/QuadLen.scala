@@ -34,11 +34,7 @@ object QuadLen {
     quadIntPart + (quadFloatPart * math.signum(float).toInt)
   }
 
-  implicit def toFloat(len: QuadLen): Float = if (len.exp >= 0) {
-    1f * len.base * (1 << len.exp)
-  } else {
-    1f * len.base / (1 << -len.exp)
-  }
+  implicit def toFloat(len: QuadLen): Float = len.toFloat
 
   def normalize(a: QuadLen, b: QuadLen): (Int, Int, Int) = {
     val newExp = if (a.base == 0 && b.base == 0) {
@@ -54,6 +50,11 @@ object QuadLen {
   }
 }
 class QuadLen(private val base: Int, private val exp: Int) {
+  def toFloat: Float = if (exp >= 0) {
+    1f * base * (1 << exp)
+  } else {
+    1f * base / (1 << -exp)
+  }
   def +(other: QuadLen): QuadLen = QuadLen.normalize(this, other) match {
     case (a, b, ex) => new QuadLen(a + b, ex).simplify
   }

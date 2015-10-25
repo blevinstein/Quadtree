@@ -19,6 +19,8 @@ object QuadOffset {
   val half = new QuadOffset(QuadLen.half, QuadLen.half)
   val one = new QuadOffset(QuadLen.one, QuadLen.one)
 
+  implicit def toPoint(offset: QuadOffset): Point = offset.toPoint
+
   def approx(point: Point, resolution: Int): QuadOffset =
       new QuadOffset(QuadLen.approx(point.x, resolution),
           QuadLen.approx(point.y, resolution))
@@ -30,6 +32,8 @@ class QuadOffset(val x: QuadLen, val y: QuadLen) {
 
   def isInUnitRectangle: Boolean = x >= QuadLen.zero && x < QuadLen.one &&
       y >= QuadLen.zero && y < QuadLen.one
+
+  def toPoint: Point = new Point(x.toFloat, y.toFloat)
 
   // Returns an address of the given length
   def toAddress(length: Int): QuadAddr = {

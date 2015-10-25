@@ -6,20 +6,21 @@ import scala.language.implicitConversions
 
 object QuadAddr {
   val empty = new QuadAddr()
-  // delegate to quads
   implicit def toQuadrantList(addr: QuadAddr): List[Quadrant] = addr.quads
-  // delegate to QuadRectangle
-  implicit def toQuadRectangle(addr: QuadAddr): QuadRectangle = {
-    val sideLen = new QuadLen(1, -addr.length)
-    val bottomLeft = addr.toOffset
-    val topRight = bottomLeft + new QuadOffset(sideLen, sideLen)
-    new QuadRectangle(bottomLeft, topRight)
-  }
+  implicit def toQuadRectangle(addr: QuadAddr): QuadRectangle =
+      addr.toQuadRectangle
 }
 class QuadAddr(val quads: List[Quadrant]) {
   def this(someQuads: Quadrant*) = this(someQuads.toList)
   // copy constructor
   def this(addr: QuadAddr) = this(addr.quads)
+
+  def toQuadRectangle: QuadRectangle = {
+    val sideLen = new QuadLen(1, -this.length)
+    val bottomLeft = this.toOffset
+    val topRight = bottomLeft + new QuadOffset(sideLen, sideLen)
+    new QuadRectangle(bottomLeft, topRight)
+  }
 
   // Returns the QuadOffset of the bottom left corner of the address.
   def toOffset: QuadOffset = {
