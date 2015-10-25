@@ -101,33 +101,39 @@ object Driver extends App {
   }
 
   // TODO: refactor movement out of Driver
-  // TODO: move minimum resolution (-6) elsewhere?
-  val moveLen = new QuadLen(1, -6)
-  val down = new QuadOffset(QuadLen.zero, -moveLen)
-  val left = new QuadOffset(-moveLen, QuadLen.zero)
-  val right = new QuadOffset(moveLen, QuadLen.zero)
-  val up = new QuadOffset(QuadLen.zero, moveLen)
+  val moveResolution = -6
+  val moveLen = 1f / (1 << -moveResolution)
+  val down = new Point(0, -moveLen)
+  val left = new Point(-moveLen, 0)
+  val right = new Point(moveLen, 0)
+  val up = new Point(0, moveLen)
+
+  // TODO: implement basic velocity for figure, then refactor into QuadObject
+  var velocity = Point.zero
   def mainLoop: Unit = {
     val figure = world.getObj(figureId)
     val container = world.getObj(containerId)
     val contactsEnvironment = !figure.contacts(container).isEmpty
+
     if (contactsEnvironment) {
+      velocity = Point.zero
       if (KeyListener.keyDown(VK_DOWN)) {
-        world.moveIfPossible(figureId, down)
+        velocity += down
       }
       if (KeyListener.keyDown(VK_LEFT)) {
-        world.moveIfPossible(figureId, left)
+        velocity += left
       }
       if (KeyListener.keyDown(VK_RIGHT)) {
-        world.moveIfPossible(figureId, right)
+        velocity += right
       }
       if (KeyListener.keyDown(VK_UP)) {
-        world.moveIfPossible(figureId, up)
+        velocity += up
       }
     } else {
       // gravity
-      world.moveIfPossible(figureId, down)
+      velocity = down
     }
+    world.moveIfPossible(figureId, QuadOffset.approx(velocity, moveResolution))
 
     // Unbounded environment, need the Reaper
     // TODO: If out of bounds, move object to back to origin
