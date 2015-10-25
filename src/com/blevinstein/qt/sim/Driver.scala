@@ -163,7 +163,7 @@ object Driver extends App {
     gl.glViewport(0, 0, width, height)
   }
 
-  var zoom = 1.0
+  var zoom = 1f
   def render(gl: GL2): Unit = {
     // drawing subroutines
     def setColor(c: Color): Unit = {
@@ -180,7 +180,7 @@ object Driver extends App {
     // TODO: add isOnScreen check
     def drawRect(rect: Rectangle): Unit = {
       val screenRect =
-          rect * LayoutManager.screen.size + LayoutManager.screen.min
+          rect * LayoutManager.screen.size / zoom + LayoutManager.screen.min
       gl.glRectf(screenRect.min.x, screenRect.min.y,
           screenRect.max.x, screenRect.max.y)
     }
@@ -263,19 +263,14 @@ object Driver extends App {
     override def keyReleased(e: KeyEvent): Unit = keysDown -= e.getKeyCode()
   }
 
-  val zoomUnit = 0.8;
+  val zoomUnit = 1.05f;
   object MouseListener extends MouseAdapter {
     override def mouseClicked(e: MouseEvent): Unit = {}
     override def mouseWheelMoved(e: MouseWheelEvent): Unit = {
-      println("mouseWheelMoved")
       if (e.getWheelRotation() > 0) {
         zoom *= zoomUnit
-        println(zoom)
       } else if (e.getWheelRotation() < 0) {
         zoom /= zoomUnit
-        println(zoom)
-      } else {
-        println(s"!!! mouseWheelMoved zero")
       }
     }
   }
