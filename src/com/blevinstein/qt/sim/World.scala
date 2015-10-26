@@ -38,20 +38,6 @@ class World[T] {
     }
   }
 
-  def view: QuadTree[Option[T]] = {
-    val addOp = QuadTree.merge((m1: Option[T], m2: Option[T]) =>
-        m2 match {
-          case Some(mat) => m2
-          case None => m1
-        }) _
-
-    var viewTree: QuadTree[Option[T]] = new QuadLeaf(None)
-    for (obj <- allObjs) {
-      viewTree = addOp(viewTree, obj.toQuadTree)
-    }
-    viewTree
-  }
-
   // Modification functions
 
   def add(position: QuadRectangle,
@@ -94,6 +80,8 @@ class World[T] {
   val anyOp = QuadTree.reduce((bs: List[Boolean]) => {
         bs.exists((b) => b)
       }) _
+  // TODO: refactor so that [toQuadTree] takes a QuadRectangle arg, removing
+  // assumption that [a] and [b] are within unit rectangle
   def collidesWith(a: QuadObject[T], b: QuadObject[T]): Boolean =
       if (anyOp(collideOp(a.toQuadTree, b.toQuadTree))) {
         true
