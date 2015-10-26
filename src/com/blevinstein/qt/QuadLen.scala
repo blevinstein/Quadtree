@@ -62,8 +62,8 @@ class QuadLen(private val base: Int, private val exp: Int) {
     case (a, b, ex) => new QuadLen(a - b, ex).simplify
   }
   def *(k: Int): QuadLen = new QuadLen(base * k, exp).simplify
-  def <<(k: Int): QuadLen = new QuadLen(base, exp + k)
-  def >>(k: Int): QuadLen = new QuadLen(base, exp - k)
+  def <<(k: Int): QuadLen = new QuadLen(base, exp + k).simplify
+  def >>(k: Int): QuadLen = new QuadLen(base, exp - k).simplify
 
   def unary_- : QuadLen = new QuadLen(-base, exp)
 
