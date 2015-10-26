@@ -22,8 +22,8 @@ class QuadRectangle(val min: QuadOffset, val max: QuadOffset) {
 
   // Recursively generate a List of addresses covered by this rectangle.
   def toAddressList: List[QuadAddr] = {
-    val minXLen = QuadLen.min(new QuadLen(1, min.x.minExp), size.x)
-    val minYLen = QuadLen.min(new QuadLen(1, min.y.minExp), size.y)
+    val minXLen = QuadLen.min(new QuadLen(1, min.x.minExp), size.x, QuadLen.one)
+    val minYLen = QuadLen.min(new QuadLen(1, min.y.minExp), size.y, QuadLen.one)
 
     if (isEmpty) {
       List()

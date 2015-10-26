@@ -249,7 +249,7 @@ class QuadTreeTest extends FunSuite with Matchers {
     bottomRight withRespectTo QuadRectangle.unit shouldEqual bottomRight
   }
 
-  test("QuadRectangle.toAddressList") {
+  test("QuadRectangle#toAddressList") {
     val rect = new QuadRectangle(
         new QuadOffset(new QuadLen(1, -2), new QuadLen(1, -3)),
         new QuadOffset(new QuadLen(3, -2), new QuadLen(5, -3)))
@@ -270,6 +270,14 @@ class QuadTreeTest extends FunSuite with Matchers {
       new QuadAddr(BottomLeft, BottomRight, TopRight), // f
       new QuadAddr(BottomRight, BottomLeft, TopLeft), // g
       new QuadAddr(BottomRight, BottomLeft, TopRight)) // h
+  }
+
+  test("QuadRectangle#toAddressList out of bounds") {
+    val rect = new QuadRectangle(
+        new QuadOffset(new QuadLen(0), new QuadLen(2).simplify),
+        new QuadOffset(new QuadLen(2).simplify, new QuadLen(4).simplify))
+
+    rect.toAddressList.toSet shouldEqual Set()
   }
 
   test("Transform") {
