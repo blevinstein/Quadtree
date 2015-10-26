@@ -84,8 +84,8 @@ class QuadOffset(val x: QuadLen, val y: QuadLen) {
   def >>(levels: Int): QuadOffset = new QuadOffset(x >> levels, y >> levels)
 
   override def hashCode: Int =
-    31 * (x.hashCode +
-      31 * y.hashCode)
+      31 * (x.hashCode +
+          31 * y.hashCode)
 
   override def equals(o: Any): Boolean = o match {
     case other: QuadOffset => x == other.x && y == other.y
