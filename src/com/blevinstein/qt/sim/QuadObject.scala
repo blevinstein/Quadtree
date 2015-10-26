@@ -13,7 +13,7 @@ class QuadObject[T](val position: QuadRectangle,
 
   // Converts into a QuadTree within a particular [space].
   def toQuadTree(space: QuadRectangle): QuadTree[Option[T]] = {
-    val posWithin = position within space
+    val posWithin = position withRespectTo space
     shape.grow(posWithin.perfectLog.get, posWithin.min, None)
   }
 
