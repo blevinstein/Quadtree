@@ -36,7 +36,7 @@ object QuadLen {
 
   implicit def toFloat(len: QuadLen): Float = len.toFloat
 
-  def normalize(a: QuadLen, b: QuadLen): (Int, Int, Int) = {
+  private def normalize(a: QuadLen, b: QuadLen): (Int, Int, Int) = {
     val newExp = if (a.base == 0 && b.base == 0) {
       0
     } else if (a.base == 0) {
@@ -66,6 +66,10 @@ class QuadLen(private val base: Int, private val exp: Int) {
   def >>(k: Int): QuadLen = new QuadLen(base, exp - k).simplify
 
   def unary_- : QuadLen = new QuadLen(-base, exp)
+
+  def minExp(other: QuadLen): Int = QuadLen.normalize(this, other) match {
+    case (a, b, exp) => exp
+  }
 
   // Delegate comparisons to float
   def >(other: QuadLen): Boolean =

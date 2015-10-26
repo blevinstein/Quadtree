@@ -28,9 +28,7 @@ object QuadOffset {
           QuadLen.approx(point.y, resolution))
 }
 class QuadOffset(val x: QuadLen, val y: QuadLen) {
-  val minExp = QuadLen.normalize(x, y) match {
-    case (a: Int, b: Int, exp: Int) => exp
-  }
+  val minExp = x minExp y
 
   def isInUnitRectangle: Boolean = x >= QuadLen.zero && x < QuadLen.one &&
       y >= QuadLen.zero && y < QuadLen.one
