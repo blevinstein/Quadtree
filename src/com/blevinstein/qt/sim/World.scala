@@ -80,11 +80,10 @@ class World[T] {
   val anyOp = QuadTree.reduce((bs: List[Boolean]) => {
         bs.exists((b) => b)
       }) _
-  // TODO: don't assume that collisions must be within unit rectangle
   def collidesWith(a: QuadObject[T], b: QuadObject[T]): Boolean =
       if (anyOp(collideOp(
-          a.toQuadTree(QuadRectangle.unit),
-          b.toQuadTree(QuadRectangle.unit)))) {
+          a.toQuadTree(a.position),
+          b.toQuadTree(a.position)))) {
         true
       } else {
         false
