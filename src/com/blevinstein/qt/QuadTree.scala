@@ -157,7 +157,7 @@ object QuadBranch {
  * [ a b ]
  * [ c d ] -> +x
  */
-class QuadBranch[T](val a: QuadTree[T],
+class QuadBranch[+T](val a: QuadTree[T],
     val b: QuadTree[T],
     val c: QuadTree[T],
     val d: QuadTree[T]) extends QuadTree[T] {
@@ -205,7 +205,7 @@ class QuadBranch[T](val a: QuadTree[T],
   }
 }
 
-class QuadLeaf[T](val data: T) extends QuadTree[T] {
+class QuadLeaf[+T](val data: T) extends QuadTree[T] {
   override def hashCode: Int = data.hashCode
 
   override def equals(o: Any): Boolean = o match {
