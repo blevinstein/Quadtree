@@ -134,19 +134,13 @@ abstract class QuadTree[+T] {
   }
 
   def grow[T2 >: T](levels: Int, offset: QuadOffset, fill: T2): QuadTree[T2] = {
-    val minExp = math.min(levels - maxDepth, offset.minExp)
-    val scanRes = new QuadLen(1, minExp - levels)
     val builder = new QuadTree.Builder[T2](fill)
-    for (i <- QuadLen.zero.untilBy(QuadLen.one, scanRes)) {
-      for (j <- QuadLen.zero.untilBy(QuadLen.one, scanRes)) {
-        val fromOffset = new QuadOffset(i, j)
-        val toOffset = (fromOffset << levels) + offset
-        if (toOffset.isInUnitRectangle) {
-          builder.add(toOffset.toAddress(-minExp),
-              getData(fromOffset.toAddress(-minExp + levels)))
-        }
+    iter((addr, data) => {
+      val toRect = (addr.toQuadRectangle << levels) + offset
+      for (toAddr <- toRect.toAddressList) {
+        builder.add(toAddr, getData(addr))
       }
-    }
+    })
     builder.build
   }
 
