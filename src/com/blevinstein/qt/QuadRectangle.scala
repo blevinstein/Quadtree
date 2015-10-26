@@ -43,11 +43,13 @@ class QuadRectangle(val min: QuadOffset, val max: QuadOffset) {
       val xCoord = min.x + minYLen
       new QuadRectangle(min, new QuadOffset(xCoord, max.y)).toAddressList ++
           new QuadRectangle(new QuadOffset(xCoord, min.y), max).toAddressList
-    } else {
+    } else if (minYLen < size.y) {
       // Split by y coord and recur
       val yCoord = min.y + minYLen
       new QuadRectangle(min, new QuadOffset(max.x, yCoord)).toAddressList ++
           new QuadRectangle(new QuadOffset(min.x, yCoord), max).toAddressList
+    } else {
+      throw new IllegalStateException(s"toAddressList $this")
     }
   }
 
