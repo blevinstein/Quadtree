@@ -123,7 +123,6 @@ object Driver extends App {
     val figure = world.getObj(figureId)
     center = figure.center
     val container = world.getObj(containerId)
-    // TODO: don't assume objects within unit rectangle
     val contactsEnvironment = !figure.contacts(container).isEmpty
 
     if (contactsEnvironment) {
