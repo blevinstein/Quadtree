@@ -6,7 +6,7 @@ object QuadZone {
   val size = QuadOffset.one
 
   def around(offset: QuadOffset): QuadZone =
-      new QuadZone((offset.x.toFloat % 1).toInt, (offset.y.toFloat % 1).toInt)
+      new QuadZone(offset.x.toFloat.toInt, offset.y.toFloat.toInt)
 
   def around(rect: QuadRectangle): List[QuadZone] = {
     var zones = List[QuadZone]()
@@ -25,6 +25,15 @@ class QuadZone(val x: Int, val y: Int) {
 
   val toQuadRectangle: QuadRectangle =
       new QuadRectangle(min, min + QuadZone.size)
+
+  override def hashCode: Int =
+      31 * (x.hashCode +
+          31 * y.hashCode)
+
+  override def equals(o: Any): Boolean = o match {
+    case other: QuadZone => x == other.x && y == other.y
+    case _ => false
+  }
 
   override def toString: String = s"QuadZone($x, $y)"
 }
