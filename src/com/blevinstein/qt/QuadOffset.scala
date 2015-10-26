@@ -2,6 +2,8 @@ package com.blevinstein.qt
 
 import com.blevinstein.geom.Point
 
+import scala.language.implicitConversions
+
 /**
  * Represents an offset between quadtrees *exactly*.
  * More accurate than a Point, which stores an offset as (x: Float, y: Float).
