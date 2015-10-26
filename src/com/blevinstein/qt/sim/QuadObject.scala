@@ -20,20 +20,23 @@ class QuadObject[T](val position: QuadRectangle,
   val center: Point = position.toRectangle.center
 
   // Returns a list of squares where [this] is touching [other] within [space].
-  def contacts(other: QuadObject[T], space: QuadRectangle):
-      List[(QuadAddr, QuadAddr)] = {
-    val thisTree = this.toQuadTree(space)
-    val otherTree = other.toQuadTree(space)
-    var contactList = List[(QuadAddr, QuadAddr)]()
-    thisTree.iter((a: QuadAddr, aMat: Option[Any]) => {
-      if (!aMat.isEmpty) {
-        otherTree.iter((b: QuadAddr, bMat: Option[Any]) => {
-          if (!bMat.isEmpty && (a touches b)) {
-            contactList = (a, b) :: contactList
-          }
-        })
-      }
-    })
+  def contacts(other: QuadObject[T]):
+      List[(QuadRectangle, QuadRectangle)] = {
+    var contactList = List[(QuadRectangle, QuadRectangle)]()
+    for (zone <- QuadZone.around(position)) {
+      val thisTree = this.toQuadTree(zone.toQuadRectangle)
+      val otherTree = other.toQuadTree(zone.toQuadRectangle)
+      thisTree.iter((a: QuadAddr, aMat: Option[Any]) => {
+        if (!aMat.isEmpty) {
+          otherTree.iter((b: QuadAddr, bMat: Option[Any]) => {
+            if (!bMat.isEmpty && (a touches b)) {
+              contactList = (a.toQuadRectangle + zone.min,
+                      b.toQuadRectangle + zone.min) :: contactList
+            }
+          })
+        }
+      })
+    }
     contactList
   }
 }
