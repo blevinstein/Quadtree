@@ -11,17 +11,19 @@ class QuadObject[T](val position: QuadRectangle,
     val shape: QuadTree[Option[T]]) {
   require(position.isPerfectSquare, s"not a square: $position")
 
-  // TODO: Refactor to not assume that this object lies within the unit
-  //   rectangle
-  val toQuadTree: QuadTree[Option[T]] =
-      shape.grow(position.perfectLog.get, position.min, None)
+  // Converts into a QuadTree within a particular [space].
+  def toQuadTree(space: QuadRectangle): QuadTree[Option[T]] = {
+    val posWithin = position within space
+    shape.grow(posWithin.perfectLog.get, posWithin.min, None)
+  }
 
   val center: Point = position.toRectangle.center
 
-  // Returns a list of squares where [this] is touching [other]
-  def contacts(other: QuadObject[T]): List[(QuadAddr, QuadAddr)] = {
-    val thisTree = this.toQuadTree
-    val otherTree = other.toQuadTree
+  // Returns a list of squares where [this] is touching [other] within [space].
+  def contacts(other: QuadObject[T], space: QuadRectangle):
+      List[(QuadAddr, QuadAddr)] = {
+    val thisTree = this.toQuadTree(space)
+    val otherTree = other.toQuadTree(space)
     var contactList = List[(QuadAddr, QuadAddr)]()
     thisTree.iter((a: QuadAddr, aMat: Option[Any]) => {
       if (!aMat.isEmpty) {

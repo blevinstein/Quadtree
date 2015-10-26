@@ -123,7 +123,9 @@ object Driver extends App {
     val figure = world.getObj(figureId)
     center = figure.center
     val container = world.getObj(containerId)
-    val contactsEnvironment = !figure.contacts(container).isEmpty
+    // TODO: don't assume objects within unit rectangle
+    val contactsEnvironment =
+        !figure.contacts(container, QuadRectangle.unit).isEmpty
 
     if (contactsEnvironment) {
       velocity = Point.zero
@@ -228,7 +230,8 @@ object Driver extends App {
     // draw collisions
     val figure = world.getObj(figureId)
     val container = world.getObj(containerId)
-    val contacts = figure.contacts(container)
+    // TODO: don't assume objects within unit rectangle
+    val contacts = figure.contacts(container, QuadRectangle.unit)
     var collisions = List[(Rectangle,Color)]()
     contacts.foreach { case (a: QuadAddr, b: QuadAddr) =>
       collisions = (a.toQuadRectangle.toRectangle, Color.YELLOW) ::
