@@ -227,6 +227,23 @@ class QuadTreeTest extends FunSuite with Matchers {
     b.prune(c) shouldEqual new QuadRectangle(QuadOffset.half, QuadOffset.one)
   }
 
+  test("QuadRectangle#within, #withRespectTo") {
+    val topLeft = new QuadRectangle(
+        new QuadOffset(QuadLen.zero, QuadLen.half),
+        new QuadOffset(QuadLen.half, QuadLen.one))
+    val bottomRight = new QuadRectangle(
+        new QuadOffset(QuadLen.half, QuadLen.zero),
+        new QuadOffset(QuadLen.one, QuadLen.half))
+
+    val aWithinB = topLeft within bottomRight
+
+    aWithinB shouldEqual new QuadRectangle(
+      new QuadOffset(QuadLen.half, new QuadLen(1, -2)),
+      new QuadOffset(new QuadLen(3, -2), QuadLen.half))
+
+    aWithinB withRespectTo bottomRight shouldEqual topLeft
+  }
+
   test("Transform") {
     val q1 = new QuadBranch(new QuadLeaf(true),
         new QuadLeaf(false),

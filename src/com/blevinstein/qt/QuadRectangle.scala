@@ -20,6 +20,12 @@ class QuadRectangle(val min: QuadOffset, val max: QuadOffset) {
   def within(other: QuadRectangle): QuadRectangle =
       (this << other.perfectLog.get) + other.min
 
+  // Inverse of [within]. Transforms [this] such that it is expressed in the
+  // coords of [other], with [other.min] at the origin, and [other.max] at
+  // [QuadOffset.one].
+  def withRespectTo(other: QuadRectangle): QuadRectangle =
+      (this - other.min) >> other.perfectLog.get
+
   // Returns the intersection of two QuadRectangles
   def prune(other: QuadRectangle): QuadRectangle = {
     def min2d(a: QuadOffset, b: QuadOffset): QuadOffset = new QuadOffset(
