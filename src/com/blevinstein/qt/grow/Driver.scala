@@ -135,7 +135,7 @@ object Driver extends App {
     var rects = List[Rectangle]()
     sample.iter((addr, m) => {
       if (m) {
-        rects = addr.toRectangle :: rects
+        rects = addr.toQuadRectangle.toRectangle :: rects
       }
     })
 

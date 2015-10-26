@@ -37,7 +37,10 @@ class QuadOffset(val x: QuadLen, val y: QuadLen) {
 
   // Returns an address of the given length
   def toAddress(length: Int): QuadAddr = {
+    require(length >= 0, "negative length specified")
+    // TODO: remove this requirement? generalize QuadAddr?
     require(isInUnitRectangle)
+
     var currentX = x
     var currentY = y
     var addr = QuadAddr.empty

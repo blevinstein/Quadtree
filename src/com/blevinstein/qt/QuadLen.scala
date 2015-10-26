@@ -36,6 +36,9 @@ object QuadLen {
 
   implicit def toFloat(len: QuadLen): Float = len.toFloat
 
+  def min(a: QuadLen, b: QuadLen): QuadLen = if (a <= b) a else b
+  def max(a: QuadLen, b: QuadLen): QuadLen = if (a >= b) a else b
+
   private def normalize(a: QuadLen, b: QuadLen): (Int, Int, Int) = {
     val newExp = if (a.base == 0 && b.base == 0) {
       0
@@ -50,7 +53,15 @@ object QuadLen {
   }
 }
 class QuadLen(private val base: Int, private val exp: Int) {
-  def toFloat: Float = if (exp >= 0) {
+  // Returns true if this represents a length of zero. Should be preferred to
+  //   quadLen == QuadLen.zero
+  //   because QuadLen(0, n) is equivalent to QuadLen(0, 0), but equals() will
+  //   return false
+  def isZero: Boolean = base == 0
+
+  def minExp: Int = simplify.exp
+
+  val toFloat: Float = if (exp >= 0) {
     1f * base * (1 << exp)
   } else {
     1f * base / (1 << -exp)
@@ -72,14 +83,10 @@ class QuadLen(private val base: Int, private val exp: Int) {
   }
 
   // Delegate comparisons to float
-  def >(other: QuadLen): Boolean =
-      QuadLen.toFloat(this) > QuadLen.toFloat(other)
-  def <(other: QuadLen): Boolean =
-      QuadLen.toFloat(this) < QuadLen.toFloat(other)
-  def >=(other: QuadLen): Boolean =
-      QuadLen.toFloat(this) >= QuadLen.toFloat(other)
-  def <=(other: QuadLen): Boolean =
-      QuadLen.toFloat(this) <= QuadLen.toFloat(other)
+  def >(other: QuadLen): Boolean = toFloat > other.toFloat
+  def <(other: QuadLen): Boolean = toFloat < other.toFloat
+  def >=(other: QuadLen): Boolean = toFloat >= other.toFloat
+  def <=(other: QuadLen): Boolean = toFloat <= other.toFloat
 
   def untilBy(until: QuadLen, by: QuadLen): List[QuadLen] = {
     var result = List[QuadLen]()

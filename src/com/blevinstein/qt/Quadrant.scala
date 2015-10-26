@@ -25,6 +25,11 @@ class Quadrant(val x: Boolean, val y: Boolean) {
     case _ => false
   }
 
-  override def toString: String = s"($x, $y)"
+  override def toString: String = (x, y) match {
+    case (false, false) => "BottomLeft"
+    case (true, false) => "BottomRight"
+    case (false, true) => "TopLeft"
+    case (true, true) => "TopRight"
+  }
 }
 

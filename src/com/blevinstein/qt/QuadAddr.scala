@@ -15,8 +15,6 @@ import scala.language.implicitConversions
 object QuadAddr {
   val empty = new QuadAddr()
   implicit def toQuadrantList(addr: QuadAddr): List[Quadrant] = addr.quads
-  implicit def toQuadRectangle(addr: QuadAddr): QuadRectangle =
-      addr.toQuadRectangle
 }
 class QuadAddr(val quads: List[Quadrant]) {
   def this(someQuads: Quadrant*) = this(someQuads.toList)
@@ -43,8 +41,8 @@ class QuadAddr(val quads: List[Quadrant]) {
   }
 
   def touches(other: QuadAddr) = {
-    val thisRect: QuadRectangle = this
-    val otherRect: QuadRectangle = other
+    val thisRect = toQuadRectangle
+    val otherRect = other.toQuadRectangle
 
     val offset = otherRect.min - thisRect.min
 

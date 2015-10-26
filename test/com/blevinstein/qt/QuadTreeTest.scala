@@ -117,7 +117,7 @@ class QuadTreeTest extends FunSuite with Matchers {
     def getArea(tree: QuadTree[Boolean]): Float = {
       var totalArea = 0f
       tree.iter { case (addr, bool) =>
-          totalArea += (if (bool) addr.toRectangle.area else 0)
+          totalArea += (if (bool) addr.toQuadRectangle.toRectangle.area else 0)
       }
       totalArea
     }
@@ -247,6 +247,29 @@ class QuadTreeTest extends FunSuite with Matchers {
     // rectangle.
     topLeft within QuadRectangle.unit shouldEqual topLeft
     bottomRight withRespectTo QuadRectangle.unit shouldEqual bottomRight
+  }
+
+  test("QuadRectangle.toAddressList") {
+    val rect = new QuadRectangle(
+        new QuadOffset(new QuadLen(1, -2), new QuadLen(1, -3)),
+        new QuadOffset(new QuadLen(3, -2), new QuadLen(5, -3)))
+
+    // - abcd
+    //   yyzz
+    //   yyzz
+    //   efgh
+    // +   |   |
+    rect.toAddressList.toSet shouldEqual Set(
+      new QuadAddr(TopLeft, BottomRight, BottomLeft), // a
+      new QuadAddr(TopLeft, BottomRight, BottomRight), // b
+      new QuadAddr(TopRight, BottomLeft, BottomLeft), // c
+      new QuadAddr(TopRight, BottomLeft, BottomRight), // d
+      new QuadAddr(BottomLeft, TopRight), // y
+      new QuadAddr(BottomRight, TopLeft), // z
+      new QuadAddr(BottomLeft, BottomRight, TopLeft), // e
+      new QuadAddr(BottomLeft, BottomRight, TopRight), // f
+      new QuadAddr(BottomRight, BottomLeft, TopLeft), // g
+      new QuadAddr(BottomRight, BottomLeft, TopRight)) // h
   }
 
   test("Transform") {

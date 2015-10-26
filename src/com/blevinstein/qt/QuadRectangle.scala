@@ -9,6 +9,8 @@ object QuadRectangle {
 }
 class QuadRectangle(val min: QuadOffset, val max: QuadOffset) {
   val size: QuadOffset = max - min
+  val isEmpty: Boolean = size.x.isZero || size.y.isZero
+
   // Returns true if [this] QuadRectangle has equal sides of the form (1 << x).
   def isPerfectSquare: Boolean = !perfectLog.isEmpty
   // If [this] has equal sides of the form (1 << x), returns x.
@@ -17,6 +19,37 @@ class QuadRectangle(val min: QuadOffset, val max: QuadOffset) {
   def toRectangle: Rectangle = new Rectangle(
       new Point(1f * min.x.toFloat, 1f * min.y.toFloat),
       new Point(1f * max.x.toFloat, 1f * max.y.toFloat))
+
+  // Recursively generate a List of addresses covered by this rectangle.
+  def toAddressList: List[QuadAddr] = {
+    val minXLen = QuadLen.min(new QuadLen(1, min.x.minExp), size.x)
+    val minYLen = QuadLen.min(new QuadLen(1, min.y.minExp), size.y)
+
+    if (isEmpty) {
+      List()
+    } else if (size == new QuadOffset(minXLen, minYLen) && size.x == size.y) {
+      if (min.isInUnitRectangle) {
+        List(min.toAddress(-size.perfectLog.get))
+      } else {
+        List()
+      }
+    } else if (minXLen < size.x) {
+      // Split by x coord and recur
+      val xCoord = min.x + minXLen
+      new QuadRectangle(min, new QuadOffset(xCoord, max.y)).toAddressList ++
+          new QuadRectangle(new QuadOffset(xCoord, min.y), max).toAddressList
+    } else if (size.y < size.x) {
+      // Split by x coord and recur
+      val xCoord = min.x + minYLen
+      new QuadRectangle(min, new QuadOffset(xCoord, max.y)).toAddressList ++
+          new QuadRectangle(new QuadOffset(xCoord, min.y), max).toAddressList
+    } else {
+      // Split by y coord and recur
+      val yCoord = min.y + minYLen
+      new QuadRectangle(min, new QuadOffset(max.x, yCoord)).toAddressList ++
+          new QuadRectangle(new QuadOffset(min.x, yCoord), max).toAddressList
+    }
+  }
 
   // Transforms [this] from coords of unit rectangle to coords of [other].
   def within(other: QuadRectangle): QuadRectangle =
