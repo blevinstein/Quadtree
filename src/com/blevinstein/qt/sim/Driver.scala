@@ -213,9 +213,8 @@ object Driver extends App {
 
     // draw world
     var rects = List[(Rectangle,Color)]()
-    world.view.iter((addr, m) => m match {
-      case Some(mat) => rects = (addr.toRectangle, mat.color) :: rects
-      case None => ()
+    world.iter((objId, quadRect, mat) => {
+      rects = (quadRect.toRectangle, mat.color) :: rects
     })
     drawAll(rects)
 

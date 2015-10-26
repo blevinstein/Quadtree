@@ -7,14 +7,18 @@ object QuadRectangle {
 }
 class QuadRectangle(val min: QuadOffset, val max: QuadOffset) {
   val size: QuadOffset = max - min
-  // Returns true if this QuadRectangle has equal sides of the form (1 << x).
+  // Returns true if [this] QuadRectangle has equal sides of the form (1 << x).
   def isPerfectSquare: Boolean = !perfectLog.isEmpty
-  // If this has equal sides of the form (1 << x), returns x.
+  // If [this] has equal sides of the form (1 << x), returns x.
   def perfectLog: Option[Int] = (max - min).perfectLog
 
   def toRectangle: Rectangle = new Rectangle(
       new Point(1f * min.x.toFloat, 1f * min.y.toFloat),
       new Point(1f * max.x.toFloat, 1f * max.y.toFloat))
+
+  // Transforms [this] from coords of unit rectangle to coords of [other].
+  def within(other: QuadRectangle): QuadRectangle =
+      (this << other.perfectLog.get) + other.min
 
   // Returns the intersection of two QuadRectangles
   def prune(other: QuadRectangle): QuadRectangle = {

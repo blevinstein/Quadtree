@@ -1,6 +1,6 @@
 package com.blevinstein.qt.sim
 
-import com.blevinstein.qt.{QuadTree,QuadLeaf,QuadRectangle,QuadOffset}
+import com.blevinstein.qt.{QuadAddr,QuadTree,QuadLeaf,QuadRectangle,QuadOffset}
 
 import scala.collection.mutable.HashMap
 
@@ -26,6 +26,17 @@ class World[T] {
   }
 
   def allObjs: Iterable[QuadObject[T]] = objs.values
+
+  def iter(cb: WorldIterCallback[T]): Unit = {
+    for (objId <- objs.keys) {
+      val obj = objs.get(objId).get
+      obj.shape.iter((addr: QuadAddr, mat: Option[T]) => {
+        if (!mat.isEmpty) {
+          cb(objId, addr.toQuadRectangle.within(obj.position), mat.get)
+        }
+      })
+    }
+  }
 
   def view: QuadTree[Option[T]] = {
     val addOp = QuadTree.merge((m1: Option[T], m2: Option[T]) =>
