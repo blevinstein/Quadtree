@@ -247,6 +247,10 @@ class QuadTreeTest extends FunSuite with Matchers {
     // rectangle.
     topLeft within QuadRectangle.unit shouldEqual topLeft
     bottomRight withRespectTo QuadRectangle.unit shouldEqual bottomRight
+
+    // Any rectangle withRespectTo itself is the unit rectangle
+    topLeft withRespectTo topLeft shouldEqual QuadRectangle.unit
+    bottomRight withRespectTo bottomRight shouldEqual QuadRectangle.unit
   }
 
   test("QuadRectangle#toAddressList") {
