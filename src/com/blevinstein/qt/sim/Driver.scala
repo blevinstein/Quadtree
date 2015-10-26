@@ -87,16 +87,24 @@ object Driver extends App {
   // setup game
   var world = new World[Material]
   val figureId = world.add(
-    (QuadRectangle.unit >> 3) + QuadOffset.half,
-    checkerboard(3))
-  val containerId = world.add(
-    QuadRectangle.unit,
-    QuadTree.approx(6, (p) =>
-        if (p.y < 0.1 || p.y < p.x - 0.5) {
-          Material.Gray
-        } else {
-          Material.Empty
-        }))
+      (QuadRectangle.unit >> 3) + QuadOffset.half,
+      checkerboard(3))
+  val floorId = world.add(
+      QuadRectangle.unit,
+      QuadTree.approx(6, (p) =>
+          if (p.y < 0.05) {
+            Material.Gray
+          } else {
+            Material.Empty
+          }))
+  val rampId = world.add(
+      QuadRectangle.unit + new QuadOffset(QuadLen.one, QuadLen.zero),
+      QuadTree.approx(6, (p) =>
+          if (p.y < p.x) {
+            Material.Gray
+          } else {
+            Material.Empty
+          }))
 
   def run: Unit = {
     val throttle = new Throttle(FPS)
@@ -122,8 +130,10 @@ object Driver extends App {
   def mainLoop: Unit = {
     val figure = world.getObj(figureId)
     center = figure.center
-    val container = world.getObj(containerId)
-    val contactsEnvironment = !figure.contacts(container).isEmpty
+    val floor = world.getObj(floorId)
+    val ramp = world.getObj(rampId)
+    val contactsEnvironment =
+        !(figure.contacts(floor).isEmpty && figure.contacts(ramp).isEmpty)
 
     if (contactsEnvironment) {
       velocity = Point.zero
@@ -227,9 +237,9 @@ object Driver extends App {
 
     // draw collisions
     val figure = world.getObj(figureId)
-    val container = world.getObj(containerId)
-    // TODO: don't assume objects within unit rectangle
-    val contacts = figure.contacts(container)
+    val floor = world.getObj(floorId)
+    val ramp = world.getObj(rampId)
+    val contacts = figure.contacts(floor) ++ figure.contacts(ramp)
     var collisions = List[(Rectangle,Color)]()
     contacts.foreach { case (a: QuadRectangle, b: QuadRectangle) =>
       collisions = (a.toRectangle, Color.YELLOW) ::
