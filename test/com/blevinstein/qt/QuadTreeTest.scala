@@ -242,6 +242,11 @@ class QuadTreeTest extends FunSuite with Matchers {
       new QuadOffset(new QuadLen(3, -2), QuadLen.half))
 
     aWithinB withRespectTo bottomRight shouldEqual topLeft
+
+    // Both within and withRespectTo become the identity function on the unit
+    // rectangle.
+    topLeft within QuadRectangle.unit shouldEqual topLeft
+    bottomRight withRespectTo QuadRectangle.unit shouldEqual bottomRight
   }
 
   test("Transform") {
