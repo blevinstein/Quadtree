@@ -36,8 +36,8 @@ object QuadLen {
 
   implicit def toFloat(len: QuadLen): Float = len.toFloat
 
-  def min(a: QuadLen, b: QuadLen): QuadLen = if (a <= b) a else b
-  def max(a: QuadLen, b: QuadLen): QuadLen = if (a >= b) a else b
+  def min(lens: QuadLen*): QuadLen = lens.reduce((a, b) => if (a <= b) a else b)
+  def max(lens: QuadLen*): QuadLen = lens.reduce((a, b) => if (a >= b) a else b)
 
   private def normalize(a: QuadLen, b: QuadLen): (Int, Int, Int) = {
     val newExp = if (a.base == 0 && b.base == 0) {
@@ -52,7 +52,7 @@ object QuadLen {
     (a.base << (a.exp - newExp), b.base << (b.exp - newExp), newExp)
   }
 }
-class QuadLen(private val base: Int, private val exp: Int) {
+class QuadLen(private val base: Int, private val exp: Int = 0) {
   // Returns true if this represents a length of zero. Should be preferred to
   //   quadLen == QuadLen.zero
   //   because QuadLen(0, n) is equivalent to QuadLen(0, 0), but equals() will
@@ -106,7 +106,7 @@ class QuadLen(private val base: Int, private val exp: Int) {
 
   def isSimplified: Boolean = base % 2 == 1 || base == 0
 
-  private def simplify: QuadLen = if (base == 0) {
+  def simplify: QuadLen = if (base == 0) {
     QuadLen.zero
   } else if (base % 2 == 0) {
     new QuadLen(base / 2, exp + 1).simplify
