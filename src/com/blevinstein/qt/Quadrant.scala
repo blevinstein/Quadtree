@@ -2,6 +2,11 @@ package com.blevinstein.qt
 
 import com.blevinstein.geom.Point
 
+// Represents one of the four quadrants - BottomLeft, BottomRight, TopLeft, and
+// TopRight.
+//
+// Quadrants can be referenced by name [Quadrant.BottomRight] or by x and y
+// position [new Quadrant(true, false)].
 object Quadrant {
   val BottomLeft = new Quadrant(false, false)
   val BottomRight = new Quadrant(true, false)

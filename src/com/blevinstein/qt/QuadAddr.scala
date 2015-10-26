@@ -4,6 +4,14 @@ import com.blevinstein.geom.Rectangle
 
 import scala.language.implicitConversions
 
+// Represents an address within a QuadTree as a List[Quadrant].
+//
+// The size of the leaf node addressed can be inferred from the length of the
+// address.
+//
+// For example, the top left quadrant of the bottom right quadrant would be
+// expressed as:
+// new QuadAddr(Quadrant.BottomRight, Quadrant.TopLeft)
 object QuadAddr {
   val empty = new QuadAddr()
   implicit def toQuadrantList(addr: QuadAddr): List[Quadrant] = addr.quads

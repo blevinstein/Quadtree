@@ -3,6 +3,18 @@ package com.blevinstein.qt
 import com.blevinstein.geom.{Point}
 import com.blevinstein.qt.Quadrant.{TopLeft,TopRight,BottomLeft,BottomRight}
 
+// This is the heart of the quad engine. A QuadTree can be used to store
+// arbitrary data in a quadtree structure.
+//
+// QuadTrees can be constructed from QuadLeaf and QuadBranch nodes.
+//
+// QuadTrees can be merged together using [merge], evaluated into a single
+// element using [reduce], and have simple, local transformations (within each
+// leaf node) using [transform].
+//
+// QuadTrees can contain complex types, so you can use complex types like:
+// - QuadTree[Option[T]], with different treatment of empty leaf nodes
+// - QuadTree[X => Y], used to perform complex transformations of a QuadTree
 object QuadTree {
   // Returns a mapping from the unit rectangle to the given quadrant.
   def zoomFunc(quad : Quadrant): (Point => Point) =
@@ -74,7 +86,7 @@ object QuadTree {
     }
   }
 }
-
+// Implemented by QuadBranch[T] and QuadLeaf[T].
 abstract class QuadTree[+T] {
   def getData(p: Point): T = {
     require(p.x >= 0 && p.x <= 1)
@@ -146,17 +158,19 @@ abstract class QuadTree[+T] {
     }
   }
 }
-
 object QuadBranch {
   def create[T](f: Quadrant => QuadTree[T]): QuadBranch[T] = new QuadBranch(
     f(TopLeft), f(TopRight), f(BottomLeft), f(BottomRight))
 }
-/**
- * +y
- * ^^
- * [ a b ]
- * [ c d ] -> +x
- */
+// NOTE: QuadBranch structure:
+//
+// +y
+// ^^
+// [ a b ] >
+// [ c d ] > +x
+//
+// Outside of the qt package, it is preferred to use getSubtree() instead of
+// referencing a/b/c/d directly, but both are allowed.
 class QuadBranch[+T](val a: QuadTree[T],
     val b: QuadTree[T],
     val c: QuadTree[T],
@@ -171,10 +185,8 @@ class QuadBranch[+T](val a: QuadTree[T],
     case BottomRight => d
   }
 
-  /**
-   * If this is a QuadBranch with 4 identical QuadLeafs, merge into one QuadLeaf
-   * Else, return this
-   */
+  // If this is a QuadBranch with 4 identical QuadLeafs, merge into one QuadLeaf
+  // Else, return this
   def tryMerge: QuadTree[T] = {
     a match {
       case leaf: QuadLeaf[T] => if (a == b && a == c && a == d) {

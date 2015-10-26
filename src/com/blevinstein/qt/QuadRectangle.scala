@@ -2,6 +2,8 @@ package com.blevinstein.qt
 
 import com.blevinstein.geom.{Point,Rectangle}
 
+// Represents a rectangle in quad space using QuadOffsets for the bottom left
+// and top right corners of the rectangle.
 object QuadRectangle {
   val unit = new QuadRectangle(QuadOffset.zero, QuadOffset.one)
 }
