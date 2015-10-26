@@ -141,7 +141,7 @@ object Driver extends App {
     }
     if(!world.moveIfPossible(
         figureId, QuadOffset.approx(velocity, moveResolution))) {
-      velocity = Point.zero
+      velocity /= 2
     }
 
     // Unbounded environment, need the Reaper
