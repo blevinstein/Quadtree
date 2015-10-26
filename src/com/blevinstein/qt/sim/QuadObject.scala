@@ -4,10 +4,15 @@ import com.blevinstein.geom.Point
 import com.blevinstein.qt.{QuadTree,QuadRectangle,QuadAddr}
 
 // Immutable container object for holding information about an object.
+//
+// Contains a QuadTree describing the [shape] of the object, and a QuadRectangle
+// describing its [position].
 class QuadObject[T](val position: QuadRectangle,
     val shape: QuadTree[Option[T]]) {
   require(position.isPerfectSquare, s"not a square: $position")
 
+  // TODO: Refactor to not assume that this object lies within the unit
+  //   rectangle
   val toQuadTree: QuadTree[Option[T]] =
       shape.grow(position.perfectLog.get, position.min, None)
 

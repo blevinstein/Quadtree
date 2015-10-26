@@ -7,7 +7,7 @@ import scala.collection.mutable.HashMap
 // Mutable class describing a group of [objs] in space.
 //
 // Each object is defined as a QuadTree[Option[T]], so that we have a concept of
-// empty space.
+// empty space for collision.
 //
 // TODO: Write tests to assess speed of implementation?
 class World[T] {

@@ -36,6 +36,13 @@ import java.awt.event.MouseWheelEvent
 import java.awt.event.WindowAdapter
 import java.awt.event.WindowEvent
 
+// This is a simple driver for testing out a simulation running on the QuadTree
+// engine.
+//
+// Much of the code here is experimental, and should eventually be
+// refactored into other classes within the [sim] package, e.g. World or
+// QuadObject.
+//
 // TODO: Think about better ways of handling degredation when framerate < [FPS]
 object Driver extends App {
   val FPS: Int = 60
