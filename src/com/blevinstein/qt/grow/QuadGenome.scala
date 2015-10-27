@@ -7,6 +7,9 @@ import com.blevinstein.util.Decider
 import scala.language.implicitConversions
 import scala.util.Random
 
+// Provides a Genome for running a genetic algorithm.
+//
+// Each gene is a ReplacementRule.
 object QuadGenome {
   // delegate to rules
   implicit def toRuleList(genome: QuadGenome): List[ReplacementRule] =

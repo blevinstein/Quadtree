@@ -33,6 +33,8 @@ import java.awt.event.MouseMotionAdapter
 import java.awt.event.WindowAdapter
 import java.awt.event.WindowEvent
 
+// This is an experiment in evolving rules for generating complex patterns in
+// QuadTrees.
 object Driver extends App {
   val FPS : Int = 60
   // dimensions of the screen

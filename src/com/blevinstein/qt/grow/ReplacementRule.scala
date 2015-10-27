@@ -3,6 +3,14 @@ package com.blevinstein.qt.grow
 import com.blevinstein.qt.{QuadTree,QuadBranch,QuadLeaf}
 import com.blevinstein.util.Decider
 
+// The main method of a ReplacmentRule is apply. When an ReplacementRule is
+// applied to a QuadTree[Boolean], it either returns None (if this rule cannot
+// be applied), or Some[QuadTree[Boolean]], the result of applying this
+// ReplacementRule to the given QuadTree.
+//
+// The structure of the ReplacementRule is, itself, a QuadTree, with its leaf
+// nodes containing QuadTransform = Boolean => Option[Boolean]. For a
+// ReplacementRule to apply, every leaf node must evaluate to Some[Boolean].
 object ReplacementRule {
   /**
    * Given a list of ReplacementRules, upate the given QuadTree. Tries to apply
