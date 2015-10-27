@@ -80,6 +80,7 @@ class World[T] {
     collisions
   }
 
+  // TODO: move QuadTree operators into separate file
   val collideOp = QuadTree.merge((m1: Option[T], m2: Option[T]) =>
       (m1, m2) match {
         case (Some(_), Some(_)) => true
