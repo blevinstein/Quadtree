@@ -28,8 +28,7 @@ class World[T] {
   def allObjs: Iterable[QuadObject[T]] = objs.values
 
   def iter(cb: WorldIterCallback[T]): Unit = {
-    for (objId <- objs.keys) {
-      val obj = objs.get(objId).get
+    for ((objId, obj) <- objs) {
       obj.shape.iter((addr: QuadAddr, mat: Option[T]) => {
         if (!mat.isEmpty) {
           cb(objId, addr.toQuadRectangle.within(obj.position), mat.get)
@@ -69,6 +68,8 @@ class World[T] {
       true
     }
   }
+
+  // TODO: reshape(id: Id, newShape: QuadTree[Option[T]]): Boolean
 
   // Collision helpers
 
