@@ -42,8 +42,10 @@ class QuadRectangle(val min: QuadOffset, val max: QuadOffset) {
         List()
       }
     } else if (xGridSize < size.x) {
+      // Necessary grid-aligned split on x
       splitOnX(min.x + xGridSize)
     } else if (yGridSize < size.y) {
+      // Necessary grid-aligned split on y
       splitOnY(min.y + yGridSize)
     } else if (size.y < size.x) {
       splitOnX(min.x + yGridSize)
