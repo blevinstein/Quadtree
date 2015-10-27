@@ -14,7 +14,7 @@ class World[T] {
   private val objs: HashMap[Id, QuadObject[T]] = new HashMap
 
   private var nextId = 0
-  // returns nextId++
+  // Returns nextId++
   def getId: Id = {
     nextId += 1
     nextId - 1
