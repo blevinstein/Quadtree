@@ -47,20 +47,12 @@ class World[T] {
     objId
   }
 
-  def move(id: Id, offset: QuadOffset): Unit = {
-    val obj = getObj(id)
-    objs.put(id, new QuadObject(obj.position + offset, obj.shape))
-  }
-
   // Returns true if the object moves
-  def moveIfPossible(id: Id, offset: QuadOffset): Boolean = {
-    val obj = getObj(id)
-    val newObj = new QuadObject(obj.position + offset, obj.shape)
+  def move(id: Id, offset: QuadOffset): Boolean = {
+    val oldObj = getObj(id)
+    val newObj = new QuadObject(oldObj.position + offset, oldObj.shape)
 
-    var collision = false
-    for (otherObj <- allObjs)
-      if (otherObj != obj && collidesWith(otherObj, newObj))
-        collision = true
+    var collision = !collideWithAll(newObj, Set(id)).isEmpty
 
     if (collision) {
       false
@@ -71,6 +63,14 @@ class World[T] {
   }
 
   // Collision helpers
+
+  def collideWithAll(obj: QuadObject[T], exclude: Set[Id] = Set()): List[Id] = {
+    var collisions = List[Id]()
+    for ((id, otherObj) <- objs if !exclude.contains(id))
+      if (collidesWith(obj, otherObj))
+        collisions = id :: collisions
+    collisions
+  }
 
   val collideOp = QuadTree.merge((m1: Option[T], m2: Option[T]) =>
       (m1, m2) match {

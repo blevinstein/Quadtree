@@ -149,8 +149,7 @@ object Driver extends App {
     } else {
       velocity += gravity
     }
-    if(!world.moveIfPossible(
-        figureId, QuadOffset.approx(velocity, moveResolution))) {
+    if(!world.move(figureId, QuadOffset.approx(velocity, moveResolution))) {
       velocity /= 2
     }
 
