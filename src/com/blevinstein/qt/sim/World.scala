@@ -40,11 +40,19 @@ class World[T] {
 
   // Modification functions
 
-  def add(position: QuadRectangle,
-      shape: QuadTree[Option[T]]): Id = {
-    val objId = getId
-    objs.put(objId, new QuadObject(position, shape))
-    objId
+  // Returns the Id of the added object, or None
+  def add(position: QuadRectangle, shape: QuadTree[Option[T]]): Option[Id] = {
+    val newObj = new QuadObject(position, shape)
+
+    val collision = !collideWithAll(newObj).isEmpty
+
+    if (collision) {
+      None
+    } else {
+      val objId = getId
+      objs.put(objId, newObj)
+      Some(objId)
+    }
   }
 
   // Returns true if the object moves
@@ -52,7 +60,7 @@ class World[T] {
     val oldObj = getObj(id)
     val newObj = new QuadObject(oldObj.position + offset, oldObj.shape)
 
-    var collision = !collideWithAll(newObj, Set(id)).isEmpty
+    val collision = !collideWithAll(newObj, Set(id)).isEmpty
 
     if (collision) {
       false
