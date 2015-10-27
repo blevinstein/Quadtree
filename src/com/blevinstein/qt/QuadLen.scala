@@ -98,6 +98,8 @@ class QuadLen(private val base: Int, private val exp: Int = 0) {
     result
   }
 
+  // Returns the largest QuadLen that is "perfect" and less than or equal to
+  // [this].
   def truncatePerfect: QuadLen = base match {
     case 1 => this
     case _ => new QuadLen(base - 1, exp).simplify.truncatePerfect
