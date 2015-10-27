@@ -210,9 +210,10 @@ object Driver extends App {
         drawRect(rect)
       }
       // outline in black
-      setFill(false)
-      setColor(Color.BLACK)
-      rects.foreach { case (rect, color) => drawRect(rect) }
+      // TODO: implement outline only where material changes
+      //setFill(false)
+      //setColor(Color.BLACK)
+      //rects.foreach { case (rect, color) => drawRect(rect) }
     }
 
     gl.glClear(GL_COLOR_BUFFER_BIT)
