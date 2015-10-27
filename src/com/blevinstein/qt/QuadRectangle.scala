@@ -43,13 +43,12 @@ class QuadRectangle(val min: QuadOffset, val max: QuadOffset) {
       }
     } else if (xGridSize < size.x) {
       splitOnX(min.x + xGridSize)
-    } else if (size.y < size.x) {
-      splitOnX(min.x + yGridSize)
     } else if (yGridSize < size.y) {
       splitOnY(min.y + yGridSize)
+    } else if (size.y < size.x) {
+      splitOnX(min.x + yGridSize)
     } else {
-      throw new IllegalStateException(
-          s"toAddressList $this grid $xGridSize $yGridSize")
+      splitOnY(min.y + xGridSize)
     }
   }
 
