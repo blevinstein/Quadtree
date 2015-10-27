@@ -29,25 +29,27 @@ class QuadRectangle(val min: QuadOffset, val max: QuadOffset) {
         new QuadRectangle(min, new QuadOffset(max.x, yCoord)).toAddressList ++
             new QuadRectangle(new QuadOffset(min.x, yCoord), max).toAddressList
 
-    val minXLen = QuadLen.min(new QuadLen(1, min.x.minExp), size.x, QuadLen.one)
-    val minYLen = QuadLen.min(new QuadLen(1, min.y.minExp), size.y, QuadLen.one)
+    val xGridSize = QuadLen.min(new QuadLen(1, min.x.minExp), size.x, QuadLen.one)
+    val yGridSize = QuadLen.min(new QuadLen(1, min.y.minExp), size.y, QuadLen.one)
 
     if (isEmpty) {
       List()
-    } else if (size == new QuadOffset(minXLen, minYLen) && size.x == size.y) {
+    } else if (size == new QuadOffset(xGridSize, yGridSize) && size.x == size.y) {
+      // base case: grid-aligned square
       if (min.isInUnitRectangle) {
         List(min.toAddress(-size.perfectLog.get))
       } else {
         List()
       }
-    } else if (minXLen < size.x) {
-      splitOnX(min.x + minXLen)
+    } else if (xGridSize < size.x) {
+      splitOnX(min.x + xGridSize)
     } else if (size.y < size.x) {
-      splitOnX(min.x + minYLen)
-    } else if (minYLen < size.y) {
-      splitOnY(min.y + minYLen)
+      splitOnX(min.x + yGridSize)
+    } else if (yGridSize < size.y) {
+      splitOnY(min.y + yGridSize)
     } else {
-      throw new IllegalStateException(s"toAddressList $this min $minXLen $minYLen")
+      throw new IllegalStateException(
+          s"toAddressList $this grid $xGridSize $yGridSize")
     }
   }
 
