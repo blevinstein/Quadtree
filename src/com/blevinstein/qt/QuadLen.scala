@@ -98,6 +98,11 @@ class QuadLen(private val base: Int, private val exp: Int = 0) {
     result
   }
 
+  def truncatePerfect: QuadLen = base match {
+    case 1 => this
+    case _ => new QuadLen(base - 1, exp).simplify.truncatePerfect
+  }
+
   // For "perfect" lengths of the form 1 << x, this will return x
   def perfectLog: Option[Int] = base match {
     case 1 => Some(exp)

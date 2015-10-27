@@ -29,10 +29,15 @@ class QuadRectangle(val min: QuadOffset, val max: QuadOffset) {
         new QuadRectangle(min, new QuadOffset(max.x, yCoord)).toAddressList ++
             new QuadRectangle(new QuadOffset(min.x, yCoord), max).toAddressList
 
-    val xGridSize =
-        QuadLen.min(new QuadLen(1, min.x.minExp), size.x, QuadLen.one)
-    val yGridSize =
-        QuadLen.min(new QuadLen(1, min.y.minExp), size.y, QuadLen.one)
+    // Grid size is determined by three limitations:
+    // - A QuadLeaf must be grid aligned
+    // - A QuadLeaf must have sides of power-of-two length
+    val xGridSize = QuadLen.min(
+        new QuadLen(1, min.x.minExp), // grid aligned
+        size.x.truncatePerfect)       // power-of-two length
+    val yGridSize = QuadLen.min(
+        new QuadLen(1, min.y.minExp), // grid aligned
+        size.y.truncatePerfect)       // power-of-two length
 
     if (isEmpty) {
       List()

@@ -253,7 +253,7 @@ class QuadTreeTest extends FunSuite with Matchers {
     bottomRight withRespectTo bottomRight shouldEqual QuadRectangle.unit
   }
 
-  test("QuadRectangle#toAddressList") {
+  test("QuadRectangle#toAddressList basic case") {
     val rect = new QuadRectangle(
         new QuadOffset(new QuadLen(1, -2), new QuadLen(1, -3)),
         new QuadOffset(new QuadLen(3, -2), new QuadLen(5, -3)))
@@ -264,16 +264,52 @@ class QuadTreeTest extends FunSuite with Matchers {
     //   efgh
     // +   |   |
     rect.toAddressList.toSet shouldEqual Set(
-      new QuadAddr(TopLeft, BottomRight, BottomLeft), // a
-      new QuadAddr(TopLeft, BottomRight, BottomRight), // b
-      new QuadAddr(TopRight, BottomLeft, BottomLeft), // c
-      new QuadAddr(TopRight, BottomLeft, BottomRight), // d
-      new QuadAddr(BottomLeft, TopRight), // y
-      new QuadAddr(BottomRight, TopLeft), // z
-      new QuadAddr(BottomLeft, BottomRight, TopLeft), // e
-      new QuadAddr(BottomLeft, BottomRight, TopRight), // f
-      new QuadAddr(BottomRight, BottomLeft, TopLeft), // g
-      new QuadAddr(BottomRight, BottomLeft, TopRight)) // h
+        new QuadAddr(TopLeft, BottomRight, BottomLeft), // a
+        new QuadAddr(TopLeft, BottomRight, BottomRight), // b
+        new QuadAddr(TopRight, BottomLeft, BottomLeft), // c
+        new QuadAddr(TopRight, BottomLeft, BottomRight), // d
+        new QuadAddr(BottomLeft, TopRight), // y
+        new QuadAddr(BottomRight, TopLeft), // z
+        new QuadAddr(BottomLeft, BottomRight, TopLeft), // e
+        new QuadAddr(BottomLeft, BottomRight, TopRight), // f
+        new QuadAddr(BottomRight, BottomLeft, TopLeft), // g
+        new QuadAddr(BottomRight, BottomLeft, TopRight)) // h
+  }
+
+  test("QuadRectangle#toAddressList off-grid squares") {
+    val rectOne = new QuadRectangle(
+        QuadOffset.zero,
+        new QuadOffset(new QuadLen(3, -2), new QuadLen(3, -2)))
+
+    // -
+    //  abc
+    //  xxd
+    //  xxe
+    // +   |
+    rectOne.toAddressList.toSet shouldEqual Set(
+        new QuadAddr(BottomLeft), // x
+        new QuadAddr(TopLeft, BottomLeft), // a
+        new QuadAddr(TopLeft, BottomRight), // b
+        new QuadAddr(TopRight, BottomLeft), // c
+        new QuadAddr(BottomRight, TopLeft), // d
+        new QuadAddr(BottomRight, BottomLeft)) // e
+
+    val rectTwo = new QuadRectangle(
+        new QuadOffset(new QuadLen(1, -2), new QuadLen(1, -2)),
+        QuadOffset.one)
+
+    // - axx
+    //   bxx
+    //   cde
+    //
+    // +   |
+    rectTwo.toAddressList.toSet shouldEqual Set(
+        new QuadAddr(TopRight), // x
+        new QuadAddr(TopLeft, TopRight), // a
+        new QuadAddr(TopLeft, BottomRight), // b
+        new QuadAddr(BottomLeft, TopRight), // c
+        new QuadAddr(BottomRight, TopLeft), // d
+        new QuadAddr(BottomRight, TopRight)) // e
   }
 
   test("QuadRectangle#toAddressList out of bounds") {
@@ -282,6 +318,13 @@ class QuadTreeTest extends FunSuite with Matchers {
         new QuadOffset(new QuadLen(2).simplify, new QuadLen(4).simplify))
 
     rect.toAddressList.toSet shouldEqual Set()
+  }
+
+  test("QuadRectangle#toAddressList large") {
+    val rect = new QuadRectangle(QuadOffset.zero,
+        new QuadOffset(new QuadLen(2), new QuadLen(2)))
+
+    rect.toAddressList.toSet shouldEqual Set(new QuadAddr())
   }
 
   test("Transform") {
@@ -441,6 +484,14 @@ class QuadTreeTest extends FunSuite with Matchers {
     QuadLen.approx(2.5f, -6) shouldEqual new QuadLen(5, -1)
     QuadLen.approx(-1.5f, -6) shouldEqual new QuadLen(-3, -1)
     QuadLen.approx(-2.5f, -6) shouldEqual new QuadLen(-5, -1)
+  }
+
+  test("QuadLen#truncatePerfect") {
+    new QuadLen(7, -3).truncatePerfect shouldEqual new QuadLen(1, -1)
+
+    new QuadLen(3, -3).truncatePerfect shouldEqual new QuadLen(1, -2)
+
+    new QuadLen(3, -4).truncatePerfect shouldEqual new QuadLen(1, -3)
   }
 }
 
