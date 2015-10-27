@@ -63,7 +63,14 @@ object QuadTree {
     var pieces: List[(QuadAddr, T)] = List()
 
     def add(addr: QuadAddr, data: T): Builder[T] = {
-      pieces = pieces :+ ((addr, data))
+      pieces = (addr, data) :: pieces
+      this
+    }
+
+    def addAll(rect: QuadRectangle, data: T): Builder[T] = {
+      for (addr <- rect.toAddressList) {
+        pieces = (addr, data) :: pieces
+      }
       this
     }
 
@@ -137,9 +144,9 @@ abstract class QuadTree[+T] {
     val builder = new QuadTree.Builder[T2](fill)
     iter((addr, data) => {
       val toRect = (addr.toQuadRectangle << levels) + offset
-      for (toAddr <- toRect.toAddressList) {
-        builder.add(toAddr, getData(addr))
-      }
+      // Must use [addAll] because resulting rectangle might not be a
+      // grid-aligned square.
+      builder.addAll(toRect, getData(addr))
     })
     builder.build
   }
