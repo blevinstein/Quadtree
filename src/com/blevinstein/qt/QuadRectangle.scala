@@ -14,7 +14,7 @@ class QuadRectangle(val min: QuadOffset, val max: QuadOffset) {
   // Returns true if [this] QuadRectangle has equal sides of the form (1 << x).
   def isPerfectSquare: Boolean = !perfectLog.isEmpty
   // If [this] has equal sides of the form (1 << x), returns x.
-  def perfectLog: Option[Int] = (max - min).perfectLog
+  def perfectLog: Option[Int] = size.perfectLog
 
   def toRectangle: Rectangle = new Rectangle(
       new Point(1f * min.x.toFloat, 1f * min.y.toFloat),
@@ -29,12 +29,15 @@ class QuadRectangle(val min: QuadOffset, val max: QuadOffset) {
         new QuadRectangle(min, new QuadOffset(max.x, yCoord)).toAddressList ++
             new QuadRectangle(new QuadOffset(min.x, yCoord), max).toAddressList
 
-    val xGridSize = QuadLen.min(new QuadLen(1, min.x.minExp), size.x, QuadLen.one)
-    val yGridSize = QuadLen.min(new QuadLen(1, min.y.minExp), size.y, QuadLen.one)
+    val xGridSize =
+        QuadLen.min(new QuadLen(1, min.x.minExp), size.x, QuadLen.one)
+    val yGridSize =
+        QuadLen.min(new QuadLen(1, min.y.minExp), size.y, QuadLen.one)
 
     if (isEmpty) {
       List()
-    } else if (size == new QuadOffset(xGridSize, yGridSize) && size.x == size.y) {
+    } else if (size == new QuadOffset(xGridSize, yGridSize) &&
+        isPerfectSquare) {
       // base case: grid-aligned square
       if (min.isInUnitRectangle) {
         List(min.toAddress(-size.perfectLog.get))
@@ -49,8 +52,11 @@ class QuadRectangle(val min: QuadOffset, val max: QuadOffset) {
       splitOnY(min.y + yGridSize)
     } else if (size.y < size.x) {
       splitOnX(min.x + yGridSize)
-    } else {
+    } else if (size.x < size.y) {
       splitOnY(min.y + xGridSize)
+    } else {
+      throw new IllegalStateException(
+          s"isAddressList $this grid $xGridSize $yGridSize")
     }
   }
 
