@@ -71,6 +71,8 @@ class World[T] {
 
   // TODO: reshape(id: Id, newShape: QuadTree[Option[T]]): Boolean
 
+  // TODO: destroy(id: Id): Unit
+
   // Collision helpers
 
   def collideWithAll(obj: QuadObject[T], exclude: Set[Id] = Set()): List[Id] = {
