@@ -22,6 +22,13 @@ class QuadRectangle(val min: QuadOffset, val max: QuadOffset) {
 
   // Recursively generate a List of addresses covered by this rectangle.
   def toAddressList: List[QuadAddr] = {
+    def splitOnX(xCoord: QuadLen): List[QuadAddr] =
+        new QuadRectangle(min, new QuadOffset(xCoord, max.y)).toAddressList ++
+            new QuadRectangle(new QuadOffset(xCoord, min.y), max).toAddressList
+    def splitOnY(yCoord: QuadLen): List[QuadAddr] =
+        new QuadRectangle(min, new QuadOffset(max.x, yCoord)).toAddressList ++
+            new QuadRectangle(new QuadOffset(min.x, yCoord), max).toAddressList
+
     val minXLen = QuadLen.min(new QuadLen(1, min.x.minExp), size.x, QuadLen.one)
     val minYLen = QuadLen.min(new QuadLen(1, min.y.minExp), size.y, QuadLen.one)
 
@@ -34,22 +41,13 @@ class QuadRectangle(val min: QuadOffset, val max: QuadOffset) {
         List()
       }
     } else if (minXLen < size.x) {
-      // Split by x coord and recur
-      val xCoord = min.x + minXLen
-      new QuadRectangle(min, new QuadOffset(xCoord, max.y)).toAddressList ++
-          new QuadRectangle(new QuadOffset(xCoord, min.y), max).toAddressList
+      splitOnX(min.x + minXLen)
     } else if (size.y < size.x) {
-      // Split by x coord and recur
-      val xCoord = min.x + minYLen
-      new QuadRectangle(min, new QuadOffset(xCoord, max.y)).toAddressList ++
-          new QuadRectangle(new QuadOffset(xCoord, min.y), max).toAddressList
+      splitOnX(min.x + minYLen)
     } else if (minYLen < size.y) {
-      // Split by y coord and recur
-      val yCoord = min.y + minYLen
-      new QuadRectangle(min, new QuadOffset(max.x, yCoord)).toAddressList ++
-          new QuadRectangle(new QuadOffset(min.x, yCoord), max).toAddressList
+      splitOnY(min.y + minYLen)
     } else {
-      throw new IllegalStateException(s"toAddressList $this")
+      throw new IllegalStateException(s"toAddressList $this min $minXLen $minYLen")
     }
   }
 
