@@ -41,6 +41,7 @@ class World[T] {
   def update: Unit = {
     for ((id, obj) <- objs) obj.state match {
       case Fixed => Unit
+      case Moving(Point.zero) => Unit
       case Moving(v) => {
         if (!move(id, QuadOffset.approx(v, moveResolution))) {
           objs.put(id, obj.withState(Moving(v / 2)))
@@ -52,9 +53,7 @@ class World[T] {
   // Modification functions
 
   // Returns the Id of the added object, or None
-  def add(position: QuadRectangle, shape: QuadTree[Option[T]]): Option[Id] = {
-    val newObj = new QuadObject(position, shape)
-
+  def add(newObj: QuadObject[T]): Option[Id] = {
     val collision = !collideWithAll(newObj).isEmpty
 
     if (collision) {

@@ -86,25 +86,27 @@ object Driver extends App {
 
   // setup game
   var world = new World[Material]
-  val figureId = world.add(
+  val figureId = world.add(new QuadObject(
       (QuadRectangle.unit >> 3) + QuadOffset.half,
-      checkerboard(3)).get
-  val floorId = world.add(
+      checkerboard(3))).get
+  val floorId = world.add(new QuadObject(
       QuadRectangle.unit,
       QuadTree.approx(6, (p) =>
           if (p.y < 0.05) {
             Material.Gray
           } else {
             Material.Empty
-          })).get
-  val rampId = world.add(
+          }),
+      Fixed)).get
+  val rampId = world.add(new QuadObject(
       QuadRectangle.unit + new QuadOffset(QuadLen.one, QuadLen.zero),
       QuadTree.approx(6, (p) =>
           if (p.y < p.x) {
             Material.Gray
           } else {
             Material.Empty
-          })).get
+          }),
+      Fixed)).get
 
   def run: Unit = {
     val throttle = new Throttle(FPS)
