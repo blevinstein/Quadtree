@@ -118,11 +118,11 @@ object Driver extends App {
   }
 
   // TODO: move this somewhere sensible
-  val moveLen = 1f / (1 << 6)
+  val accel = 1f / (1 << 6)
 
-  val left = new Point(-moveLen, 0)
-  val right = new Point(moveLen, 0)
-  val up = new Point(0, moveLen * 2)
+  val left = new Point(-accel, 0)
+  val right = new Point(accel, 0)
+  val up = new Point(0, accel * 2)
 
   val gravity = new Point(0, -1f / (1 << 8))
 
