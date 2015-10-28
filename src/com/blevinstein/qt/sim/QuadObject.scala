@@ -19,14 +19,17 @@ class QuadObject[T](val position: QuadRectangle,
   }
 
   def moved(offset: QuadOffset): QuadObject[T] =
-      new QuadObject(position + offset, shape)
+      new QuadObject(position + offset, shape, state)
 
   // TODO: refactor center => QuadOffset
   //def withPosition(pos: QuadOffset): QuadObject[T] =
   //    new QuadObject(
 
   def withShape(newShape: QuadTree[Option[T]]): QuadObject[T] =
-      new QuadObject(position, newShape)
+      new QuadObject(position, newShape, state)
+
+  def withState(newState: State): QuadObject[T] =
+      new QuadObject(position, shape, newState)
 
   val center: Point = position.toRectangle.center
 
