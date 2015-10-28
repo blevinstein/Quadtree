@@ -8,8 +8,6 @@ import scala.collection.mutable.HashMap
 //
 // Each object is defined as a QuadTree[Option[T]], so that we have a concept of
 // empty space for collision.
-//
-// TODO: Write tests to assess speed of implementation?
 class World[T] {
   private val objs: HashMap[Id, QuadObject[T]] = new HashMap
 
@@ -69,9 +67,24 @@ class World[T] {
     }
   }
 
-  // TODO: reshape(id: Id, newShape: QuadTree[Option[T]]): Boolean
+  // Returns true if the object can be resized
+  def reshape(id: Id, newShape: QuadTree[Option[T]]): Boolean = {
+    val oldObj = getObj(id)
+    val newObj = new QuadObject(oldObj.position, newShape)
 
-  // TODO: destroy(id: Id): Unit
+    val collision = !collideWithAll(newObj, Set(id)).isEmpty
+
+    if (collision) {
+      false
+    } else {
+      objs.put(id, newObj)
+      true
+    }
+  }
+
+  def destroy(id: Id): Unit = {
+    objs.remove(id)
+  }
 
   // Collision helpers
 
