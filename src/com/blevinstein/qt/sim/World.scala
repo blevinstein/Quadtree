@@ -53,20 +53,12 @@ class World[T] {
   }
 
   // Returns true if the object moves
-  def move(id: Id, offset: QuadOffset): Boolean = {
-    val oldObj = getObj(id)
-    val newObj = new QuadObject(oldObj.position + offset, oldObj.shape)
-
-    tryReplace(id, newObj)
-  }
+  def move(id: Id, offset: QuadOffset): Boolean =
+      tryReplace(id, getObj(id).moved(offset))
 
   // Returns true if the object is be resized
-  def reshape(id: Id, newShape: QuadTree[Option[T]]): Boolean = {
-    val oldObj = getObj(id)
-    val newObj = new QuadObject(oldObj.position, newShape)
-
-    tryReplace(id, newObj)
-  }
+  def reshape(id: Id, newShape: QuadTree[Option[T]]): Boolean =
+      tryReplace(id, getObj(id).withShape(newShape))
 
   // Returns true if the object is replaced
   def tryReplace(id: Id, newObject: QuadObject[T]): Boolean = {

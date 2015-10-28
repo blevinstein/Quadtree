@@ -1,14 +1,15 @@
 package com.blevinstein.qt.sim
 
 import com.blevinstein.geom.Point
-import com.blevinstein.qt.{QuadTree,QuadRectangle,QuadAddr}
+import com.blevinstein.qt.{QuadTree,QuadRectangle,QuadAddr,QuadOffset}
 
 // Immutable container object for holding information about an object.
 //
 // Contains a QuadTree describing the [shape] of the object, and a QuadRectangle
 // describing its [position].
 class QuadObject[T](val position: QuadRectangle,
-    val shape: QuadTree[Option[T]]) {
+    val shape: QuadTree[Option[T]],
+    val velocity: Point = Point.zero) {
   require(position.isPerfectSquare, s"not a square: $position")
 
   // Converts into a QuadTree within a particular [space].
@@ -16,6 +17,16 @@ class QuadObject[T](val position: QuadRectangle,
     val posWithin = position withRespectTo space
     shape.grow(posWithin.perfectLog.get, posWithin.min, None)
   }
+
+  def moved(offset: QuadOffset): QuadObject[T] =
+      new QuadObject(position + offset, shape)
+
+  // TODO: refactor center => QuadOffset
+  //def withPosition(pos: QuadOffset): QuadObject[T] =
+  //    new QuadObject(
+
+  def withShape(newShape: QuadTree[Option[T]]): QuadObject[T] =
+      new QuadObject(position, newShape)
 
   val center: Point = position.toRectangle.center
 
