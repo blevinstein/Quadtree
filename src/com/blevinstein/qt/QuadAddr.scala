@@ -40,7 +40,7 @@ class QuadAddr(val quads: List[Quadrant]) {
     bottomLeft
   }
 
-  def touches(other: QuadAddr) = {
+  def touches(other: QuadAddr): Boolean = {
     val thisRect = toQuadRectangle
     val otherRect = other.toQuadRectangle
 
