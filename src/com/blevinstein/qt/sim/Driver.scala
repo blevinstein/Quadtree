@@ -124,6 +124,7 @@ object Driver extends App {
   val right = new Point(accel, 0)
   val up = new Point(0, accel * 2)
 
+  // TODO: consider refactoring gravity into World
   val gravity = new Point(0, -1f / (1 << 8))
 
   def mainLoop: Unit = {
