@@ -44,6 +44,9 @@ class World[T] {
       case Moving(Point.zero) => Unit
       case Moving(v) => {
         if (!move(id, QuadOffset.approx(v, moveResolution))) {
+          // TODO: instead of just halving velocity, check whether colliding
+          // with Fixed or Moving objects, try to update velocities of Moving
+          // objects to synchronize
           objs.put(id, obj.withState(Moving(v / 2)))
         }
       }
