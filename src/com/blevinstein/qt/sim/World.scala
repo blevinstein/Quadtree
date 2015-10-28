@@ -57,28 +57,24 @@ class World[T] {
     val oldObj = getObj(id)
     val newObj = new QuadObject(oldObj.position + offset, oldObj.shape)
 
-    val collision = !collideWithAll(newObj, Set(id)).isEmpty
-
-    if (collision) {
-      false
-    } else {
-      objs.put(id, newObj)
-      true
-    }
+    tryReplace(id, newObj)
   }
 
-  // Returns true if the object can be resized
+  // Returns true if the object is be resized
   def reshape(id: Id, newShape: QuadTree[Option[T]]): Boolean = {
     val oldObj = getObj(id)
     val newObj = new QuadObject(oldObj.position, newShape)
 
-    val collision = !collideWithAll(newObj, Set(id)).isEmpty
+    tryReplace(id, newObj)
+  }
 
-    if (collision) {
-      false
-    } else {
-      objs.put(id, newObj)
+  // Returns true if the object is replaced
+  def tryReplace(id: Id, newObject: QuadObject[T]): Boolean = {
+    if (collideWithAll(newObject, Set(id)).isEmpty) {
+      objs.put(id, newObject)
       true
+    } else {
+      false
     }
   }
 
