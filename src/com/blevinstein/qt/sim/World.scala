@@ -1,5 +1,6 @@
 package com.blevinstein.qt.sim
 
+import com.blevinstein.geom.Point
 import com.blevinstein.qt.{QuadAddr,QuadTree,QuadLeaf,QuadRectangle,QuadOffset}
 
 import scala.collection.mutable.HashMap
@@ -9,6 +10,8 @@ import scala.collection.mutable.HashMap
 // Each object is defined as a QuadTree[Option[T]], so that we have a concept of
 // empty space for collision.
 class World[T] {
+  val moveResolution = -6
+
   private val objs: HashMap[Id, QuadObject[T]] = new HashMap
 
   private var nextId = 0
@@ -32,6 +35,17 @@ class World[T] {
           cb(objId, addr.toQuadRectangle.within(obj.position), mat.get)
         }
       })
+    }
+  }
+
+  def update: Unit = {
+    for ((id, obj) <- objs) obj.state match {
+      case Fixed => Unit
+      case Moving(v) => {
+        if (!move(id, QuadOffset.approx(v, moveResolution))) {
+          objs.put(id, obj.withState(Moving(v / 2)))
+        }
+      }
     }
   }
 
@@ -68,6 +82,20 @@ class World[T] {
     } else {
       false
     }
+  }
+
+  def accel(id: Id, deltaVelocity: Point): Unit = {
+    val obj = getObj(id)
+    require(obj.state != Fixed, "Can't change velocity of a Fixed object.")
+    obj.state match {
+      case Moving(v) => objs.put(id, obj.withState(Moving(v + deltaVelocity)))
+    }
+  }
+
+  def setVelocity(id: Id, newVelocity: Point): Unit = {
+    val obj = getObj(id)
+    require(obj.state != Fixed, "Can't change velocity of a Fixed object.")
+    objs.put(id, obj.withState(Moving(newVelocity)))
   }
 
   def destroy(id: Id): Unit = {

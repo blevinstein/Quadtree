@@ -115,9 +115,8 @@ object Driver extends App {
     }
   }
 
-  // TODO: refactor movement out of Driver
-  val moveResolution = -6
-  val moveLen = 1f / (1 << -moveResolution)
+  // TODO: move this somewhere sensible
+  val moveLen = 1f / (1 << 6)
 
   val left = new Point(-moveLen, 0)
   val right = new Point(moveLen, 0)
@@ -125,33 +124,30 @@ object Driver extends App {
 
   val gravity = new Point(0, -1f / (1 << 8))
 
-  // TODO: refactor velocity into QuadObject
-  var velocity = Point.zero
   def mainLoop: Unit = {
     val figure = world.getObj(figureId)
-    center = figure.center
     val floor = world.getObj(floorId)
     val ramp = world.getObj(rampId)
     val contactsEnvironment =
         !(figure.contacts(floor).isEmpty && figure.contacts(ramp).isEmpty)
 
+    // Changes in velocity
     if (contactsEnvironment) {
-      velocity = Point.zero
+      world.setVelocity(figureId, Point.zero)
       if (KeyListener.keyDown(VK_LEFT)) {
-        velocity += left
+        world.accel(figureId, left)
       }
       if (KeyListener.keyDown(VK_RIGHT)) {
-        velocity += right
+        world.accel(figureId, right)
       }
       if (KeyListener.keyDown(VK_UP)) {
-        velocity += up
+        world.accel(figureId, up)
       }
     } else {
-      velocity += gravity
+      world.accel(figureId, gravity)
     }
-    if(!world.move(figureId, QuadOffset.approx(velocity, moveResolution))) {
-      velocity /= 2
-    }
+
+    world.update
 
     // Unbounded environment, need the Reaper
     // TODO: If out of bounds, move object to back to origin
@@ -223,6 +219,14 @@ object Driver extends App {
       return
     }
 
+    // Get world data
+    val figure = world.getObj(figureId)
+    val floor = world.getObj(floorId)
+    val ramp = world.getObj(rampId)
+
+    // Focus camera
+    center = figure.center
+
     // draw background
     setFill(true)
     setColor(Color.WHITE)
@@ -236,9 +240,6 @@ object Driver extends App {
     drawAll(rects)
 
     // draw collisions
-    val figure = world.getObj(figureId)
-    val floor = world.getObj(floorId)
-    val ramp = world.getObj(rampId)
     val contacts = figure.contacts(floor) ++ figure.contacts(ramp)
     var collisions = List[(Rectangle,Color)]()
     contacts.foreach { case (a: QuadRectangle, b: QuadRectangle) =>
