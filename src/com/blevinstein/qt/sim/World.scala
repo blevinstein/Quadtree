@@ -9,7 +9,7 @@ import scala.collection.mutable.HashMap
 //
 // Each object is defined as a QuadTree[Option[T]], so that we have a concept of
 // empty space for collision.
-class World[T] {
+class World[T <: HasDensity] {
   val moveResolution = -6
 
   private val objs: HashMap[Id, QuadObject[T]] = new HashMap
@@ -102,6 +102,18 @@ class World[T] {
 
   def destroy(id: Id): Unit = {
     objs.remove(id)
+  }
+
+  def getMass(obj: QuadObject[T]): Float = {
+    val avgOp = QuadTree.reduce((xs: List[Float]) => xs.sum / xs.length) _
+    val densityOp = QuadTree.transform((m: Option[T]) => m match {
+      case None => 0f
+      case Some(m) => m.density
+    }) _
+
+    val boundingArea = obj.position.toRectangle.area
+
+    avgOp(densityOp(obj.shape)) * boundingArea
   }
 
   // Collision helpers
