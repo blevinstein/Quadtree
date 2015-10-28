@@ -13,6 +13,7 @@ object QuadLen {
   val half = new QuadLen(1, -1)
 
   // TODO: find a cleaner way to implement this method
+  // TODO: change sign of [resolution]
   def approx(float: Float, resolution: Int): QuadLen = {
     val intPart = float.toInt
     val floatPart = math.abs(float % 1) // NOTE: drops sign, adds back at end
