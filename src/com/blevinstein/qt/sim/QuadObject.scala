@@ -9,7 +9,7 @@ import com.blevinstein.qt.{QuadTree,QuadRectangle,QuadAddr,QuadOffset}
 // describing its [position].
 class QuadObject[T](val position: QuadRectangle,
     val shape: QuadTree[Option[T]],
-    val velocity: Point = Point.zero) {
+    val state: State = Moving(Point.zero)) {
   require(position.isPerfectSquare, s"not a square: $position")
 
   // Converts into a QuadTree within a particular [space].
