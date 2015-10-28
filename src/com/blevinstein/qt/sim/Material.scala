@@ -8,8 +8,8 @@ import java.awt.Color
 //   figure on contact (e.g. arrest momentum).
 object Material {
   val Empty: Option[Material] = None
-  val Gray = Some(new Material(Color.LIGHT_GRAY))
-  val Blue = Some(new Material(Color.BLUE))
+  val Gray = Some(new Material(Color.LIGHT_GRAY, 1f))
+  val Blue = Some(new Material(Color.BLUE, 1f))
 }
-class Material(val color: Color)
+class Material(val color: Color, val density: Float)
 
