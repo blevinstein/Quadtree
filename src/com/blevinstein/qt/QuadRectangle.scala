@@ -86,19 +86,6 @@ class QuadRectangle(val min: QuadOffset, val max: QuadOffset) {
     new QuadRectangle(max2d(min, other.min), min2d(max, other.max))
   }
 
-  // Returns all addresses in the contained area at a given depth
-  // TODO: add tests
-  def allAddresses(depth: Int): List[QuadAddr] = {
-    val stepLen = new QuadLen(1, -depth)
-    var addresses = List[QuadAddr]()
-    for (i <- min.x.untilBy(max.x, stepLen)) {
-      for (j <- min.y.untilBy(max.y, stepLen)) {
-        addresses = new QuadOffset(i, j).toAddress(depth) :: addresses
-      }
-    }
-    addresses
-  }
-
   // Operators
 
   def +(offset: QuadOffset): QuadRectangle =
