@@ -6,10 +6,15 @@ import java.awt.Color
 //
 // TODO: Add "stickiness" and/or other properties, to determine behavior of
 //   figure on contact (e.g. arrest momentum).
+
+trait HasDensity {
+  def density: Float
+}
+
 object Material {
   val Empty: Option[Material] = None
   val Gray = Some(new Material(Color.LIGHT_GRAY, 1f))
   val Blue = Some(new Material(Color.BLUE, 1f))
 }
-class Material(val color: Color, val density: Float)
+class Material(val color: Color, val density: Float) extends HasDensity
 
