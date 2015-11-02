@@ -76,7 +76,7 @@ class QuadRectangle(val min: QuadOffset, val max: QuadOffset) {
       (this - other.min) >> other.perfectLog.get
 
   // Returns the intersection of two QuadRectangles
-  def prune(other: QuadRectangle): QuadRectangle = {
+  def intersect(other: QuadRectangle): QuadRectangle = {
     def min2d(a: QuadOffset, b: QuadOffset): QuadOffset = new QuadOffset(
         if (a.x < b.x) a.x else b.x,
         if (a.y < b.y) a.y else b.y)

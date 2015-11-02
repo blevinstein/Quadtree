@@ -217,14 +217,14 @@ class QuadTreeTest extends FunSuite with Matchers {
           new Rectangle(new Point(0.75f, 0.5f), new Point(1, 0.75f)))
   }
 
-  test("QuadRectangle#prune") {
+  test("QuadRectangle#intersect") {
     val a = new QuadRectangle(-QuadOffset.half, QuadOffset.half)
     val b = new QuadRectangle(QuadOffset.zero, QuadOffset.one)
     val c = new QuadRectangle(QuadOffset.half, QuadOffset.one + QuadOffset.half)
 
-    b.prune(a) shouldEqual new QuadRectangle(QuadOffset.zero, QuadOffset.half)
+    b intersect a shouldEqual new QuadRectangle(QuadOffset.zero, QuadOffset.half)
 
-    b.prune(c) shouldEqual new QuadRectangle(QuadOffset.half, QuadOffset.one)
+    b intersect c shouldEqual new QuadRectangle(QuadOffset.half, QuadOffset.one)
   }
 
   test("QuadRectangle#within, #withRespectTo") {
