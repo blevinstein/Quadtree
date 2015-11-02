@@ -22,7 +22,7 @@ class QuadObject(val position: QuadRectangle,
       new QuadObject(position + offset, shape, state)
 
   def withPosition(newPosition: QuadOffset): QuadObject = new QuadObject(
-      new QuadRectangle(position.size + (newPosition - (position.size >> 1))),
+      new QuadRectangle(position.size) + (newPosition - (position.size >> 1)),
       shape,
       state)
   def withPosition(newPosition: QuadRectangle): QuadObject =
