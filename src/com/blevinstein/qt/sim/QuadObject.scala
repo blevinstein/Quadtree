@@ -46,7 +46,7 @@ class QuadObject(val position: QuadRectangle,
           otherTree.iter((b: QuadAddr, bMat: Option[Any]) => {
             if (!bMat.isEmpty && (a touches b)) {
               contactList = (a.toQuadRectangle + zone.min,
-                      b.toQuadRectangle + zone.min) :: contactList
+                  b.toQuadRectangle + zone.min) :: contactList
             }
           })
         }
