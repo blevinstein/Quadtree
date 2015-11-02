@@ -131,8 +131,7 @@ object Driver extends App {
     val figure = world.getObj(figureId)
     val floor = world.getObj(floorId)
     val ramp = world.getObj(rampId)
-    val contactsEnvironment =
-        !(figure.contacts(floor).isEmpty && figure.contacts(ramp).isEmpty)
+    val contactsEnvironment = !world.contactsWithAll(figureId).isEmpty
 
     // Changes in velocity
     if (contactsEnvironment) {
@@ -243,9 +242,9 @@ object Driver extends App {
     drawAll(rects)
 
     // draw collisions
-    val contacts = figure.contacts(floor) ++ figure.contacts(ramp)
+    val contacts = world.contactsWithAll(figureId)
     var collisions = List[(Rectangle,Color)]()
-    contacts.foreach { case (a: QuadRectangle, b: QuadRectangle) =>
+    contacts.foreach { case (id: Id, a: QuadRectangle, b: QuadRectangle) =>
       collisions = (a.toRectangle, Color.YELLOW) ::
           (b.toRectangle, Color.RED) :: collisions
     }

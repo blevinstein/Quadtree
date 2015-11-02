@@ -116,6 +116,19 @@ class World {
     avgOp(densityOp(obj.shape)) * boundingArea
   }
 
+  // Get all contacts with other objects
+  def contactsWithAll(id: Id): List[(Id, QuadRectangle, QuadRectangle)]
+      = contactsWithAll(getObj(id), Set(id))
+  def contactsWithAll(obj: QuadObject, exclude: Set[Id] = Set()) = {
+    var contacts = List[(Id, QuadRectangle, QuadRectangle)]()
+    for ((id, otherObj) <- objs if !exclude.contains(id)) {
+      for ((rect, otherRect) <- obj.contacts(otherObj)) {
+        contacts = (id, rect, otherRect) :: contacts
+      }
+    }
+    contacts
+  }
+
   // Collision helpers
 
   def collideWithAll(obj: QuadObject, exclude: Set[Id] = Set()): List[Id] = {
