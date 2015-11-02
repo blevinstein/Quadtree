@@ -45,7 +45,7 @@ import java.awt.event.WindowEvent
 //
 // TODO: Think about better ways of handling degredation when framerate < [FPS]
 object Driver extends App {
-  val FPS: Int = 60
+  val FPS: Int = 30
   // Dimensions of the screen
   var height: Int = 1
   var width: Int = 1
@@ -129,8 +129,6 @@ object Driver extends App {
 
   def mainLoop: Unit = {
     val figure = world.getObj(figureId)
-    val floor = world.getObj(floorId)
-    val ramp = world.getObj(rampId)
     val contactsEnvironment = !world.contactsWithAll(figureId).isEmpty
 
     val desiredVelocity = Point.zero +
@@ -219,8 +217,6 @@ object Driver extends App {
 
     // Get world data
     val figure = world.getObj(figureId)
-    val floor = world.getObj(floorId)
-    val ramp = world.getObj(rampId)
 
     // Focus camera
     center = figure.center.toPoint
