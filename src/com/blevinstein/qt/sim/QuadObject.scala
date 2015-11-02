@@ -7,34 +7,34 @@ import com.blevinstein.qt.{QuadTree,QuadRectangle,QuadAddr,QuadOffset}
 //
 // Contains a QuadTree describing the [shape] of the object, and a QuadRectangle
 // describing its [position].
-class QuadObject[T](val position: QuadRectangle,
-    val shape: QuadTree[Option[T]],
+class QuadObject(val position: QuadRectangle,
+    val shape: QuadTree[Option[Material]],
     val state: State = Moving(Point.zero)) {
   require(position.isPerfectSquare, s"not a square: $position")
 
   // Converts into a QuadTree within a particular [space].
-  def toQuadTree(space: QuadRectangle): QuadTree[Option[T]] = {
+  def toQuadTree(space: QuadRectangle): QuadTree[Option[Material]] = {
     val posWithin = position withRespectTo space
     shape.grow(posWithin.perfectLog.get, posWithin.min, None)
   }
 
-  def moved(offset: QuadOffset): QuadObject[T] =
+  def moved(offset: QuadOffset): QuadObject =
       new QuadObject(position + offset, shape, state)
 
   // TODO: refactor center => QuadOffset
-  //def withPosition(pos: QuadOffset): QuadObject[T] =
+  //def withPosition(pos: QuadOffset): QuadObject =
   //    new QuadObject(
 
-  def withShape(newShape: QuadTree[Option[T]]): QuadObject[T] =
+  def withShape(newShape: QuadTree[Option[Material]]): QuadObject =
       new QuadObject(position, newShape, state)
 
-  def withState(newState: State): QuadObject[T] =
+  def withState(newState: State): QuadObject =
       new QuadObject(position, shape, newState)
 
   val center: Point = position.toRectangle.center
 
   // Returns a list of squares where [this] is touching [other] within [space].
-  def contacts(other: QuadObject[T]):
+  def contacts(other: QuadObject):
       List[(QuadRectangle, QuadRectangle)] = {
     var contactList = List[(QuadRectangle, QuadRectangle)]()
     for (zone <- QuadZone.around(position)) {

@@ -9,10 +9,10 @@ import scala.collection.mutable.HashMap
 //
 // Each object is defined as a QuadTree[Option[T]], so that we have a concept of
 // empty space for collision.
-class World[T <: HasDensity] {
+class World {
   val moveResolution = -6
 
-  private val objs: HashMap[Id, QuadObject[T]] = new HashMap
+  private val objs: HashMap[Id, QuadObject] = new HashMap
 
   private var nextId = 0
   // Returns nextId++
@@ -21,16 +21,16 @@ class World[T <: HasDensity] {
     nextId - 1
   }
 
-  def getObj(id: Id): QuadObject[T] = {
+  def getObj(id: Id): QuadObject = {
     require(objs.contains(id), s"objs does not contain id: $id")
     objs.get(id).get
   }
 
-  def allObjs: Iterable[QuadObject[T]] = objs.values
+  def allObjs: Iterable[QuadObject] = objs.values
 
-  def iter(cb: WorldIterCallback[T]): Unit = {
+  def iter(cb: WorldIterCallback): Unit = {
     for ((objId, obj) <- objs) {
-      obj.shape.iter((addr: QuadAddr, mat: Option[T]) => {
+      obj.shape.iter((addr: QuadAddr, mat: Option[Material]) => {
         if (!mat.isEmpty) {
           cb(objId, addr.toQuadRectangle.within(obj.position), mat.get)
         }
@@ -56,7 +56,7 @@ class World[T <: HasDensity] {
   // Modification functions
 
   // Returns the Id of the added object, or None
-  def add(newObj: QuadObject[T]): Option[Id] = {
+  def add(newObj: QuadObject): Option[Id] = {
     val collision = !collideWithAll(newObj).isEmpty
 
     if (collision) {
@@ -73,11 +73,11 @@ class World[T <: HasDensity] {
       tryReplace(id, getObj(id).moved(offset))
 
   // Returns true if the object is be resized
-  def reshape(id: Id, newShape: QuadTree[Option[T]]): Boolean =
+  def reshape(id: Id, newShape: QuadTree[Option[Material]]): Boolean =
       tryReplace(id, getObj(id).withShape(newShape))
 
   // Returns true if the object is replaced
-  def tryReplace(id: Id, newObject: QuadObject[T]): Boolean = {
+  def tryReplace(id: Id, newObject: QuadObject): Boolean = {
     if (collideWithAll(newObject, Set(id)).isEmpty) {
       objs.put(id, newObject)
       true
@@ -104,9 +104,9 @@ class World[T <: HasDensity] {
     objs.remove(id)
   }
 
-  def getMass(obj: QuadObject[T]): Float = {
+  def getMass(obj: QuadObject): Float = {
     val avgOp = QuadTree.reduce((xs: List[Float]) => xs.sum / xs.length) _
-    val densityOp = QuadTree.transform((m: Option[T]) => m match {
+    val densityOp = QuadTree.transform((m: Option[Material]) => m match {
       case None => 0f
       case Some(m) => m.density
     }) _
@@ -118,7 +118,7 @@ class World[T <: HasDensity] {
 
   // Collision helpers
 
-  def collideWithAll(obj: QuadObject[T], exclude: Set[Id] = Set()): List[Id] = {
+  def collideWithAll(obj: QuadObject, exclude: Set[Id] = Set()): List[Id] = {
     var collisions = List[Id]()
     for ((id, otherObj) <- objs if !exclude.contains(id))
       if (collidesWith(obj, otherObj)) {
@@ -128,7 +128,7 @@ class World[T <: HasDensity] {
   }
 
   // TODO: move QuadTree operators into separate file
-  val collideOp = QuadTree.merge((m1: Option[T], m2: Option[T]) =>
+  val collideOp = QuadTree.merge((m1: Option[Any], m2: Option[Any]) =>
       (m1, m2) match {
         case (Some(_), Some(_)) => true
         case _ => false
@@ -136,7 +136,7 @@ class World[T <: HasDensity] {
   val anyOp = QuadTree.reduce((bs: List[Boolean]) => {
         bs.exists((b) => b)
       }) _
-  def collidesWith(a: QuadObject[T], b: QuadObject[T]): Boolean =
+  def collidesWith(a: QuadObject, b: QuadObject): Boolean =
       if (anyOp(collideOp(
           a.toQuadTree(a.position),
           b.toQuadTree(a.position)))) {
