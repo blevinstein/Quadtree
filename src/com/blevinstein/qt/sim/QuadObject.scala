@@ -37,22 +37,26 @@ class QuadObject(val position: QuadRectangle,
   // overlapping areas, as well as areas that share an edge or corner.
   def contacts(other: QuadObject):
       List[(QuadRectangle, QuadRectangle)] = {
-    var contactList = List[(QuadRectangle, QuadRectangle)]()
-    for (zone <- QuadZone.around(position)) {
-      val thisTree = this.toQuadTree(zone.toQuadRectangle)
-      val otherTree = other.toQuadTree(zone.toQuadRectangle)
-      thisTree.iter((a: QuadAddr, aMat: Option[Any]) => {
-        if (!aMat.isEmpty) {
-          otherTree.iter((b: QuadAddr, bMat: Option[Any]) => {
-            if (!bMat.isEmpty && (a touches b)) {
-              contactList = (a.toQuadRectangle + zone.min,
-                  b.toQuadRectangle + zone.min) :: contactList
-            }
-          })
-        }
-      })
+    if (!(this.position touches other.position)) {
+      List()
+    } else {
+      var contactList = List[(QuadRectangle, QuadRectangle)]()
+      for (zone <- QuadZone.around(position)) {
+        val thisTree = this.toQuadTree(zone.toQuadRectangle)
+        val otherTree = other.toQuadTree(zone.toQuadRectangle)
+        thisTree.iter((a: QuadAddr, aMat: Option[Any]) => {
+          if (!aMat.isEmpty) {
+            otherTree.iter((b: QuadAddr, bMat: Option[Any]) => {
+              if (!bMat.isEmpty && (a touches b)) {
+                contactList = (a.toQuadRectangle + zone.min,
+                    b.toQuadRectangle + zone.min) :: contactList
+              }
+            })
+          }
+        })
+      }
+      contactList
     }
-    contactList
   }
 }
 
