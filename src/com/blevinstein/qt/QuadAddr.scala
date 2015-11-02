@@ -40,15 +40,9 @@ class QuadAddr(val quads: List[Quadrant]) {
     bottomLeft
   }
 
-  def touches(other: QuadAddr): Boolean = {
-    val thisRect = toQuadRectangle
-    val otherRect = other.toQuadRectangle
-
-    val offset = otherRect.min - thisRect.min
-
-    -otherRect.size.x <= offset.x && offset.x <= thisRect.size.x &&
-        -otherRect.size.y <= offset.y && offset.y <= thisRect.size.y
-  }
+  // delegate to QuadRectangle
+  def touches(other: QuadAddr): Boolean =
+      this.toQuadRectangle touches other.toQuadRectangle
 
   // don't implicitly delegate tail, we want a QuadAddr not List[Quadrant]
   def tail: QuadAddr = new QuadAddr(quads.tail)

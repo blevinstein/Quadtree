@@ -79,6 +79,10 @@ class QuadRectangle(val min: QuadOffset, val max: QuadOffset) {
   def withRespectTo(other: QuadRectangle): QuadRectangle =
       (this - other.min) >> other.perfectLog.get
 
+  def touches(other: QuadRectangle): Boolean =
+    min.x <= other.max.x && max.x >= other.min.x &&
+        min.y <= other.max.y && max.y >= other.min.y
+
   // Returns the intersection of two QuadRectangles
   def intersect(other: QuadRectangle): QuadRectangle = {
     def min2d(a: QuadOffset, b: QuadOffset): QuadOffset = new QuadOffset(
@@ -90,6 +94,7 @@ class QuadRectangle(val min: QuadOffset, val max: QuadOffset) {
     val newMin = max2d(min, other.min)
     val newMax = min2d(max, other.max)
     if (newMax.x < newMin.x || newMax.y < newMin.y) {
+      // Don't create an invalid rectangle
       QuadRectangle.empty
     } else {
       new QuadRectangle(newMin, newMax)
