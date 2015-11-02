@@ -5,9 +5,13 @@ import com.blevinstein.geom.{Point,Rectangle}
 // Represents a rectangle in quad space using QuadOffsets for the bottom left
 // and top right corners of the rectangle.
 object QuadRectangle {
+  val empty = new QuadRectangle(QuadOffset.zero, QuadOffset.zero)
   val unit = new QuadRectangle(QuadOffset.zero, QuadOffset.one)
 }
 class QuadRectangle(val min: QuadOffset, val max: QuadOffset) {
+  require(max.x >= min.x, s"max.x ${max.x} < min.x ${min.x}")
+  require(max.y >= min.y, s"max.y ${max.y} < min.y ${min.y}")
+
   val size: QuadOffset = max - min
   val isEmpty: Boolean = size.x.isZero || size.y.isZero
 
@@ -83,7 +87,13 @@ class QuadRectangle(val min: QuadOffset, val max: QuadOffset) {
     def max2d(a: QuadOffset, b: QuadOffset): QuadOffset = new QuadOffset(
         if (a.x > b.x) a.x else b.x,
         if (a.y > b.y) a.y else b.y)
-    new QuadRectangle(max2d(min, other.min), min2d(max, other.max))
+    val newMin = max2d(min, other.min)
+    val newMax = min2d(max, other.max)
+    if (newMax.x < newMin.x || newMax.y < newMin.y) {
+      QuadRectangle.empty
+    } else {
+      new QuadRectangle(newMin, newMax)
+    }
   }
 
   // Operators
