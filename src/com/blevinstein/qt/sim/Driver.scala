@@ -86,6 +86,7 @@ object Driver extends App {
 
   // setup game
   var world = new World
+  val boundingRectangle = new Rectangle(new Point(-5, -5), new Point(5, 5))
   val figureId = world.add(new QuadObject(
       (QuadRectangle.unit >> 3) + QuadOffset.half,
       checkerboard(3))).get
@@ -146,7 +147,10 @@ object Driver extends App {
     world.update
 
     // Unbounded environment, need the Reaper
-    // TODO: If out of bounds, move object to back to origin
+    if (!(boundingRectangle contains figure.center.toPoint)) {
+      world.moveTo(figureId, QuadOffset.half)
+      world.setVelocity(figureId, Point.zero)
+    }
   }
 
   // DEBUGGING ROUTINES
