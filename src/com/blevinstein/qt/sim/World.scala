@@ -121,8 +121,10 @@ class World {
   def collideWithAll(obj: QuadObject, exclude: Set[Id] = Set()): List[Id] = {
     var collisions = List[Id]()
     for ((id, otherObj) <- objs if !exclude.contains(id))
-      if (collidesWith(obj, otherObj)) {
-        collisions = id :: collisions
+      if (!(obj.position intersect otherObj.position).isEmpty) {
+        if (collidesWith(obj, otherObj)) {
+          collisions = id :: collisions
+        }
       }
     collisions
   }
