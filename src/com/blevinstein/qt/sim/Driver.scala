@@ -133,18 +133,14 @@ object Driver extends App {
     val ramp = world.getObj(rampId)
     val contactsEnvironment = !world.contactsWithAll(figureId).isEmpty
 
+    val desiredVelocity = Point.zero +
+        (if (KeyListener.keyDown(VK_LEFT)) left else Point.zero) +
+        (if (KeyListener.keyDown(VK_RIGHT)) right else Point.zero) +
+        (if (KeyListener.keyDown(VK_UP)) up else Point.zero)
+
     // Changes in velocity
     if (contactsEnvironment) {
-      world.setVelocity(figureId, Point.zero)
-      if (KeyListener.keyDown(VK_LEFT)) {
-        world.accel(figureId, left)
-      }
-      if (KeyListener.keyDown(VK_RIGHT)) {
-        world.accel(figureId, right)
-      }
-      if (KeyListener.keyDown(VK_UP)) {
-        world.accel(figureId, up)
-      }
+      world.setVelocity(figureId, desiredVelocity)
     } else {
       world.accel(figureId, gravity)
     }
