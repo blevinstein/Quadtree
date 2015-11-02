@@ -33,7 +33,8 @@ class QuadObject(val position: QuadRectangle,
 
   val center: Point = position.toRectangle.center
 
-  // Returns a list of squares where [this] is touching [other] within [space].
+  // Returns a list of squares where [this] is touching [other]. This includes
+  // overlapping areas, as well as areas that share an edge or corner.
   def contacts(other: QuadObject):
       List[(QuadRectangle, QuadRectangle)] = {
     var contactList = List[(QuadRectangle, QuadRectangle)]()
