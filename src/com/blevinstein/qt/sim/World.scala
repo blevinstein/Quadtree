@@ -43,7 +43,7 @@ class World {
       case Fixed => Unit
       case Moving(Point.zero) => Unit
       case Moving(v) => {
-        if (!move(id, QuadOffset.approx(v, moveResolution))) {
+        if (!moveBy(id, QuadOffset.approx(v, moveResolution))) {
           // TODO: instead of just halving velocity, check whether colliding
           // with Fixed or Moving objects, try to update velocities of Moving
           // objects to synchronize
@@ -69,8 +69,12 @@ class World {
   }
 
   // Returns true if the object moves
-  def move(id: Id, offset: QuadOffset): Boolean =
-      tryReplace(id, getObj(id).moved(offset))
+  def moveTo(id: Id, position: QuadOffset): Boolean =
+      tryReplace(id, getObj(id).withPosition(position))
+
+  // Returns true if the object moves
+  def moveBy(id: Id, offset: QuadOffset): Boolean =
+      tryReplace(id, getObj(id).withOffset(offset))
 
   // Returns true if the object is be resized
   def reshape(id: Id, newShape: QuadTree[Option[Material]]): Boolean =

@@ -20,4 +20,9 @@ class SimTest extends FunSuite with Matchers {
             new QuadZone(1, 0),
             new QuadZone(1, 1))
   }
+  // TODO: expand test coverage
+  // - QuadObject#contacts
+  // - World
+  //   - basic use case - create, move, handle collisions correctly
+  //   - update
 }

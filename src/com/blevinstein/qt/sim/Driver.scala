@@ -227,7 +227,7 @@ object Driver extends App {
     val ramp = world.getObj(rampId)
 
     // Focus camera
-    center = figure.center
+    center = figure.center.toPoint
 
     // draw background
     setFill(true)

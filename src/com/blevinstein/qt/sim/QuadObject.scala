@@ -18,12 +18,15 @@ class QuadObject(val position: QuadRectangle,
     shape.grow(posWithin.perfectLog.get, posWithin.min, None)
   }
 
-  def moved(offset: QuadOffset): QuadObject =
+  def withOffset(offset: QuadOffset): QuadObject =
       new QuadObject(position + offset, shape, state)
 
-  // TODO: refactor center => QuadOffset
-  //def withPosition(pos: QuadOffset): QuadObject =
-  //    new QuadObject(
+  def withPosition(newPosition: QuadOffset): QuadObject = new QuadObject(
+      new QuadRectangle(position.size + (newPosition - (position.size >> 1))),
+      shape,
+      state)
+  def withPosition(newPosition: QuadRectangle): QuadObject =
+      new QuadObject(newPosition, shape, state)
 
   def withShape(newShape: QuadTree[Option[Material]]): QuadObject =
       new QuadObject(position, newShape, state)
@@ -31,7 +34,7 @@ class QuadObject(val position: QuadRectangle,
   def withState(newState: State): QuadObject =
       new QuadObject(position, shape, newState)
 
-  val center: Point = position.toRectangle.center
+  val center: QuadOffset = position.min + (position.size >> 1)
 
   // Returns a list of squares where [this] is touching [other]. This includes
   // overlapping areas, as well as areas that share an edge or corner.

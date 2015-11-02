@@ -5,10 +5,12 @@ import com.blevinstein.geom.{Point,Rectangle}
 // Represents a rectangle in quad space using QuadOffsets for the bottom left
 // and top right corners of the rectangle.
 object QuadRectangle {
-  val empty = new QuadRectangle(QuadOffset.zero, QuadOffset.zero)
+  val zero = new QuadRectangle(QuadOffset.zero, QuadOffset.zero)
   val unit = new QuadRectangle(QuadOffset.zero, QuadOffset.one)
 }
 class QuadRectangle(val min: QuadOffset, val max: QuadOffset) {
+  def this(max: QuadOffset) = this(QuadOffset.zero, max)
+
   require(max.x >= min.x, s"max.x ${max.x} < min.x ${min.x}")
   require(max.y >= min.y, s"max.y ${max.y} < min.y ${min.y}")
 
@@ -95,7 +97,7 @@ class QuadRectangle(val min: QuadOffset, val max: QuadOffset) {
     val newMax = min2d(max, other.max)
     if (newMax.x < newMin.x || newMax.y < newMin.y) {
       // Don't create an invalid rectangle
-      QuadRectangle.empty
+      QuadRectangle.zero
     } else {
       new QuadRectangle(newMin, newMax)
     }
