@@ -3,9 +3,7 @@ package com.blevinstein.util
 import java.io.IOException
 import java.nio.file._
 
-object Config {
-  val pathPrefix = "config"
-
+class Config(pathPrefix: String = "config") {
   def get(filename: String): Option[String] = {
     try {
       Some(new String(Files.readAllBytes(Paths.get(pathPrefix, filename))))
