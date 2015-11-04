@@ -14,3 +14,7 @@ TODO
 
 - Add message to every require() call
 
+- Implement ToolBelt, allow creating and shaping objects
+- Implement persistence, save/load world
+- Add configurable settings
+
