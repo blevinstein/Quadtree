@@ -1,18 +1,12 @@
 scalaVersion := "2.11.4"
 
-libraryDependencies += "com.typesafe.akka" %% "akka-actor" % "2.4-SNAPSHOT"
-
-libraryDependencies += "org.scala-lang" %% "scala-pickling" % "0.8.0"
-
 libraryDependencies += "org.scalatest" % "scalatest_2.11" % "2.2.4"
-
-resolvers += "Akka Snapshot Repository" at "http://repo.akka.io/snapshots/"
 
 scalaSource in Compile := baseDirectory.value / "src"
 
 scalaSource in Test := baseDirectory.value / "test"
 
-scalacOptions ++= Seq("-deprecation", "-feature")
+scalacOptions ++= Seq("-deprecation", "-feature", "-Xlog-implicits")
 
 lazy val grow = taskKey[Unit](
   "Run qt grow, a cellular automata evolutionary algorithm.")
