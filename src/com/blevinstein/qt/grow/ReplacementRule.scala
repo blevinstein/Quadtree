@@ -22,12 +22,13 @@ object ReplacementRule {
   def update(rules: List[ReplacementRule])
       (root : QuadTree[Boolean]): QuadTree[Boolean] = {
     def update_recur(qt: QuadTree[Boolean]): QuadTree[Boolean] = {
-      val results = (rules map (_(qt))).flatten
+      val results: List[QuadTree[Boolean]] = rules.flatMap((rule) => rule(qt))
       if (!results.isEmpty) {
         Decider.choose(results)
       } else {
         qt match {
-          case branch: QuadBranch[Boolean] => branch.map((tree, _) => update_recur(tree))
+          case branch: QuadBranch[Boolean] =>
+              branch.map((tree, _) => update_recur(tree))
           case leaf: QuadLeaf[Boolean] => leaf
         }
       }
