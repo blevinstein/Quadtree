@@ -158,6 +158,8 @@ abstract class QuadTree[+T] {
     builder.build
   }
 
+  // TODO: use getGraph and Search.floodfill to implement getRegions
+
   // Calculates a graph representation of this QuadTree, where each QuadAddr is
   // a node, and there is an edge between two squares if they touch.
   def getGraph: Map[QuadAddr, Set[QuadAddr]] = {
