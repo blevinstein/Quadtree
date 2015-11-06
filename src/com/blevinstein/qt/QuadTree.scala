@@ -95,14 +95,21 @@ object QuadTree {
 }
 // Implemented by QuadBranch[T] and QuadLeaf[T].
 abstract class QuadTree[+T] {
-  def getData(p: Point): T = {
+  def getAddr(p: Point): QuadAddr = {
     require(p.x >= 0 && p.x <= 1)
     require(p.y >= 0 && p.y <= 1)
     this match {
-      case branch: QuadBranch[T] =>
-        branch.getSubtree(Quadrant.of(p)).getData((p * 2) % 1)
-      case leaf: QuadLeaf[T] => leaf.data
+      case branch: QuadBranch[T] => {
+        val quadrant = Quadrant.of(p)
+        new QuadAddr(
+          quadrant :: branch.getSubtree(quadrant).getAddr((p * 2) % 1))
+      }
+      case leaf: QuadLeaf[T] => new QuadAddr()
     }
+  }
+
+  def getData(p: Point): T = {
+    getData(getAddr(p))
   }
 
   def getData(addr: QuadAddr): T = this match {
