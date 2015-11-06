@@ -158,6 +158,24 @@ abstract class QuadTree[+T] {
     builder.build
   }
 
+  // Calculates a graph representation of this QuadTree, where each QuadAddr is
+  // a node, and there is an edge between two squares if they touch.
+  def getGraph: Map[QuadAddr, Set[QuadAddr]] = {
+    // Create a list of all addresses
+    var allAddresses = List[QuadAddr]()
+    iter((addr, _) => allAddresses = addr :: allAddresses)
+
+    var graph = Map[QuadAddr, Set[QuadAddr]]()
+    for (a <- allAddresses) {
+      var neighbors = Set[QuadAddr]()
+      for (b <- allAddresses)
+        if (a != b && (a touches b))
+          neighbors += b
+      graph += ((a, neighbors))
+    }
+    graph
+  }
+
   override def toString: String = {
     this match {
       case branch: QuadBranch[T] =>

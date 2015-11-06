@@ -475,6 +475,55 @@ class QuadTreeTest extends FunSuite with Matchers {
         new QuadLeaf(true), new QuadLeaf(false))
   }
 
+  test("QuadTree#getGraph - fully connected graph") {
+    val qt = new QuadBranch(
+        new QuadLeaf(1),
+        new QuadLeaf(2),
+        new QuadLeaf(3),
+        new QuadLeaf(4))
+
+    val bl = new QuadAddr(BottomLeft)
+    val br = new QuadAddr(BottomRight)
+    val tl = new QuadAddr(TopLeft)
+    val tr = new QuadAddr(TopRight)
+
+    qt.getGraph shouldEqual Map(
+        (bl, Set(tr, tl, br)),
+        (br, Set(tr, tl, bl)),
+        (tl, Set(tr, bl, br)),
+        (tr, Set(tl, bl, br)))
+  }
+
+  test("QuadTree#getGraph - simple case") {
+    val qt = new QuadBranch(
+        new QuadBranch(
+          new QuadLeaf(1),
+          new QuadLeaf(2),
+          new QuadLeaf(3),
+          new QuadLeaf(4)),
+        new QuadLeaf(5),
+        new QuadLeaf(6),
+        new QuadLeaf(7))
+
+    val tl_bl = new QuadAddr(TopLeft, BottomLeft)
+    val tl_br = new QuadAddr(TopLeft, BottomRight)
+    val tl_tl = new QuadAddr(TopLeft, TopLeft)
+    val tl_tr = new QuadAddr(TopLeft, TopRight)
+
+    val bl = new QuadAddr(BottomLeft)
+    val br = new QuadAddr(BottomRight)
+    val tr = new QuadAddr(TopRight)
+
+    qt.getGraph shouldEqual Map(
+        (tl_bl, Set(bl, tl_br, tl_tr, tl_tl)),
+        (tl_br, Set(bl, br, tr, tl_bl, tl_tr, tl_tl)),
+        (tl_tl, Set(tl_bl, tl_br, tl_tr)),
+        (tl_tr, Set(tl_tl, tl_br, tl_bl, tr)),
+        (bl, Set(tr, tl_bl, tl_br, br)),
+        (br, Set(tr, tl_br, bl)),
+        (tr, Set(tl_tr, tl_br, bl, br)))
+  }
+
   test("QuadLen.approx") {
     QuadLen.approx(0.5f, -6) shouldEqual new QuadLen(1, -1)
     QuadLen.approx(0.25f, -6) shouldEqual new QuadLen(1, -2)
