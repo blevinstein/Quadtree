@@ -34,6 +34,20 @@ class QuadObject(val position: QuadRectangle,
   def withState(newState: State): QuadObject =
       new QuadObject(position, shape, newState)
 
+  def canSplit: Boolean =
+      shape.getRegions.filter { case (mat, addrs) => !mat.isEmpty }.size > 1
+
+  def split: Iterable[QuadObject] =
+      shape.getRegions
+          .filter { case (mat, addrs) => !mat.isEmpty }
+          .map { case (mat, addrs) => new QuadObject(
+              position,
+              new QuadTree.Builder[Option[Material]](None)
+                  .addAll(addrs, mat)
+                  .build,
+              state) }
+
+
   val center: QuadOffset = position.min + (position.size >> 1)
 
   // Returns a list of squares where [this] is touching [other]. This includes
