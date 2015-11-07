@@ -2,6 +2,7 @@ package com.blevinstein.qt
 
 import com.blevinstein.geom.{Point}
 import com.blevinstein.qt.Quadrant.{TopLeft,TopRight,BottomLeft,BottomRight}
+import com.blevinstein.util.Search
 
 // This is the heart of the quad engine. A QuadTree can be used to store
 // arbitrary data in a quadtree structure.
@@ -158,7 +159,23 @@ abstract class QuadTree[+T] {
     builder.build
   }
 
-  // TODO: use getGraph and Search.floodfill to implement getRegions
+  def getRegions: List[(T, List[QuadAddr])] = {
+    val graph = getGraph
+    var regions = List[(T, List[QuadAddr])]()
+    var visited = Set[QuadAddr]()
+
+    for (current <- graph.keys) {
+      val data = getData(current)
+      if (!visited.contains(current)) {
+        val region = Search.floodfill(current,
+            (a: QuadAddr) => graph.get(a).get.filter((b) => getData(b) == data))
+        visited ++= region.toSet
+        regions = (data, region) :: regions
+      }
+    }
+
+    regions
+  }
 
   // Calculates a graph representation of this QuadTree, where each QuadAddr is
   // a node, and there is an edge between two squares if they touch.

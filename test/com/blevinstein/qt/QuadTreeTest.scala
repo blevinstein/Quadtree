@@ -524,6 +524,35 @@ class QuadTreeTest extends FunSuite with Matchers {
         (tr, Set(tl_tr, tl_br, bl, br)))
   }
 
+  test("QuadTree#getRegions") {
+    val qt = new QuadBranch(
+        new QuadBranch(
+          new QuadLeaf(1),
+          new QuadLeaf(1),
+          new QuadLeaf(2),
+          new QuadLeaf(2)),
+        new QuadLeaf(2),
+        new QuadLeaf(2),
+        new QuadLeaf(3))
+
+    val tl_bl = new QuadAddr(TopLeft, BottomLeft)
+    val tl_br = new QuadAddr(TopLeft, BottomRight)
+    val tl_tl = new QuadAddr(TopLeft, TopLeft)
+    val tl_tr = new QuadAddr(TopLeft, TopRight)
+
+    val bl = new QuadAddr(BottomLeft)
+    val br = new QuadAddr(BottomRight)
+    val tr = new QuadAddr(TopRight)
+
+    val regions = qt.getRegions
+    regions.find { case (num: Int, _) => num == 1 }.get._2.toSet shouldEqual
+        Set(tl_tl, tl_tr)
+    regions.find { case (num: Int, _) => num == 2 }.get._2.toSet shouldEqual
+        Set(tl_bl, tl_br, tr, bl)
+    regions.find { case (num: Int, _) => num == 3 }.get._2.toSet shouldEqual
+        Set(br)
+  }
+
   test("QuadLen.approx") {
     QuadLen.approx(0.5f, -6) shouldEqual new QuadLen(1, -1)
     QuadLen.approx(0.25f, -6) shouldEqual new QuadLen(1, -2)
