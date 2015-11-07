@@ -159,6 +159,7 @@ abstract class QuadTree[+T] {
     builder.build
   }
 
+  // Returns a list of continuous regions by material
   def getRegions: List[(T, List[QuadAddr])] = {
     val graph = getGraph
     var regions = List[(T, List[QuadAddr])]()
