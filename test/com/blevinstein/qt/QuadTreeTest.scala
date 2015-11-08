@@ -160,8 +160,8 @@ class QuadTreeTest extends FunSuite with Matchers {
       new QuadLeaf(true))
 
     // getData by Point
-    q1.getData(new Point(0.1f, 0.1f)) shouldEqual false
-    q1.getData(new Point(0.9f, 0.1f)) shouldEqual true
+    q1.getData(q1.getAddr(new Point(0.1f, 0.1f))) shouldEqual false
+    q1.getData(q1.getAddr(new Point(0.9f, 0.1f))) shouldEqual true
 
     // getData by address
     q1.getData(new QuadAddr(BottomLeft)) shouldEqual false

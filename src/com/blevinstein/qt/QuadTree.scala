@@ -96,6 +96,17 @@ object QuadTree {
 }
 // Implemented by QuadBranch[T] and QuadLeaf[T].
 abstract class QuadTree[+T] {
+  def toBuilder[T1 >: T]: QuadTree.Builder[T1] = {
+    // NOTE: Code smell here. Background argument wants to be omitted, because
+    // the unit rectangle is entirely covered by the leaves of this tree.
+    val someData = getData(getAddr(Point.zero))
+
+    val builder = new QuadTree.Builder[T1](someData)
+    iter((addr, data) => builder.add(addr, data))
+    builder
+  }
+
+  // Returns the address of the leaf node that contains this point
   def getAddr(p: Point): QuadAddr = {
     require(p.x >= 0 && p.x <= 1)
     require(p.y >= 0 && p.y <= 1)
@@ -107,10 +118,6 @@ abstract class QuadTree[+T] {
       }
       case leaf: QuadLeaf[T] => new QuadAddr()
     }
-  }
-
-  def getData(p: Point): T = {
-    getData(getAddr(p))
   }
 
   def getData(addr: QuadAddr): T = this match {
@@ -148,8 +155,11 @@ abstract class QuadTree[+T] {
     iter_recur(cb, this, new QuadAddr())
   }
 
-  def grow[T2 >: T](levels: Int, offset: QuadOffset, fill: T2): QuadTree[T2] = {
-    val builder = new QuadTree.Builder[T2](fill)
+  // Resizes this quadtree by scaling up by 2^[levels] and translating [offset].
+  // Any area of the output not covered by the input tree will be filled with
+  // [fill].
+  def grow[T1 >: T](levels: Int, offset: QuadOffset, fill: T1): QuadTree[T1] = {
+    val builder = new QuadTree.Builder[T1](fill)
     iter((addr, data) => {
       val quadRect = (addr.toQuadRectangle << levels) + offset
       builder.addAll(quadRect.toAddressList, getData(addr))
