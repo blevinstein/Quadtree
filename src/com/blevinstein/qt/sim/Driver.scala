@@ -206,7 +206,9 @@ object Driver extends App {
         drawRect(rect)
       }
       // outline in black
-      // TODO: implement outline only where material changes
+      // TODO: implement outline only where material changes, use getRegions?
+      // TODO: getBorders(region: List[QuadAddr/QuadRectangle]):
+      //     List[(Quadffset, QuadOffset)]
       //setFill(false)
       //setColor(Color.BLACK)
       //rects.foreach { case (rect, color) => drawRect(rect) }

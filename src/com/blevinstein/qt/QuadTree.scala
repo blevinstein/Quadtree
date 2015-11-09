@@ -197,8 +197,9 @@ abstract class QuadTree[+T] {
     for (a <- allAddresses) {
       var neighbors = Set[QuadAddr]()
       for (b <- allAddresses)
-        if (a != b && (a touches b))
+        if (a != b && (a touches b)) {
           neighbors += b
+        }
       graph += ((a, neighbors))
     }
     graph
