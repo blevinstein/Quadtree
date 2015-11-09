@@ -35,6 +35,8 @@ import java.awt.event.MouseMotionAdapter
 import java.awt.event.MouseWheelEvent
 import java.awt.event.WindowAdapter
 import java.awt.event.WindowEvent
+import scala.collection.mutable.HashMap
+import scala.util.control.Breaks._
 
 // This is a simple driver for testing out a simulation running on the QuadTree
 // engine.
@@ -64,6 +66,10 @@ object Driver extends App {
   glCanvas.addMouseListener(MouseListener)
   glCanvas.addMouseMotionListener(MouseMotionListener)
   glCanvas.addMouseWheelListener(MouseListener)
+
+  var toolbelt: HashMap[Int, Tool] = new HashMap
+  // TODO: don't use null
+  var activeTool: Tool = null
 
   // setup window
   val frame = new Frame()
@@ -138,6 +144,28 @@ object Driver extends App {
       world.setVelocity(figureId, desiredVelocity)
     }
 
+    // Switch between tools in toolbelt
+    breakable {
+      for (keyCode <- KeyListener.keysDown) {
+        if (toolbelt.contains(keyCode)) {
+          activeTool = toolbelt.get(keyCode).get
+          break
+        }
+      }
+    }
+    // Use activeTool
+    // TODO: remove null check
+    if (activeTool != null) {
+      MouseListener.click match {
+        case Some(MouseEvent.BUTTON1) => {
+          // TODO: scale and pan appropriately; Camera class?
+          val point = MouseMotionListener.position
+          activeTool.activate(world, point)
+        }
+        case _ => Unit
+      }
+    }
+
     world.update
   }
 
@@ -186,7 +214,7 @@ object Driver extends App {
       gl.glRectf(screenRect.min.x, screenRect.min.y,
           screenRect.max.x, screenRect.max.y)
     }
-    def drawAll(rects: List[(Rectangle, Color)]) {
+    def drawAll(rects: Iterable[(Rectangle, Color)]) {
       // fill
       setFill(true)
       rects.foreach { case (rect, color) =>
@@ -227,14 +255,13 @@ object Driver extends App {
     })
     drawAll(rects)
 
-    // draw collisions
-    val contacts = world.contactsWithAll(figureId)
-    var collisions = List[(Rectangle,Color)]()
-    contacts.foreach { case (id: Id, a: QuadRectangle, b: QuadRectangle) =>
-      collisions = (a.toRectangle, Color.YELLOW) ::
-          (b.toRectangle, Color.RED) :: collisions
+    // draw cursor
+    // TODO: remove null check
+    if (activeTool != null) {
+      val cursorRects = activeTool.render(world, MouseMotionListener.position)
+      // TODO: make color partially transparent
+      drawAll(for (rect <- cursorRects) yield (rect.toRectangle, Color.YELLOW))
     }
-    drawAll(collisions)
 
     // end drawing
     gl.glFlush()
@@ -264,16 +291,21 @@ object Driver extends App {
   }
 
   object KeyListener extends KeyAdapter {
-    var keysDown: Set[Integer] = Set()
+    var keysDown: Set[Int] = Set()
 
-    def keyDown(keyCode: Integer): Boolean = keysDown.contains(keyCode)
+    def keyDown(keyCode: Int): Boolean = keysDown.contains(keyCode)
     override def keyPressed(e: KeyEvent): Unit = keysDown += e.getKeyCode()
     override def keyReleased(e: KeyEvent): Unit = keysDown -= e.getKeyCode()
   }
 
   val zoomUnit = 1.05f;
   object MouseListener extends MouseAdapter {
-    override def mouseClicked(e: MouseEvent): Unit = {}
+    var click: Option[Int] = None
+    def clearClicked(): Unit = click = None
+
+    override def mouseClicked(e: MouseEvent): Unit = {
+      click = Some(e.getButton())
+    }
     override def mouseWheelMoved(e: MouseWheelEvent): Unit = {
       if (e.getWheelRotation() > 0) {
         zoom *= zoomUnit
@@ -284,7 +316,10 @@ object Driver extends App {
   }
 
   object MouseMotionListener extends MouseMotionAdapter {
-    override def mouseMoved(e: MouseEvent): Unit = {}
+    var position: Point = Point.zero
+    override def mouseMoved(e: MouseEvent): Unit = {
+      position = new Point(e.getX(), e.getY())
+    }
   }
 
   object EventListener extends GLEventListener {
