@@ -28,6 +28,9 @@ class World {
 
   def allObjs: Iterable[QuadObject] = objs.values
 
+  // physics
+  var gravity = Point.zero
+
   def iter(cb: WorldIterCallback): Unit = {
     for ((objId, obj) <- objs) {
       obj.shape.iter((addr: QuadAddr, mat: Option[Material]) => {
@@ -41,9 +44,10 @@ class World {
   def update: Unit = {
     for ((id, obj) <- objs) obj.state match {
       case Fixed => Unit
-      case Moving(Point.zero) => Unit
       case Moving(v) => {
-        if (!moveBy(id, QuadOffset.approx(v, moveResolution))) {
+        if (moveBy(id, QuadOffset.approx(v, moveResolution))) {
+          accel(id, gravity)
+        } else {
           // TODO: instead of just halving velocity, check whether colliding
           // with Fixed or Moving objects, try to update velocities of Moving
           // objects to synchronize

@@ -118,15 +118,13 @@ object Driver extends App {
     }
   }
 
-  // TODO: move this somewhere sensible
   val accel = 1f / (1 << 6)
 
   val left = new Point(-accel, 0)
   val right = new Point(accel, 0)
   val up = new Point(0, accel * 2)
 
-  // TODO: consider refactoring gravity into World
-  val gravity = new Point(0, -1f / (1 << 8))
+  world.gravity = new Point(0, -1f / (1 << 8))
 
   def mainLoop: Unit = {
     val figure = world.getObj(figureId)
@@ -140,8 +138,6 @@ object Driver extends App {
     // Changes in velocity
     if (contactsEnvironment) {
       world.setVelocity(figureId, desiredVelocity)
-    } else {
-      world.accel(figureId, gravity)
     }
 
     world.update
