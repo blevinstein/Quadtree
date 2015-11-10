@@ -91,7 +91,7 @@ object Driver extends App {
   val figureId = world.add(new QuadObject(
       (QuadRectangle.unit >> 3) + QuadOffset.half,
       checkerboard(3))).get
-  val floorId = world.add(new QuadObject(
+  world.add(new QuadObject(
       QuadRectangle.unit,
       QuadTree.approx(6, (p) =>
           if (p.y < 0.05) {
@@ -100,7 +100,7 @@ object Driver extends App {
             Material.Empty
           }),
       Fixed)).get
-  val rampId = world.add(new QuadObject(
+  world.add(new QuadObject(
       QuadRectangle.unit + new QuadOffset(QuadLen.one, QuadLen.zero),
       QuadTree.approx(6, (p) =>
           if (p.y < p.x) {
@@ -134,7 +134,6 @@ object Driver extends App {
         (if (KeyListener.keyDown(VK_RIGHT)) right else Point.zero) +
         (if (KeyListener.keyDown(VK_UP)) up else Point.zero)
 
-    // Changes in velocity
     if (contactsEnvironment) {
       world.setVelocity(figureId, desiredVelocity)
     }
