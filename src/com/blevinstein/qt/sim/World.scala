@@ -112,18 +112,6 @@ class World {
     objs.remove(id)
   }
 
-  def getMass(obj: QuadObject): Float = {
-    val avgOp = QuadTree.reduce((xs: List[Float]) => xs.sum / xs.length) _
-    val densityOp = QuadTree.transform((m: Option[Material]) => m match {
-      case None => 0f
-      case Some(m) => m.density
-    }) _
-
-    val boundingArea = obj.position.toRectangle.area
-
-    avgOp(densityOp(obj.shape)) * boundingArea
-  }
-
   // Get all contacts with other objects
   def contactsWithAll(id: Id): List[(Id, QuadRectangle, QuadRectangle)]
       = contactsWithAll(getObj(id), Set(id))
@@ -168,6 +156,8 @@ class World {
       } else {
         false
       }
+
+  // overrides
 
   override def toString: String = s"World(objs=$objs)"
 }

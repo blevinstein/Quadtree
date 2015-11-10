@@ -75,5 +75,19 @@ class QuadObject(val position: QuadRectangle,
       contactList
     }
   }
+
+  // Returns totalMass = avgDensity * area
+  def getMass: Float = {
+    val avgOp = QuadTree.reduce((xs: List[Float]) => xs.sum / xs.length) _
+    val densityOp = QuadTree.transform((m: Option[Material]) => m match {
+      case None => 0f
+      case Some(m) => m.density
+    }) _
+
+    val boundingArea = position.toRectangle.area
+
+    avgOp(densityOp(shape)) * boundingArea
+  }
+
 }
 
