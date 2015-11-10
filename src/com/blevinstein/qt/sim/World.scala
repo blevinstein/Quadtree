@@ -1,6 +1,6 @@
 package com.blevinstein.qt.sim
 
-import com.blevinstein.geom.Point
+import com.blevinstein.geom.{Point,Rectangle}
 import com.blevinstein.qt.{QuadAddr,QuadTree,QuadLeaf,QuadRectangle,QuadOffset}
 
 import scala.collection.mutable.HashMap
@@ -28,8 +28,19 @@ class World {
 
   def allObjs: Iterable[QuadObject] = objs.values
 
+  val inf = Int.MaxValue
+  val ninf = Int.MinValue
+
+  // bounds
+  var boundingRectangle =
+      new Rectangle(new Point(ninf, ninf), new Point(inf, inf))
   // physics
   var gravity = Point.zero
+  // reaper
+  var reaper = (world: World, id: Id, obj: QuadObject) => {
+    world.moveTo(id, QuadOffset.half)
+    world.setVelocity(id, Point.zero)
+  }
 
   def iter(cb: WorldIterCallback): Unit = {
     for ((objId, obj) <- objs) {
@@ -42,6 +53,7 @@ class World {
   }
 
   def update: Unit = {
+    // Physics movement
     for ((id, obj) <- objs) obj.state match {
       case Fixed => Unit
       case Moving(v) => {
@@ -55,7 +67,15 @@ class World {
         }
       }
     }
+    // Reaper
+    for ((id, obj) <- objs if !boundingRectangle.contains(obj.center.toPoint)) {
+      reaper(this, id, obj)
+    }
   }
+
+  // TODO: trait WorldModule {
+  //   def update: Unit
+  // }
 
   // Modification functions
 

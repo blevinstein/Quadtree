@@ -86,7 +86,8 @@ object Driver extends App {
 
   // setup game
   var world = new World
-  val boundingRectangle = new Rectangle(new Point(-5, -5), new Point(5, 5))
+  world.boundingRectangle = new Rectangle(new Point(-5, -5), new Point(5, 5))
+  world.gravity = new Point(0, -1f / (1 << 8))
   val figureId = world.add(new QuadObject(
       (QuadRectangle.unit >> 3) + QuadOffset.half,
       checkerboard(3))).get
@@ -124,8 +125,6 @@ object Driver extends App {
   val right = new Point(accel, 0)
   val up = new Point(0, accel * 2)
 
-  world.gravity = new Point(0, -1f / (1 << 8))
-
   def mainLoop: Unit = {
     val figure = world.getObj(figureId)
     val contactsEnvironment = !world.contactsWithAll(figureId).isEmpty
@@ -141,12 +140,6 @@ object Driver extends App {
     }
 
     world.update
-
-    // Unbounded environment, need the Reaper
-    if (!(boundingRectangle contains figure.center.toPoint)) {
-      world.moveTo(figureId, QuadOffset.half)
-      world.setVelocity(figureId, Point.zero)
-    }
   }
 
   // DEBUGGING ROUTINES
