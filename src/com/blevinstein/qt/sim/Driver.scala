@@ -68,8 +68,8 @@ object Driver extends App {
   glCanvas.addMouseWheelListener(MouseListener)
 
   var toolbelt: HashMap[Int, Tool] = new HashMap
-  // TODO: don't use null
-  var activeTool: Tool = null
+  toolbelt.put(KeyEvent.VK_A, DeleteTool)
+  var activeTool: Tool = toolbelt.head._2
 
   // setup window
   val frame = new Frame()
@@ -154,16 +154,13 @@ object Driver extends App {
       }
     }
     // Use activeTool
-    // TODO: remove null check
-    if (activeTool != null) {
-      MouseListener.click match {
-        case Some(MouseEvent.BUTTON1) => {
-          // TODO: scale and pan appropriately; Camera class?
-          val point = MouseMotionListener.position
-          activeTool.activate(world, point)
-        }
-        case _ => Unit
+    MouseListener.click match {
+      case Some(MouseEvent.BUTTON1) => {
+        // TODO: scale and pan appropriately; Camera class?
+        activeTool.activate(world, mousePosition)
+        MouseListener.clearClicked
       }
+      case _ => Unit
     }
 
     world.update
@@ -256,12 +253,9 @@ object Driver extends App {
     drawAll(rects)
 
     // draw cursor
-    // TODO: remove null check
-    if (activeTool != null) {
-      val cursorRects = activeTool.render(world, MouseMotionListener.position)
-      // TODO: make color partially transparent
-      drawAll(for (rect <- cursorRects) yield (rect.toRectangle, Color.YELLOW))
-    }
+    val cursorRects = activeTool.render(world, mousePosition)
+    // TODO: make color partially transparent
+    drawAll(for (rect <- cursorRects) yield (rect.toRectangle, Color.YELLOW))
 
     // end drawing
     gl.glFlush()
@@ -301,7 +295,7 @@ object Driver extends App {
   val zoomUnit = 1.05f;
   object MouseListener extends MouseAdapter {
     var click: Option[Int] = None
-    def clearClicked(): Unit = click = None
+    def clearClicked: Unit = click = None
 
     override def mouseClicked(e: MouseEvent): Unit = {
       click = Some(e.getButton())
@@ -315,10 +309,14 @@ object Driver extends App {
     }
   }
 
+  def mousePosition: Point =
+      (MouseMotionListener.position - LayoutManager.screen.center) /
+          LayoutManager.screen.size * zoom + center
+
   object MouseMotionListener extends MouseMotionAdapter {
     var position: Point = Point.zero
     override def mouseMoved(e: MouseEvent): Unit = {
-      position = new Point(e.getX(), e.getY())
+      position = new Point(e.getX(), LayoutManager.screen.size.y - e.getY())
     }
   }
 
