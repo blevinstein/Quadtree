@@ -30,6 +30,15 @@ object QuadOffset {
 class QuadOffset(val x: QuadLen, val y: QuadLen) {
   val minExp = x minExp y
 
+  // Transforms [this] from unit rectangle to [rect]
+  def within(rect: QuadRectangle): QuadOffset =
+      (this << rect.perfectLog.get) + rect.min
+
+  // Returns [this] in the coordinate system of [rect]
+  // Inverse of [within]
+  def withRespectTo(rect: QuadRectangle): QuadOffset =
+      (this - rect.min) >> rect.perfectLog.get
+
   def isInUnitRectangle: Boolean = x >= QuadLen.zero && x < QuadLen.one &&
       y >= QuadLen.zero && y < QuadLen.one
 

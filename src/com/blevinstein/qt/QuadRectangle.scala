@@ -73,13 +73,13 @@ class QuadRectangle(val min: QuadOffset, val max: QuadOffset) {
 
   // Transforms [this] from coords of unit rectangle to coords of [other].
   def within(other: QuadRectangle): QuadRectangle =
-      (this << other.perfectLog.get) + other.min
+      new QuadRectangle(min within other, max within other)
 
   // Inverse of [within]. Transforms [this] such that it is expressed in the
   // coords of [other], with [other.min] at the origin, and [other.max] at
   // [QuadOffset.one].
   def withRespectTo(other: QuadRectangle): QuadRectangle =
-      (this - other.min) >> other.perfectLog.get
+      new QuadRectangle(min withRespectTo other, max withRespectTo other)
 
   def touches(other: QuadRectangle): Boolean =
     min.x <= other.max.x && max.x >= other.min.x &&
