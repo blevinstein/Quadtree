@@ -158,6 +158,7 @@ abstract class QuadTree[+T] {
   // Resizes this quadtree by scaling up by 2^[levels] and translating [offset].
   // Any area of the output not covered by the input tree will be filled with
   // [fill].
+  // TODO: think of a better name for this
   def grow[T1 >: T](levels: Int, offset: QuadOffset, fill: T1): QuadTree[T1] = {
     val builder = new QuadTree.Builder[T1](fill)
     iter((addr, data) => {
