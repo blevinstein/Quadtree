@@ -12,7 +12,7 @@ import scala.collection.mutable.HashMap
 class World {
   val moveResolution = -6
 
-  private val objs: HashMap[Id, QuadObject] = new HashMap
+  val objs: HashMap[Id, QuadObject] = new HashMap
 
   private var nextId = 0
   // Returns nextId++
@@ -25,8 +25,6 @@ class World {
     require(objs.contains(id), s"objs does not contain id: $id")
     objs.get(id).get
   }
-
-  def allObjs: Iterable[QuadObject] = objs.values
 
   val inf = Int.MaxValue
   val ninf = Int.MinValue

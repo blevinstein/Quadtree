@@ -172,7 +172,7 @@ object Driver extends App {
   // DEBUGGING ROUTINES
   def printObjectPositions: Unit = {
     println("object positions:")
-    for (obj <- world.allObjs) {
+    for ((id, obj) <- world.objs) {
       println(s"${obj.position}")
     }
   }
