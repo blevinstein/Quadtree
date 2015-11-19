@@ -153,15 +153,6 @@ object Driver extends App {
         }
       }
     }
-    // Use activeTool
-    MouseListener.click match {
-      case Some(MouseEvent.BUTTON1) => {
-        // TODO: scale and pan appropriately; Camera class?
-        activeTool.activate(world, mousePosition)
-        MouseListener.clearClicked
-      }
-      case _ => Unit
-    }
 
     world.update
   }
@@ -252,8 +243,10 @@ object Driver extends App {
     })
     drawAll(rects)
 
-    // draw cursor
-    val cursorRects = activeTool.render(world, mousePosition)
+    // Use activeTool
+    val cursorRects = activeTool(world, List(mouseInput))
+    MouseListener.clearClicked
+    // Draw cursor
     // TODO: make color partially transparent
     drawAll(for (rect <- cursorRects) yield (rect.toRectangle, Color.YELLOW))
 
@@ -309,9 +302,18 @@ object Driver extends App {
     }
   }
 
+  // TODO: Figure out how to build & clear input list.
+
+  def mouseInput: Input = MouseListener.click match {
+    case Some(button: Int) => MouseInput(mousePosition, button)
+    case _ => MouseInput(mousePosition, MouseInput.HOVER)
+  }
+
   def mousePosition: Point =
       (MouseMotionListener.position - LayoutManager.screen.center) /
           LayoutManager.screen.size * zoom + center
+
+  // TODO: keyInput
 
   object MouseMotionListener extends MouseMotionAdapter {
     var position: Point = Point.zero

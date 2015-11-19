@@ -3,9 +3,10 @@ package com.blevinstein.qt.sim
 import com.blevinstein.geom.Point
 import com.blevinstein.qt.{QuadAddr,QuadRectangle}
 
+import java.awt.event.MouseEvent
+
 trait Tool {
-  def activate(world: World, p: Point): Unit
-  def render(world: World, p: Point): Iterable[QuadRectangle]
+  def apply(world: World, input: List[Input]): Iterable[QuadRectangle]
 }
 
 object DeleteTool extends Tool {
@@ -28,23 +29,24 @@ object DeleteTool extends Tool {
     return None
   }
 
-  def activate(world: World, point: Point): Unit = {
-    find(world, point) match {
-      case Some((id, rect, mat)) => {
-        val obj = world.getObj(id)
-        world.reshape(id,
-            obj.shape.toBuilder
-                .addAll(rect.withRespectTo(obj.position).toAddressList, None)
-                .build)
-      }
-      case None => ()
-    }
-  }
-
-  def render(world: World, point: Point): Iterable[QuadRectangle] = {
-    find(world, point) match {
-      case Some((id, rect, mat)) => List(rect)
-      case None => List()
-    }
+  def apply(world: World, input: List[Input]): Iterable[QuadRectangle] =
+      input match {
+    case List(MouseInput(point: Point, MouseInput.HOVER)) =>
+        find(world, point) match {
+          case Some((id, rect, mat)) => List(rect)
+          case None => List()
+        }
+    case List(MouseInput(point: Point, MouseEvent.BUTTON1)) =>
+        find(world, point) match {
+          case Some((id, rect, mat)) => {
+            val obj = world.getObj(id)
+            world.reshape(id,
+                obj.shape.toBuilder
+                    .addAll(rect.withRespectTo(obj.position).toAddressList, None)
+                    .build)
+            List()
+          }
+          case None => List()
+        }
   }
 }
