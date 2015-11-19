@@ -8,9 +8,8 @@ import java.awt.event.MouseEvent
 trait Tool {
   def apply(world: World, input: List[Input]): Iterable[QuadRectangle]
 }
-
-object DeleteTool extends Tool {
-  private def find(world: World, point: Point):
+object Tool {
+  def find(world: World, point: Point):
       Option[(Id, QuadRectangle, Material)] = {
     for ((id, obj) <- world.objs) {
       // bounds check
@@ -28,16 +27,17 @@ object DeleteTool extends Tool {
     }
     return None
   }
-
+}
+object DeleteTool extends Tool {
   def apply(world: World, input: List[Input]): Iterable[QuadRectangle] =
       input match {
     case List(MouseInput(point: Point, MouseInput.HOVER)) =>
-        find(world, point) match {
+        Tool.find(world, point) match {
           case Some((id, rect, mat)) => List(rect)
           case None => List()
         }
     case List(MouseInput(point: Point, MouseEvent.BUTTON1)) =>
-        find(world, point) match {
+        Tool.find(world, point) match {
           case Some((id, rect, mat)) => {
             val obj = world.getObj(id)
             world.reshape(id,
