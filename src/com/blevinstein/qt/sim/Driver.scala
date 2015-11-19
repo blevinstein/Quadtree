@@ -28,7 +28,7 @@ import java.awt.Font
 import java.awt.Frame
 import java.awt.event.KeyAdapter
 import java.awt.event.KeyEvent
-import java.awt.event.KeyEvent.{VK_DOWN,VK_LEFT,VK_RIGHT,VK_UP}
+import java.awt.event.KeyEvent.{VK_A,VK_D,VK_W,VK_X}
 import java.awt.event.MouseAdapter
 import java.awt.event.MouseEvent
 import java.awt.event.MouseMotionAdapter
@@ -68,7 +68,7 @@ object Driver extends App {
   glCanvas.addMouseWheelListener(MouseListener)
 
   var toolbelt: HashMap[Int, Tool] = new HashMap
-  toolbelt.put(KeyEvent.VK_A, DeleteTool)
+  toolbelt.put(KeyEvent.VK_X, DeleteTool)
   var activeTool: Tool = toolbelt.head._2
 
   // setup window
@@ -136,9 +136,9 @@ object Driver extends App {
     val contactsEnvironment = !world.contactsWithAll(figureId).isEmpty
 
     val desiredVelocity = Point.zero +
-        (if (KeyListener.keyDown(VK_LEFT)) left else Point.zero) +
-        (if (KeyListener.keyDown(VK_RIGHT)) right else Point.zero) +
-        (if (KeyListener.keyDown(VK_UP)) up else Point.zero)
+        (if (KeyListener.keyDown(VK_A)) left else Point.zero) +
+        (if (KeyListener.keyDown(VK_D)) right else Point.zero) +
+        (if (KeyListener.keyDown(VK_W)) up else Point.zero)
 
     if (contactsEnvironment) {
       world.setVelocity(figureId, desiredVelocity)
