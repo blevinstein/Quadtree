@@ -69,6 +69,7 @@ object Driver extends App {
   glCanvas.addMouseMotionListener(MouseMotionListener)
   glCanvas.addMouseWheelListener(MouseListener)
 
+  // TODO: refactor toolbelt -> List, instead of 'active tool' apply all tools
   var toolbelt: HashMap[Int, Tool] = new HashMap
   toolbelt.put(KeyEvent.VK_X, DeleteTool)
   var activeTool: Tool = toolbelt.head._2
@@ -324,6 +325,7 @@ object Driver extends App {
     }
   }
 
+  // TODO: clear stack automatically when tool is activated
   var inputStack: Stack[Input] = new Stack()
 
   def getInput: List[Input] = {
