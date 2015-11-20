@@ -28,6 +28,7 @@ object Tool {
     return None
   }
 }
+
 object DeleteTool extends Tool {
   def apply(world: World, input: List[Input]): Iterable[QuadRectangle] =
       input match {
@@ -48,5 +49,6 @@ object DeleteTool extends Tool {
           }
           case None => List()
         }
+    case _ => List()
   }
 }

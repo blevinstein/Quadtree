@@ -28,7 +28,6 @@ import java.awt.Font
 import java.awt.Frame
 import java.awt.event.KeyAdapter
 import java.awt.event.KeyEvent
-import java.awt.event.KeyEvent.{VK_A,VK_D,VK_W,VK_X}
 import java.awt.event.MouseAdapter
 import java.awt.event.MouseEvent
 import java.awt.event.MouseMotionAdapter
@@ -138,9 +137,9 @@ object Driver extends App {
     val contactsEnvironment = !world.contactsWithAll(figureId).isEmpty
 
     val desiredVelocity = Point.zero +
-        (if (KeyListener.keyDown(VK_A)) left else Point.zero) +
-        (if (KeyListener.keyDown(VK_D)) right else Point.zero) +
-        (if (KeyListener.keyDown(VK_W)) up else Point.zero)
+        (if (KeyListener.keyDown(KeyEvent.VK_A)) left else Point.zero) +
+        (if (KeyListener.keyDown(KeyEvent.VK_D)) right else Point.zero) +
+        (if (KeyListener.keyDown(KeyEvent.VK_W)) up else Point.zero)
 
     if (contactsEnvironment) {
       world.setVelocity(figureId, desiredVelocity)
@@ -223,7 +222,8 @@ object Driver extends App {
     gl.glClear(GL_COLOR_BUFFER_BIT)
 
     // Short-circuit if world is uninitialized
-    if (world == null) {
+    // TODO: refactor, this happens because App uses DelayedInit
+    if (world == null || inputStack == null) {
       return
     }
 
@@ -246,7 +246,7 @@ object Driver extends App {
     drawAll(rects)
 
     // Use activeTool
-    val cursorRects = activeTool(world, List(mouseInput))
+    val cursorRects = activeTool(world, getInput)
     MouseListener.clearClicked
     // Draw cursor
     // TODO: make color partially transparent
@@ -282,8 +282,24 @@ object Driver extends App {
   object KeyListener extends KeyAdapter {
     var keysDown: Set[Int] = Set()
 
+    val inputStackBlacklist = Set(
+        KeyEvent.VK_A,
+        KeyEvent.VK_D,
+        KeyEvent.VK_S,
+        KeyEvent.VK_W)
+
     def keyDown(keyCode: Int): Boolean = keysDown.contains(keyCode)
-    override def keyPressed(e: KeyEvent): Unit = keysDown += e.getKeyCode()
+
+    override def keyPressed(e: KeyEvent): Unit = {
+      // Update keysDown
+      keysDown += e.getKeyCode()
+      // Update inputStack
+      e.getKeyCode() match {
+        case KeyEvent.VK_ESCAPE => inputStack = List()
+        case code if inputStackBlacklist contains code => ()
+        case code => inputStack = KeyInput(code) :: inputStack
+      }
+    }
     override def keyReleased(e: KeyEvent): Unit = keysDown -= e.getKeyCode()
   }
 
@@ -293,7 +309,9 @@ object Driver extends App {
     def clearClicked: Unit = click = None
 
     override def mouseClicked(e: MouseEvent): Unit = {
-      click = Some(e.getButton())
+      inputStack = MouseInput(
+          screenToWorld(new Point(e.getX(), e.getY())), e.getButton()) ::
+          inputStack
     }
     override def mouseWheelMoved(e: MouseWheelEvent): Unit = {
       if (e.getWheelRotation() > 0) {
@@ -304,16 +322,15 @@ object Driver extends App {
     }
   }
 
-  // TODO: Figure out how to build & clear input list.
+  var inputStack: List[Input] = List()
 
-  def mouseInput: Input = MouseListener.click match {
-    case Some(button: Int) => MouseInput(mousePosition, button)
-    case _ => MouseInput(mousePosition, MouseInput.HOVER)
+  def getInput: List[Input] = {
+    MouseInput(screenToWorld(MouseMotionListener.position), MouseInput.HOVER) ::
+        inputStack
   }
 
-  def mousePosition: Point =
-      (MouseMotionListener.position - LayoutManager.screen.center) /
-          LayoutManager.screen.size * zoom + center
+  def screenToWorld(p: Point) = (p - LayoutManager.screen.center) /
+      LayoutManager.screen.size * zoom + center
 
   // TODO: keyInput
 
