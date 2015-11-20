@@ -35,6 +35,7 @@ import java.awt.event.MouseWheelEvent
 import java.awt.event.WindowAdapter
 import java.awt.event.WindowEvent
 import scala.collection.mutable.HashMap
+import scala.collection.mutable.Stack
 import scala.util.control.Breaks._
 
 // This is a simple driver for testing out a simulation running on the QuadTree
@@ -295,9 +296,9 @@ object Driver extends App {
       keysDown += e.getKeyCode()
       // Update inputStack
       e.getKeyCode() match {
-        case KeyEvent.VK_ESCAPE => inputStack = List()
+        case KeyEvent.VK_ESCAPE => inputStack.clear()
         case code if inputStackBlacklist contains code => ()
-        case code => inputStack = KeyInput(code) :: inputStack
+        case code => inputStack.push(KeyInput(code))
       }
     }
     override def keyReleased(e: KeyEvent): Unit = keysDown -= e.getKeyCode()
@@ -309,9 +310,10 @@ object Driver extends App {
     def clearClicked: Unit = click = None
 
     override def mouseClicked(e: MouseEvent): Unit = {
-      inputStack = MouseInput(
-          screenToWorld(new Point(e.getX(), e.getY())), e.getButton()) ::
-          inputStack
+      inputStack.push(MouseInput(
+          screenToWorld(
+              new Point(e.getX(), LayoutManager.screen.size.y - e.getY())),
+          e.getButton()))
     }
     override def mouseWheelMoved(e: MouseWheelEvent): Unit = {
       if (e.getWheelRotation() > 0) {
@@ -322,11 +324,11 @@ object Driver extends App {
     }
   }
 
-  var inputStack: List[Input] = List()
+  var inputStack: Stack[Input] = new Stack()
 
   def getInput: List[Input] = {
     MouseInput(screenToWorld(MouseMotionListener.position), MouseInput.HOVER) ::
-        inputStack
+        inputStack.toList
   }
 
   def screenToWorld(p: Point) = (p - LayoutManager.screen.center) /

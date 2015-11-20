@@ -37,7 +37,7 @@ object DeleteTool extends Tool {
           case Some((id, rect, mat)) => List(rect)
           case None => List()
         }
-    case List(MouseInput(point: Point, MouseEvent.BUTTON1)) =>
+    case _ :: List(MouseInput(point: Point, MouseEvent.BUTTON1)) =>
         Tool.find(world, point) match {
           case Some((id, rect, mat)) => {
             val obj = world.getObj(id)
