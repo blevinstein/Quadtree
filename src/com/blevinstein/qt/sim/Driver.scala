@@ -46,6 +46,8 @@ import scala.util.control.Breaks._
 // QuadObject.
 //
 // TODO: Think about better ways of handling degredation when framerate < [FPS]
+//
+// TODO: Debug freezing on osx (stops receiving [KeyEvent]s)
 object Driver extends App {
   val FPS: Int = 30
   // Dimensions of the screen
