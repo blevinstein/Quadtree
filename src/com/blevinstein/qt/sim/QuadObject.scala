@@ -2,6 +2,7 @@ package com.blevinstein.qt.sim
 
 import com.blevinstein.geom.Point
 import com.blevinstein.qt.{QuadTree,QuadRectangle,QuadAddr,QuadOffset}
+import com.blevinstein.qt.sim.Operators.avgOp;
 
 // Immutable container object for holding information about an object.
 //
@@ -76,18 +77,14 @@ class QuadObject(val position: QuadRectangle,
     }
   }
 
+  val densityOp = QuadTree.transform((m: Option[Material]) => m match {
+    case None => 0f
+    case Some(m) => m.density
+  }) _
+
   // Returns totalMass = avgDensity * area
   def getMass: Float = {
-    val avgOp = QuadTree.reduce((xs: List[Float]) => xs.sum / xs.length) _
-    val densityOp = QuadTree.transform((m: Option[Material]) => m match {
-      case None => 0f
-      case Some(m) => m.density
-    }) _
-
-    val boundingArea = position.toRectangle.area
-
-    avgOp(densityOp(shape)) * boundingArea
+    avgOp(densityOp(shape)) * position.toRectangle.area
   }
-
 }
 
