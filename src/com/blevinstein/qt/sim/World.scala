@@ -6,12 +6,21 @@ import com.blevinstein.qt.sim.Operators.{anyOp,collideOp}
 
 import scala.collection.mutable.HashMap
 
+trait WorldModule {
+  def update(world: World): Unit
+}
+
 // Mutable class describing a group of [objs] in space.
 //
 // Each object is defined as a QuadTree[Option[T]], so that we have a concept of
 // empty space for collision.
 class World {
-  val moveResolution = -6
+  var modules: List[WorldModule] = List()
+
+  def install(module: WorldModule): World = {
+    modules = module :: modules
+    this
+  }
 
   val objs: HashMap[Id, QuadObject] = new HashMap
 
@@ -33,8 +42,6 @@ class World {
   // bounds
   var boundingRectangle =
       new Rectangle(new Point(ninf, ninf), new Point(inf, inf))
-  // physics
-  var gravity = Point.zero
   // reaper
   var reaper = (world: World, id: Id, obj: QuadObject) => {
     world.moveTo(id, QuadOffset.half)
@@ -52,31 +59,13 @@ class World {
   }
 
   def update: Unit = {
-    // Physics movement
-    // TODO: separate physics into module, trait WorldModule
-    for ((id, obj) <- objs) obj.state match {
-      case Fixed => Unit
-      case Moving(v) => {
-        if (moveBy(id, QuadOffset.approx(v, moveResolution))) {
-          accel(id, gravity)
-        } else {
-          // TODO: instead of just halving velocity, check whether colliding
-          // with Fixed or Moving objects, try to update velocities of Moving
-          // objects to synchronize
-          objs.put(id, obj.withState(Moving(v / 2)))
-        }
-      }
-    }
+    modules.foreach((module) => module.update(this))
     // Reaper
     // TODO: refactor into module
     for ((id, obj) <- objs if !boundingRectangle.contains(obj.center.toPoint)) {
       reaper(this, id, obj)
     }
   }
-
-  // TODO: trait WorldModule {
-  //   def update: Unit
-  // }
 
   // Modification functions
 

@@ -35,9 +35,13 @@ class QuadObject(val position: QuadRectangle,
   def withState(newState: State): QuadObject =
       new QuadObject(position, shape, newState)
 
+  // Returns true if this object consists of 2 or more continuous regions of
+  // material.
   def canSplit: Boolean =
       shape.getRegions.filter { case (mat, addrs) => !mat.isEmpty }.size > 1
 
+  // Splits [this] into multiple QuadObjects, 1 for each continuous region of
+  // material.
   def split: Iterable[QuadObject] =
       shape.getRegions
           .filter { case (mat, addrs) => !mat.isEmpty }
@@ -48,13 +52,11 @@ class QuadObject(val position: QuadRectangle,
                   .build,
               state) }
 
-
   val center: QuadOffset = position.min + (position.size >> 1)
 
   // Returns a list of squares where [this] is touching [other]. This includes
   // overlapping areas, as well as areas that share an edge or corner.
-  def contacts(other: QuadObject):
-      List[(QuadRectangle, QuadRectangle)] = {
+  def contacts(other: QuadObject): List[(QuadRectangle, QuadRectangle)] = {
     if (!(this.position touches other.position)) {
       List()
     } else {
@@ -77,6 +79,7 @@ class QuadObject(val position: QuadRectangle,
     }
   }
 
+  // TODO: refactor into Physics module
   val densityOp = QuadTree.transform((m: Option[Material]) => m match {
     case None => 0f
     case Some(m) => m.density

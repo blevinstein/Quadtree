@@ -94,9 +94,13 @@ object Driver extends App {
   }
 
   // setup game
+  val physics = new PhysicsModule
+  physics.gravity = new Point(0, -1f / (1 << 8))
+
   var world = new World
+  world.install(physics)
+
   world.boundingRectangle = new Rectangle(new Point(-5, -5), new Point(5, 5))
-  world.gravity = new Point(0, -1f / (1 << 8))
   val figureId = world.add(new QuadObject(
       (QuadRectangle.unit >> 3) + QuadOffset.half,
       checkerboard(3))).get
