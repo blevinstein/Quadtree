@@ -52,6 +52,7 @@ class World {
 
   def update: Unit = {
     // Physics movement
+    // TODO: separate physics into module, trait WorldModule
     for ((id, obj) <- objs) obj.state match {
       case Fixed => Unit
       case Moving(v) => {
@@ -66,6 +67,7 @@ class World {
       }
     }
     // Reaper
+    // TODO: refactor into module
     for ((id, obj) <- objs if !boundingRectangle.contains(obj.center.toPoint)) {
       reaper(this, id, obj)
     }
@@ -103,6 +105,7 @@ class World {
       tryReplace(id, getObj(id).withShape(newShape))
 
   // Returns true if the object is replaced
+  // Provides the underlying implementation for [moveTo], [moveBy], [reshape]...
   def tryReplace(id: Id, newObject: QuadObject): Boolean = {
     if (collideWithAll(newObject, Set(id)).isEmpty) {
       objs.put(id, newObject)
@@ -112,6 +115,7 @@ class World {
     }
   }
 
+  // Physics: change Moving object's velocity by [deltaVelocity]
   def accel(id: Id, deltaVelocity: Point): Unit = {
     val obj = getObj(id)
     require(obj.state != Fixed, "Can't change velocity of a Fixed object.")
@@ -120,6 +124,7 @@ class World {
     }
   }
 
+  // Physics: set Moving object's velocity to [newVelocity]
   def setVelocity(id: Id, newVelocity: Point): Unit = {
     val obj = getObj(id)
     require(obj.state != Fixed, "Can't change velocity of a Fixed object.")
@@ -130,9 +135,11 @@ class World {
     objs.remove(id)
   }
 
-  // Get all contacts with other objects
+  // Helper method for static contact checking with all other objects.
   def contactsWithAll(id: Id): List[(Id, QuadRectangle, QuadRectangle)]
       = contactsWithAll(getObj(id), Set(id))
+  // Get all contacts with objects in the world. "Contact" includes touching
+  // along an edge or at a corner (a valid position).
   def contactsWithAll(obj: QuadObject, exclude: Set[Id] = Set()):
       List[(Id, QuadRectangle, QuadRectangle)] = {
     var contacts = List[(Id, QuadRectangle, QuadRectangle)]()
@@ -144,8 +151,20 @@ class World {
     contacts
   }
 
-  // Collision helpers
+  // TODO: move QuadTree operators into separate file
+  val collideOp = QuadTree.merge((m1: Option[Any], m2: Option[Any]) =>
+      (m1, m2) match {
+        case (Some(_), Some(_)) => true
+        case _ => false
+      }) _
+  val anyOp = QuadTree.reduce((bs: List[Boolean]) => {
+        bs.exists((b) => b)
+      }) _
 
+  // Helper method for checking whether an object collides with any other
+  // object (i.e. has an impermissible overlap).
+  // [tryReplace] will fail if the new object would "collide" with any other
+  // existing object.
   def collideWithAll(obj: QuadObject, exclude: Set[Id] = Set()): List[Id] = {
     var collisions = List[Id]()
     for ((id, otherObj) <- objs if !exclude.contains(id))
@@ -157,15 +176,7 @@ class World {
     collisions
   }
 
-  // TODO: move QuadTree operators into separate file
-  val collideOp = QuadTree.merge((m1: Option[Any], m2: Option[Any]) =>
-      (m1, m2) match {
-        case (Some(_), Some(_)) => true
-        case _ => false
-      }) _
-  val anyOp = QuadTree.reduce((bs: List[Boolean]) => {
-        bs.exists((b) => b)
-      }) _
+  // Helper method for checking whether two objects collide
   def collidesWith(a: QuadObject, b: QuadObject): Boolean =
       if (anyOp(collideOp(
           a.toQuadTree(a.position),
