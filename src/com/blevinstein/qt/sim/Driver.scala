@@ -97,10 +97,13 @@ object Driver extends App {
   val physics = new PhysicsModule
   physics.gravity = new Point(0, -1f / (1 << 8))
 
-  var world = new World
-  world.install(physics)
+  val reaper = new ReaperModule
+  reaper.boundingRectangle = new Rectangle(new Point(-5, -5), new Point(5, 5))
 
-  world.boundingRectangle = new Rectangle(new Point(-5, -5), new Point(5, 5))
+  var world = (new World).
+      install(physics).
+      install(reaper)
+
   val figureId = world.add(new QuadObject(
       (QuadRectangle.unit >> 3) + QuadOffset.half,
       checkerboard(3))).get

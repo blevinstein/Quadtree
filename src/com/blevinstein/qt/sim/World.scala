@@ -36,18 +36,6 @@ class World {
     objs.get(id).get
   }
 
-  val inf = Int.MaxValue
-  val ninf = Int.MinValue
-
-  // bounds
-  var boundingRectangle =
-      new Rectangle(new Point(ninf, ninf), new Point(inf, inf))
-  // reaper
-  var reaper = (world: World, id: Id, obj: QuadObject) => {
-    world.moveTo(id, QuadOffset.half)
-    world.setVelocity(id, Point.zero)
-  }
-
   def iter(cb: WorldIterCallback): Unit = {
     for ((objId, obj) <- objs) {
       obj.shape.iter((addr: QuadAddr, mat: Option[Material]) => {
@@ -60,11 +48,6 @@ class World {
 
   def update: Unit = {
     modules.foreach((module) => module.update(this))
-    // Reaper
-    // TODO: refactor into module
-    for ((id, obj) <- objs if !boundingRectangle.contains(obj.center.toPoint)) {
-      reaper(this, id, obj)
-    }
   }
 
   // Modification functions
