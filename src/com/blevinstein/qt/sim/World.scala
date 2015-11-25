@@ -46,6 +46,25 @@ class World {
     }
   }
 
+  def find(point: Point):
+      Option[(Id, QuadRectangle, Material)] = {
+    for ((id, obj) <- objs) {
+      // bounds check
+      if (obj.position.toRectangle.contains(point)) {
+        // geometry
+        val addr =
+            obj.shape.getAddr(point withRespectTo obj.position.toRectangle)
+        obj.shape.getData(addr) match {
+          case Some(material: Material) =>
+            return Some(
+                (id, addr.toQuadRectangle within obj.position, material))
+          case None => ()
+        }
+      }
+    }
+    return None
+  }
+
   def update: Unit = {
     modules.foreach((module) => module.update(this))
   }
