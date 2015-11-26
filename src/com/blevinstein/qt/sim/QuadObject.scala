@@ -35,6 +35,9 @@ class QuadObject(val position: QuadRectangle,
   def withState(newState: State): QuadObject =
       new QuadObject(position, shape, newState)
 
+  // TODO: add impulse between regions in contact?
+  // TODO: add tool for splitting?
+  // TODO: add image input?
   // Returns true if this object consists of 2 or more continuous regions of
   // material.
   def canSplit: Boolean =
