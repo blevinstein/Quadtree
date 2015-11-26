@@ -70,9 +70,9 @@ object Driver extends App {
   glCanvas.addMouseWheelListener(MouseListener)
 
   // TODO: refactor toolbelt -> List, instead of 'active tool' apply all tools
-  var toolbelt: HashMap[Int, Tool] = new HashMap
-  toolbelt.put(KeyEvent.VK_X, DeleteTool)
-  var activeTool: Tool = toolbelt.head._2
+  var toolbelt: List[Tool] = List(
+    DeleteTool
+  )
 
   // setup window
   val frame = new Frame()
@@ -152,16 +152,6 @@ object Driver extends App {
 
     if (contactsEnvironment) {
       world.setVelocity(figureId, desiredVelocity)
-    }
-
-    // Switch between tools in toolbelt
-    breakable {
-      for (keyCode <- KeyListener.keysDown) {
-        if (toolbelt.contains(keyCode)) {
-          activeTool = toolbelt.get(keyCode).get
-          break
-        }
-      }
     }
 
     world.update
@@ -254,12 +244,17 @@ object Driver extends App {
     })
     drawAll(rects)
 
-    // Use activeTool
-    val cursorRects = activeTool(world, getInput)
-    MouseListener.clearClicked
-    // Draw cursor
-    // TODO: make color partially transparent
-    drawAll(for (rect <- cursorRects) yield (rect.toRectangle, Color.YELLOW))
+    for (tool <- toolbelt) {
+      if (tool.trigger(world, getInput)) {
+        val cursorRects = tool.activate(world, getInput)
+        // TODO: refactor to allow different colors for different tools
+        drawAll(
+            for (rect <- cursorRects) yield (rect.toRectangle, Color.YELLOW))
+      }
+      if (tool.clear(world, getInput)) {
+        inputStack.clear()
+      }
+    }
 
     // end drawing
     gl.glFlush()
@@ -314,9 +309,6 @@ object Driver extends App {
 
   val zoomUnit = 1.05f;
   object MouseListener extends MouseAdapter {
-    var click: Option[Int] = None
-    def clearClicked: Unit = click = None
-
     override def mouseClicked(e: MouseEvent): Unit = {
       inputStack.push(MouseInput(
           screenToWorld(
@@ -336,8 +328,14 @@ object Driver extends App {
   var inputStack: Stack[Input] = new Stack()
 
   def getInput: List[Input] = {
-    MouseInput(screenToWorld(MouseMotionListener.position), MouseInput.HOVER) ::
-        inputStack.toList
+    inputStack.toList match {
+      case MouseInput(point, button) :: _ => inputStack.toList
+      case _ =>
+          MouseInput(
+              screenToWorld(MouseMotionListener.position),
+              MouseInput.HOVER) ::
+          inputStack.toList
+    }
   }
 
   def screenToWorld(p: Point) = (p - LayoutManager.screen.center) /
