@@ -2,6 +2,8 @@ scalaVersion := "2.11.4"
 
 libraryDependencies += "org.scalatest" % "scalatest_2.11" % "2.2.4"
 
+libraryDependencies += "com.sksamuel.scrimage" % "scrimage-core_2.11" % "2.1.0"
+
 scalaSource in Compile := baseDirectory.value / "src"
 
 scalaSource in Test := baseDirectory.value / "test"
