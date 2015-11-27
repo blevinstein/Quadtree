@@ -24,7 +24,8 @@ object QuadOffset {
   implicit def toPoint(offset: QuadOffset): Point = offset.toPoint
 
   def approx(point: Point, resolution: Int): QuadOffset =
-      new QuadOffset(QuadLen.approx(point.x, resolution),
+      new QuadOffset(
+          QuadLen.approx(point.x, resolution),
           QuadLen.approx(point.y, resolution))
 }
 class QuadOffset(val x: QuadLen, val y: QuadLen) {
