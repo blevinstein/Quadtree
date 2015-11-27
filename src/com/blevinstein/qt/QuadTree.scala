@@ -33,7 +33,9 @@ object QuadTree {
     }
   }
 
-  // Used for constructing operators on QuadTrees
+  // Used for constructing operators on QuadTrees: [merge], [transform],
+  // [reduce]
+
   def merge[X,Y,Z](op: (X, Y) => Z)(q1: QuadTree[X],
       q2: QuadTree[Y]): QuadTree[Z] = {
     (q1, q2) match {
@@ -60,11 +62,19 @@ object QuadTree {
     case leaf: QuadLeaf[X] => leaf.data
   }
 
+  // Used for constructing a QuadTree
   class Builder[T](background: T) {
     var pieces: List[(QuadAddr, T)] = List()
 
     def add(addr: QuadAddr, data: T): Builder[T] = {
       pieces = (addr, data) :: pieces
+      this
+    }
+
+    def addAll(rect: QuadRectangle, data: T): Builder[T] = {
+      for (addr <- rect.toAddressList) {
+        pieces = (addr, data) :: pieces
+      }
       this
     }
 
@@ -163,7 +173,7 @@ abstract class QuadTree[+T] {
     val builder = new QuadTree.Builder[T1](fill)
     iter((addr, data) => {
       val quadRect = (addr.toQuadRectangle << levels) + offset
-      builder.addAll(quadRect.toAddressList, getData(addr))
+      builder.addAll(quadRect, getData(addr))
     })
     builder.build
   }

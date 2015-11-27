@@ -37,7 +37,7 @@ object DeleteTool extends Tool {
             val obj = world.getObj(id)
             world.reshape(id,
                 obj.shape.toBuilder
-                    .addAll(rect.withRespectTo(obj.position).toAddressList, None)
+                    .addAll(rect.withRespectTo(obj.position), None)
                     .build)
             List()
           }
