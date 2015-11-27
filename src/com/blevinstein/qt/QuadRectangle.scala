@@ -7,6 +7,12 @@ import com.blevinstein.geom.{Point,Rectangle}
 object QuadRectangle {
   val zero = new QuadRectangle(QuadOffset.zero, QuadOffset.zero)
   val unit = new QuadRectangle(QuadOffset.zero, QuadOffset.one)
+
+  def approx(min: Point, max: Point, resolution: Int): QuadRectangle = {
+    new QuadRectangle(
+        QuadOffset.approx(min, resolution),
+        QuadOffset.approx(max, resolution))
+  }
 }
 class QuadRectangle(val min: QuadOffset, val max: QuadOffset) {
   def this(max: QuadOffset) = this(QuadOffset.zero, max)
