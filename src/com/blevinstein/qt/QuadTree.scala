@@ -62,7 +62,7 @@ object QuadTree {
     case leaf: QuadLeaf[X] => leaf.data
   }
 
-  // Used for constructing a QuadTree
+  // Used for constructing a QuadTree, by QuadAddr or QuadRectangle
   class Builder[T](background: T) {
     var pieces: List[(QuadAddr, T)] = List()
 
