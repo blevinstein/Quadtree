@@ -12,9 +12,21 @@ To run the "sim" app:
 TODO
 ====
 
-- Add message to every require() call
+Features
+--------
 
-- Implement ToolBelt, allow creating and shaping objects
+- Use Akka to improve behavior of Driver
+
+- GrowTool, can click on an object and copy a block into an adjacent open square
+
 - Implement persistence, save/load world
+
 - Add configurable settings
+
+- Implement Image -> QuadTree
+
+Cleanup
+-------
+
+- Add message to every require() call
 
