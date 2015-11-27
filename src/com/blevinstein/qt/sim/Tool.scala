@@ -45,5 +45,6 @@ object DeleteTool extends Tool {
             List()
           }
         }
+    case _ => ???
   }
 }
