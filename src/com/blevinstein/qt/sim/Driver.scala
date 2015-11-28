@@ -34,6 +34,8 @@ import java.awt.event.MouseMotionAdapter
 import java.awt.event.MouseWheelEvent
 import java.awt.event.WindowAdapter
 import java.awt.event.WindowEvent
+import java.io.File
+import javax.imageio.ImageIO
 import scala.collection.mutable.HashMap
 import scala.collection.mutable.Stack
 import scala.util.control.Breaks._
@@ -81,18 +83,6 @@ object Driver extends App {
   frame.setSize(1024, 1024 + 25) // scalastyle:off magic.number
   frame.setVisible(true)
 
-  // TODO: refactor game logic out of Driver
-  def checkerboard(depth: Int): QuadTree[Option[Material]] = depth match {
-    case 1 => new QuadBranch(new QuadLeaf(Material.Empty),
-      new QuadLeaf(Material.Blue),
-      new QuadLeaf(Material.Blue),
-      new QuadLeaf(Material.Empty))
-    case other: Int => new QuadBranch(checkerboard(other - 1),
-      checkerboard(other - 1),
-      checkerboard(other - 1),
-      checkerboard(other - 1))
-  }
-
   // setup game
   val physics = new PhysicsModule
   physics.gravity = new Point(0, -1f / (1 << 8))
@@ -104,9 +94,11 @@ object Driver extends App {
       install(physics).
       install(reaper)
 
+  val figureShape =
+      ImageHelper.createTreeFromImage(ImageIO.read(new File("data/figure.png")))
   val figureId = world.add(new QuadObject(
       (QuadRectangle.unit >> 3) + QuadOffset.half,
-      checkerboard(3))).get
+      figureShape)).get
   world.add(new QuadObject(
       QuadRectangle.unit,
       QuadTree.approx(6, (p) =>
