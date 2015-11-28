@@ -296,15 +296,23 @@ object Driver extends App {
         case code => inputStack.push(KeyInput(code))
       }
     }
-    override def keyReleased(e: KeyEvent): Unit = keysDown -= e.getKeyCode()
+
+    override def keyReleased(e: KeyEvent): Unit = {
+      println(s"keyReleased: ${e.getKeyCode()}")
+      keysDown.synchronized {
+        keysDown -= e.getKeyCode()
+      }
+    }
   }
 
   val zoomUnit = 1.05f;
   object MouseListener extends MouseAdapter {
     override def mouseClicked(e: MouseEvent): Unit = {
+      // TODO: BROKEN fix y coordinate when width < height
       inputStack.push(MouseInput(
-          screenToWorld(
-              new Point(e.getX(), LayoutManager.screen.size.y - e.getY())),
+          screenToWorld(new Point(
+              e.getX(),
+              height - e.getY())),
           e.getButton()))
     }
     override def mouseWheelMoved(e: MouseWheelEvent): Unit = {
@@ -316,7 +324,6 @@ object Driver extends App {
     }
   }
 
-  // TODO: clear stack automatically when tool is activated
   var inputStack: Stack[Input] = new Stack()
 
   def getInput: List[Input] = {
@@ -332,8 +339,6 @@ object Driver extends App {
 
   def screenToWorld(p: Point) = (p - LayoutManager.screen.center) /
       LayoutManager.screen.size * zoom + center
-
-  // TODO: keyInput
 
   object MouseMotionListener extends MouseMotionAdapter {
     var position: Point = Point.zero
