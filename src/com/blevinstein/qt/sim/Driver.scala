@@ -73,7 +73,7 @@ object Driver extends App with Runnable {
 
   // TODO: refactor toolbelt -> List, instead of 'active tool' apply all tools
   var toolbelt: List[Tool] = List(
-    DeleteTool
+    DeleteTool(List(KeyInput(KeyEvent.VK_X)))
   )
 
   // setup window

@@ -7,32 +7,37 @@ import java.awt.Color
 import java.awt.event.MouseEvent
 
 object Tool {
-  val Noop = (List(), List())
+  val Noop: ToolOutput = (List(), List())
 }
 trait Tool {
-  def activate(world: World, input: List[Input]):
-      (Iterable[Drawable], Iterable[Event])
+  // This method returns [Drawable]s to draw on the screen, e.g. a cursor
+  // or text messages to the user, as well as [Event]s that change the state of
+  // the world.
+  def activate(world: World, input: List[Input]): ToolOutput
 
   // When [clear] returns true, [inputStack] is cleared.
+  // TODO: refactor into activate()? It's annoying that the return type of
+  //   [activate] is getting so long. If it gets any bigger than 3 parts, I
+  //   should create a class ToolOutput.
   def clear(world: World, input: List[Input]): Boolean
 }
 
 // TODO: take prefix: List[Input] argument? e.g. match prefix :: MouseInput  :: _
-object DeleteTool extends Tool {
+case class DeleteTool(prefix: List[Input]) extends Tool {
   def clear(world: World, input: List[Input]): Boolean = input match {
-    case MouseInput(point: Point, MouseEvent.BUTTON1) :: _ => true
+    case MouseInput(point: Point, MouseEvent.BUTTON1) :: prefix :: _ => true
     case _ => false
   }
 
   def activate(world: World, input: List[Input]) =
       input match {
-    case MouseInput(point: Point, MouseInput.HOVER) :: _ =>
+    case MouseInput(point: Point, MouseInput.HOVER) :: prefix :: _ =>
         world.find(point) match {
           case Some((id, rect, mat)) =>
               (List(FillRect(Color.YELLOW, rect.toRectangle)), List())
           case None => Tool.Noop
         }
-    case MouseInput(point: Point, MouseEvent.BUTTON1) :: _ =>
+    case MouseInput(point: Point, MouseEvent.BUTTON1) :: prefix :: _ =>
         world.find(point) match {
           case Some((id, rect, mat)) => {
             val obj = world.getObj(id)
