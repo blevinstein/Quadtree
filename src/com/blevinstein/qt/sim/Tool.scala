@@ -22,7 +22,6 @@ trait Tool {
   def clear(world: World, input: List[Input]): Boolean
 }
 
-// TODO: take prefix: List[Input] argument? e.g. match prefix :: MouseInput  :: _
 case class DeleteTool(prefix: List[Input]) extends Tool {
   def clear(world: World, input: List[Input]): Boolean = input match {
     case MouseInput(point: Point, MouseEvent.BUTTON1) :: prefix :: _ => true
