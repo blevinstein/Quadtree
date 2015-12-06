@@ -9,21 +9,27 @@ To run the "grow" app:
 To run the "sim" app:
 > sbt sim
 
+Controls in the sim:
+
+WASD - Move the figure
+
+Tools:
+
+X [click] - DeleteTool
+
 TODO
 ====
 
 Features
 --------
 
-- Use Akka to improve behavior of Driver
+- Use Akka to improve behavior of Driver?
 
 - GrowTool, can click on an object and copy a block into an adjacent open square
 
 - Implement persistence, save/load world
 
 - Add configurable settings
-
-- Implement Image -> QuadTree
 
 Cleanup
 -------
