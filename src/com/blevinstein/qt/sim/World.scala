@@ -60,6 +60,10 @@ class World(val objs: Map[Id, QuadObject], val modules: List[WorldModule]) {
         events.foldLeft(newWorld)((w: World, e: Event) => w.afterAllEvents(e))
   }
 
+  // Returns (newWorld, secondaryEvents), where [newWorld] represents the new
+  // state of the world after [event], and [secondaryEvents] is a collection of
+  // (zero or more) events that occur as a result of the primary event [event].
+  // E.g. a MoveTo/MoveBy event can cause a Collision event.
   def afterEvent(event: Event): (World, Iterable[Event]) = event match {
     case Add(newId: Id, newObj: QuadObject) =>
         if (collideWithAll(newObj).isEmpty) {
@@ -111,13 +115,22 @@ class World(val objs: Map[Id, QuadObject], val modules: List[WorldModule]) {
       }
   }
 
+  // Calls [getEvents] on each [module], and process all those events.
+  // To add new behaviors, [install] a new [WorldModule], e.g. [PhysicsModule]
+  // or [ReaperModule].
   def update: World =
       process(modules.flatMap((module) => module.getEvents(this)))
 
+  // Process a list of events by by calling [afterAllEvents] on each input
+  // event.
   def process(events: Iterable[Event]): World = {
     events.foldLeft(this)((w: World, e: Event) => w.afterAllEvents(e))
   }
 
+  // Considers creating a world where object [id] is replaced by [newObject]. If
+  // that world is not legal (e.g. if any two objects are overlapping), will
+  // return (this, List[Collision]). If that world is legal, will return
+  // (newWorld, List()).
   def tryReplace(id: Id, newObject: QuadObject): (World, Iterable[Event]) = {
     val collisions = collideWithAll(newObject, Set(id))
     if (collisions.isEmpty) {
