@@ -242,12 +242,10 @@ object Driver extends App with Runnable {
     drawAll(gl, rects)
 
     for (tool <- toolbelt) {
-      if (tool.trigger(world, getInput)) {
-        tool.activate(world, getInput) match {
-          case (drawables, events) => {
-            drawAll(gl, drawables)
-            world = world.process(events)
-          }
+      tool.activate(world, getInput) match {
+        case (drawables, events) => {
+          drawAll(gl, drawables)
+          world = world.process(events)
         }
       }
       if (tool.clear(world, getInput)) {

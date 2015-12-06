@@ -12,18 +12,13 @@ object Tool {
 trait Tool {
   def activate(world: World, input: List[Input]):
       (Iterable[Drawable], Iterable[Event])
+
+  // When [clear] returns true, [inputStack] is cleared.
   def clear(world: World, input: List[Input]): Boolean
-  def trigger(world: World, input: List[Input]): Boolean
 }
 
 // TODO: take prefix: List[Input] argument? e.g. match prefix :: MouseInput  :: _
 object DeleteTool extends Tool {
-  def trigger(world: World, input: List[Input]): Boolean = input match {
-    case MouseInput(point: Point, MouseInput.HOVER) :: _ => true
-    case MouseInput(point: Point, MouseEvent.BUTTON1) :: _ => true
-    case _ => false
-  }
-
   def clear(world: World, input: List[Input]): Boolean = input match {
     case MouseInput(point: Point, MouseEvent.BUTTON1) :: _ => true
     case _ => false
@@ -50,6 +45,6 @@ object DeleteTool extends Tool {
           }
           case None => Tool.Noop
         }
-    case _ => ???
+    case _ => Tool.Noop
   }
 }
