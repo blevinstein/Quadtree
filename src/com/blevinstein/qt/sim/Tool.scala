@@ -29,7 +29,7 @@ case class DeleteTool(prefix: List[Input]) extends Tool {
     case _ => false
   }
 
-  def activate(world: World, input: List[Input]) = input match {
+  def activate(world: World, input: List[Input]): ToolOutput = input match {
     case MouseInput(point: Point, MouseInput.HOVER) :: tail
         if tail startsWith prefix =>
             world.find(point) match {
@@ -85,7 +85,7 @@ case class GrowTool(prefix: List[Input]) extends Tool {
       source + source.size.xComp - source.size.yComp,
       source - source.size.xComp + source.size.yComp)
 
-  def activate(world: World, input: List[Input]) = input match {
+  def activate(world: World, input: List[Input]): ToolOutput = input match {
     // When user is hovering over pointA, highlight source square
     case MouseInput(pointA, MouseInput.HOVER) ::
         tail if tail startsWith prefix => {

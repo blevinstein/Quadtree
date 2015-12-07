@@ -337,7 +337,7 @@ object Driver extends App with Runnable {
           MouseInput.HOVER) ::
       inputStack.toList
 
-  def screenToWorld(p: Point) = (p - LayoutManager.screen.center) /
+  def screenToWorld(p: Point): Point = (p - LayoutManager.screen.center) /
       LayoutManager.screen.size * zoom + center
 
   object MouseMotionListener extends MouseMotionAdapter {
