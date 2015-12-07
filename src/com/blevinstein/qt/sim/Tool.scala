@@ -73,12 +73,15 @@ case class GrowTool(prefix: List[Input]) extends Tool {
 
   // Given a [source] rectangle, returns a list of all new QuadRectangles (of
   // equal size, adjacent to source) where growth is allowed
-  // TODO: allow diagonal growth as well
   def growthPossibilities(source: QuadRectangle) = List(
       source + source.size.xComp,
       source - source.size.xComp,
       source + source.size.yComp,
-      source - source.size.yComp)
+      source - source.size.yComp,
+      source + source.size,
+      source - source.size,
+      source + source.size.xComp - source.size.yComp,
+      source - source.size.xComp + source.size.yComp)
 
   def activate(world: World, input: List[Input]) = input match {
     // When user is hovering over pointA, highlight source square
