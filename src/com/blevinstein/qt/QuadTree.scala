@@ -67,20 +67,21 @@ object QuadTree {
     var pieces: List[(QuadAddr, T)] = List()
 
     def add(addr: QuadAddr, data: T): Builder[T] = {
-      pieces = (addr, data) :: pieces
+      pieces = (addr, data) ::
+          pieces.filter { case (oldAddr, data) => !oldAddr.isInside(addr) }
       this
     }
 
     def addAll(rect: QuadRectangle, data: T): Builder[T] = {
       for (addr <- rect.toAddressList) {
-        pieces = (addr, data) :: pieces
+        add(addr, data)
       }
       this
     }
 
     def addAll(addrs: Iterable[QuadAddr], data: T): Builder[T] = {
       for (addr <- addrs) {
-        pieces = (addr, data) :: pieces
+        add(addr, data)
       }
       this
     }
