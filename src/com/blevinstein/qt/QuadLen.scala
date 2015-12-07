@@ -131,5 +131,5 @@ class QuadLen(private val base: Int, private val exp: Int = 0) {
     case _ => false
   }
 
-  override def toString: String = s"[$base << $exp ~ $toFloat]"
+  override def toString: String = s"[$toFloat (${base}E${exp})]"
 }
