@@ -226,7 +226,7 @@ object Driver extends App {
 
     // draw background
     setFill(true)
-    setColor(Color.WHITE)
+    setColor(Color.GRAY)
     gl.glRectf(0, 0, width, height)
 
     // draw world
@@ -298,7 +298,6 @@ object Driver extends App {
     }
 
     override def keyReleased(e: KeyEvent): Unit = {
-      println(s"keyReleased: ${e.getKeyCode()}")
       keysDown -= e.getKeyCode()
     }
   }
