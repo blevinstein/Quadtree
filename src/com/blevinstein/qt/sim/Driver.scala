@@ -298,6 +298,8 @@ object Driver extends App with Runnable {
       // Update inputStack
       e.getKeyCode() match {
         case KeyEvent.VK_ESCAPE => inputStack.clear()
+        case KeyEvent.VK_Z => // Dump inputStack for debugging
+            println(s"Input: $inputStack")
         case code if inputStackBlacklist contains code => ()
         case code => inputStack.push(KeyInput(code))
       }
