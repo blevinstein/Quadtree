@@ -31,6 +31,12 @@ object QuadOffset {
 class QuadOffset(val x: QuadLen, val y: QuadLen) {
   val minExp = x minExp y
 
+  // Returns the x component of [this] as a QuadOffset
+  def xComp: QuadOffset = new QuadOffset(x, QuadLen.zero)
+
+  // Returns the y component of [this] as a QuadOffset
+  def yComp: QuadOffset = new QuadOffset(QuadLen.zero, y)
+
   // Transforms [this] from unit rectangle to [rect]
   def within(rect: QuadRectangle): QuadOffset =
       (this << rect.perfectLog.get) + rect.min

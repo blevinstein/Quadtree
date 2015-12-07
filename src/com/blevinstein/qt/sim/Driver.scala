@@ -73,7 +73,8 @@ object Driver extends App with Runnable {
 
   // TODO: refactor toolbelt -> List, instead of 'active tool' apply all tools
   var toolbelt: List[Tool] = List(
-    DeleteTool(List(KeyInput(KeyEvent.VK_X)))
+    DeleteTool(List(KeyInput(KeyEvent.VK_X))),
+    GrowTool(List(KeyInput(KeyEvent.VK_G)))
   )
 
   // setup window
@@ -328,16 +329,11 @@ object Driver extends App with Runnable {
 
   var inputStack: Stack[Input] = new Stack()
 
-  def getInput: List[Input] = {
-    inputStack.toList match {
-      case MouseInput(point, button) :: _ => inputStack.toList
-      case _ =>
-          MouseInput(
-              screenToWorld(MouseMotionListener.position),
-              MouseInput.HOVER) ::
-          inputStack.toList
-    }
-  }
+  def getInput: List[Input] =
+      MouseInput(
+          screenToWorld(MouseMotionListener.position),
+          MouseInput.HOVER) ::
+      inputStack.toList
 
   def screenToWorld(p: Point) = (p - LayoutManager.screen.center) /
       LayoutManager.screen.size * zoom + center

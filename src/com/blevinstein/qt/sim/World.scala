@@ -100,6 +100,8 @@ class World(val objs: Map[Id, QuadObject], val modules: List[WorldModule]) {
         (objA.state, objB.state) match {
           case (Moving(velA), Fixed) =>
               (this, List(SetVelocity(idA, Point.zero)))
+          case (Fixed, Moving(velB)) =>
+              (this, List(SetVelocity(idB, Point.zero)))
           case (Moving(velA), Moving(velB)) => {
               // TODO: calculate mass, preserve avg momentum not avg velocity
               val newVelocity = (velA + velB) / 2
@@ -123,9 +125,8 @@ class World(val objs: Map[Id, QuadObject], val modules: List[WorldModule]) {
 
   // Process a list of events by by calling [afterAllEvents] on each input
   // event.
-  def process(events: Iterable[Event]): World = {
+  def process(events: Iterable[Event]): World =
     events.foldLeft(this)((w: World, e: Event) => w.afterAllEvents(e))
-  }
 
   // Considers creating a world where object [id] is replaced by [newObject]. If
   // that world is not legal (e.g. if any two objects are overlapping), will
