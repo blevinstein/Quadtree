@@ -124,10 +124,6 @@ case class GrowTool(prefix: List[Input]) extends Tool {
                 val obj = world.getObj(id)
                 // From there, this tool allows us to "grow" in any direction by
                 // copying [material] into an adjacent [newRect]
-
-                // DEBUG
-                println(s"look around $rect")
-
                 growthPossibilities(rect).
                     find((newRect) => newRect.toRectangle.contains(pointB))
                         match {
