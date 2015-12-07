@@ -46,12 +46,11 @@ class World {
     }
   }
 
-  def find(point: Point):
-      Option[(Id, QuadRectangle, Material)] = {
+  def find(point: Point): Option[(Id, QuadRectangle, Material)] = {
     for ((id, obj) <- objs) {
       // bounds check
       if (obj.position.toRectangle.contains(point)) {
-        // geometry
+        // geometry check
         val addr =
             obj.shape.getAddr(point withRespectTo obj.position.toRectangle)
         obj.shape.getData(addr) match {
