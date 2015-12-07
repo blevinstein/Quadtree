@@ -24,13 +24,6 @@ class World {
 
   val objs: HashMap[Id, QuadObject] = new HashMap
 
-  private var nextId = 0
-  // Returns nextId++
-  def getId: Id = {
-    nextId += 1
-    nextId - 1
-  }
-
   def getObj(id: Id): QuadObject = {
     require(objs.contains(id), s"objs does not contain id: $id")
     objs.get(id).get
@@ -77,7 +70,7 @@ class World {
     if (collision) {
       None
     } else {
-      val objId = getId
+      val objId = Id.get
       objs.put(objId, newObj)
       Some(objId)
     }
