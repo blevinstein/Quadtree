@@ -97,9 +97,6 @@ class World(val objs: Map[Id, QuadObject], val modules: List[WorldModule]) {
     // TODO: instead of setting velocity to zero on collision, try setting only
     // velocity.x or velocity.y to zero, to enable "sliding".
     case Collision(idA: Id, idB: Id) => {
-        // DEBUG
-        println(s"Collide! $idA and $idB")
-
         val objA = getObj(idA)
         val objB = getObj(idB)
         (objA.state, objB.state) match {
