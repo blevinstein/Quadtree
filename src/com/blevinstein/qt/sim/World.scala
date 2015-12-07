@@ -71,16 +71,15 @@ class World(val objs: Map[Id, QuadObject], val modules: List[WorldModule]) {
         } else {
           (this, List(Failed(event)))
         }
+    case AddShape(id: Id, newShape: QuadTree[Option[Material]]) =>
+      tryReplace(id, getObj(id).addShape(newShape))
     case MoveBy(id: Id, offset: QuadOffset) =>
         tryReplace(id, getObj(id).withOffset(offset))
     case MoveTo(id: Id, newPosition: QuadOffset) =>
         tryReplace(id, getObj(id).withPosition(newPosition))
     case Remove(id: Id) => (withObjs(objs - id), List())
-    case Reshape(id: Id, newShape: QuadTree[Option[Material]]) => {
-        // DEBUG
-        println(s"reshape $id")
+    case Reshape(id: Id, newShape: QuadTree[Option[Material]]) =>
         tryReplace(id, getObj(id).withShape(newShape))
-    }
     // Physics events
     case SetVelocity(id: Id, newVelocity: Point) =>
         tryReplace(id, getObj(id).withState(Moving(newVelocity)))

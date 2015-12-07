@@ -2,7 +2,7 @@ package com.blevinstein.qt.sim
 
 import com.blevinstein.geom.Point
 import com.blevinstein.qt.{QuadTree,QuadRectangle,QuadAddr,QuadOffset}
-import com.blevinstein.qt.sim.Operators.avgOp;
+import com.blevinstein.qt.sim.Operators.{addOp,avgOp};
 
 // Immutable container object for holding information about an object.
 //
@@ -31,6 +31,9 @@ class QuadObject(val position: QuadRectangle,
 
   def withShape(newShape: QuadTree[Option[Material]]): QuadObject =
       new QuadObject(position, newShape, state)
+
+  def addShape(mask: QuadTree[Option[Material]]): QuadObject =
+      new QuadObject(position, addOp(shape, mask), state)
 
   def withState(newState: State): QuadObject =
       new QuadObject(position, shape, newState)

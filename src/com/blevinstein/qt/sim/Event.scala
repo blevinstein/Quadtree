@@ -4,7 +4,8 @@ import com.blevinstein.geom.Point
 import com.blevinstein.qt.{QuadOffset,QuadTree}
 
 abstract class Event
-case class Add(id: Id, obj: QuadObject) extends Event
+case class Add(newId: Id, obj: QuadObject) extends Event
+case class AddShape(id: Id, newShape: QuadTree[Option[Material]]) extends Event
 case class MoveBy(id: Id, deltaPosition: QuadOffset) extends Event
 case class MoveTo(id: Id, newPosition: QuadOffset) extends Event
 case class Remove(id: Id) extends Event

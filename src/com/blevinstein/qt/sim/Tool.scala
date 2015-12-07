@@ -1,7 +1,7 @@
 package com.blevinstein.qt.sim
 
 import com.blevinstein.geom.Point
-import com.blevinstein.qt.{QuadAddr,QuadRectangle}
+import com.blevinstein.qt.{QuadAddr,QuadRectangle,QuadTree}
 
 import java.awt.Color
 import java.awt.event.MouseEvent
@@ -128,15 +128,21 @@ case class GrowTool(prefix: List[Input]) extends Tool {
                     find((newRect) => newRect.toRectangle.contains(pointB))
                         match {
                   case Some(newRect: QuadRectangle) => {
-                      // DEBUG
-                      println(s"add ${newRect.withRespectTo(obj.position)}")
-
                       (List(), List(
                           // Reshape the containing object, copying [material]
                           // into [newRect].
                           // NOTE: This will happily overrwrite existing nodes
                           // in the source object, although it will fail if this
                           // would cause a collision with another object.
+                          AddShape(
+                              id,
+                              new QuadTree.Builder[Option[Material]](None)
+                                  .addAll(
+                                      newRect.withRespectTo(obj.position),
+                                      Some(material))
+                                  .build)))
+                          /*
+                          TODO: diagnose why this doesn't work
                           Reshape(
                               id,
                               obj.shape.toBuilder
@@ -144,6 +150,7 @@ case class GrowTool(prefix: List[Input]) extends Tool {
                                       newRect.withRespectTo(obj.position),
                                       Some(material))
                                   .build)))
+                          */
                   }
                   case None => Tool.Noop // Invalid second location
                 }
