@@ -172,44 +172,41 @@ object Driver extends App {
     gl.glViewport(0, 0, width, height)
   }
 
+  // Drawing subroutines
+
+  // TODO: add isOnScreen check
+  // TODO: add DrawRegion?
+  def draw(gl: GL2, drawable: Drawable): Unit = drawable match {
+      case FillRect(color, rect) => {
+          setColor(gl, color)
+          setFill(gl, true)
+          val screenRect =
+              (rect - center) * LayoutManager.screen.size / zoom +
+                  LayoutManager.screen.center
+          gl.glRectf(
+              screenRect.min.x,
+              screenRect.min.y,
+              screenRect.max.x,
+              screenRect.max.y)
+        }
+    }
+
+  def drawAll(gl: GL2, drawables: Iterable[Drawable]): Unit =
+      drawables.foreach((drawable) => draw(gl, drawable))
+
+  def setColor(gl: GL2, c: Color): Unit =
+    gl.glColor4d(
+      c.getRed() / 255.0,
+      c.getGreen() / 255.0,
+      c.getBlue() / 255.0,
+      c.getAlpha() / 255.0)
+
+  def setFill(gl: GL2, fill: Boolean): Unit =
+    gl.glPolygonMode(GL_FRONT_AND_BACK, if (fill) GL_FILL else GL_LINE)
+
   var zoom = 1f
   var center = Point.zero
   def render(gl: GL2): Unit = {
-    // drawing subroutines
-    def setColor(c: Color): Unit = {
-      gl.glColor4d(c.getRed() / 255.0,
-        c.getGreen() / 255.0,
-        c.getBlue() / 255.0,
-        c.getAlpha() / 255.0)
-    }
-    def setFill(fill: Boolean): Unit = {
-      gl.glPolygonMode(GL_FRONT_AND_BACK, if (fill) GL_FILL else GL_LINE)
-    }
-    // TODO: center on figure
-    // TODO: add isOnScreen check
-    def drawRect(rect: Rectangle): Unit = {
-      val screenRect =
-          (rect - center) * LayoutManager.screen.size / zoom +
-              LayoutManager.screen.center
-      gl.glRectf(screenRect.min.x, screenRect.min.y,
-          screenRect.max.x, screenRect.max.y)
-    }
-    def drawAll(rects: Iterable[(Rectangle, Color)]) {
-      // fill
-      setFill(true)
-      rects.foreach { case (rect, color) =>
-        setColor(color)
-        drawRect(rect)
-      }
-      // outline in black
-      // TODO: implement outline only where material changes, use getRegions?
-      // TODO: getBorders(region: List[QuadAddr/QuadRectangle]):
-      //     List[(Quadffset, QuadOffset)]
-      //setFill(false)
-      //setColor(Color.BLACK)
-      //rects.foreach { case (rect, color) => drawRect(rect) }
-    }
-
     gl.glClear(GL_COLOR_BUFFER_BIT)
 
     // Short-circuit if world is uninitialized
@@ -225,23 +222,20 @@ object Driver extends App {
     center = figure.center.toPoint
 
     // draw background
-    setFill(true)
-    setColor(Color.GRAY)
+    setFill(gl, true)
+    setColor(gl, Color.GRAY)
     gl.glRectf(0, 0, width, height)
 
     // draw world
-    var rects = List[(Rectangle,Color)]()
+    var rects: List[Drawable] = List()
     world.iter((objId, quadRect, mat) => {
-      rects = (quadRect.toRectangle, mat.color) :: rects
+      rects = FillRect(mat.color, quadRect.toRectangle) :: rects
     })
-    drawAll(rects)
+    drawAll(gl, rects)
 
     for (tool <- toolbelt) {
       if (tool.trigger(world, getInput)) {
-        val cursorRects = tool.activate(world, getInput)
-        // TODO: refactor to allow different colors for different tools
-        drawAll(
-            for (rect <- cursorRects) yield (rect.toRectangle, Color.YELLOW))
+        drawAll(gl, tool.activate(world, getInput))
       }
       if (tool.clear(world, getInput)) {
         inputStack.clear()
