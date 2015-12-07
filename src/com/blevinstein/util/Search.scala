@@ -8,6 +8,7 @@ import scala.collection.mutable.HashSet
  * BFS/DFS, floodfill, or A*.
  */
 object Search {
+  // DFS floodfill
   def floodfill[Node](start: Node, neighbors: Node => Iterable[Node]):
       List[Node] = {
     val visited = new HashSet[Node]()
