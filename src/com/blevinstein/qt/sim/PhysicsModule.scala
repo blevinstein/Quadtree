@@ -8,7 +8,7 @@ class PhysicsModule extends WorldModule {
 
   var gravity = Point.zero
 
-  def getEvents(world: World) = {
+  def getEvents(world: World): Iterable[Event] = {
     world.objs.
       flatMap { case (id, obj) =>
         obj.state match {
