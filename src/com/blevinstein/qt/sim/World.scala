@@ -3,6 +3,7 @@ package com.blevinstein.qt.sim
 import com.blevinstein.geom.{Point,Rectangle}
 import com.blevinstein.qt.{QuadAddr,QuadTree,QuadLeaf,QuadRectangle,QuadOffset}
 import com.blevinstein.qt.sim.Operators.{anyOp,collideOp}
+import com.blevinstein.util.Find.findMap
 
 trait WorldModule {
   def getEvents(world: World): Iterable[Event]
@@ -36,23 +37,44 @@ class World(val objs: Map[Id, QuadObject], val modules: List[WorldModule]) {
     }
   }
 
-  def find(point: Point): Option[(Id, QuadRectangle, Material)] = {
-    for ((id, obj) <- objs) {
-      // bounds check
-      if (obj.position.toRectangle.contains(point)) {
-        // geometry check
-        val addr =
-            obj.shape.getAddr(point withRespectTo obj.position.toRectangle)
-        obj.shape.getData(addr) match {
-          case Some(material: Material) =>
-            return Some(
-                (id, addr.toQuadRectangle within obj.position, material))
-          case None => ()
-        }
-      }
-    }
-    return None
-  }
+  // Try to find an object with a leaf node containing the given point
+  def find(point: Point): Option[(Id, QuadRectangle, Material)] =
+      findMap(objs, (tuple: (Id, QuadObject)) => tuple match { case (id, obj) =>
+          // bounds check
+          if (obj.position.toRectangle.contains(point)) {
+            // geometry check
+            val addr =
+                obj.shape.getAddr(point withRespectTo obj.position.toRectangle)
+            obj.shape.getData(addr) match {
+              case Some(material: Material) =>
+                  Some((id, addr.toQuadRectangle within obj.position, material))
+              case None => None
+            }
+          } else {
+            None
+          }})
+
+  // Try to find an object with a region containing the given point
+  def findRegion(point: Point): Option[(Id, List[QuadRectangle], Material)] =
+    findMap(objs, (tuple: (Id, QuadObject)) => tuple match { case (id, obj) =>
+        // bounds check
+        if (obj.position.toRectangle.contains(point)) {
+          // geometry check
+          obj.shape.getRegions.
+              find { case (material, addrs) =>
+                  addrs.exists((addr) =>
+                      addr.toQuadRectangle.toRectangle.contains(
+                          point.withRespectTo(obj.position.toRectangle)))
+              } match {
+                case Some((Some(material), addrs: List[QuadAddr])) => Some((
+                        id,
+                        addrs.map((addr) => addr.toQuadRectangle within obj.position),
+                        material))
+                case _ => None
+              }
+        } else {
+          None
+        }})
 
   // Process all events recursively, handling emitted events
   def afterAllEvents(event: Event): World = afterEvent(event) match {
