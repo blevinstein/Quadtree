@@ -86,7 +86,7 @@ case class GrowTool(prefix: List[Input]) extends Tool {
         tail if tail startsWith prefix => {
             world.find(pointA) match {
                 case Some((id, rect, material)) =>
-                    (List(FillRect(Color.YELLOW, rect.toRectangle)), List())
+                    (List(FillRect(Color.GREEN, rect.toRectangle)), List())
                 case None => Tool.Noop
             }
         }
@@ -104,9 +104,9 @@ case class GrowTool(prefix: List[Input]) extends Tool {
                           // Draw growth possibilities in yellow, green when the
                           // user hovers over them.
                           if (newRect.toRectangle.contains(pointB)) {
-                            Color.GREEN
+                            Color.BLUE
                           } else {
-                            Color.YELLOW
+                            Color.GREEN
                           },
                           newRect.toRectangle)), List())
               case None => Tool.Noop
@@ -124,10 +124,17 @@ case class GrowTool(prefix: List[Input]) extends Tool {
                 val obj = world.getObj(id)
                 // From there, this tool allows us to "grow" in any direction by
                 // copying [material] into an adjacent [newRect]
+
+                // DEBUG
+                println(s"look around $rect")
+
                 growthPossibilities(rect).
                     find((newRect) => newRect.toRectangle.contains(pointB))
                         match {
-                  case Some(newRect: QuadRectangle) =>
+                  case Some(newRect: QuadRectangle) => {
+                      // DEBUG
+                      println(s"add ${newRect.withRespectTo(obj.position)}")
+
                       (List(), List(
                           // Reshape the containing object, copying [material]
                           // into [newRect].
@@ -141,6 +148,7 @@ case class GrowTool(prefix: List[Input]) extends Tool {
                                       newRect.withRespectTo(obj.position),
                                       Some(material))
                                   .build)))
+                  }
                   case None => Tool.Noop // Invalid second location
                 }
             case None => Tool.Noop // No rect at first location
