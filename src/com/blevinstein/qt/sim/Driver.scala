@@ -299,9 +299,7 @@ object Driver extends App {
 
     override def keyReleased(e: KeyEvent): Unit = {
       println(s"keyReleased: ${e.getKeyCode()}")
-      keysDown.synchronized {
-        keysDown -= e.getKeyCode()
-      }
+      keysDown -= e.getKeyCode()
     }
   }
 
