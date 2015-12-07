@@ -276,7 +276,7 @@ object Driver extends App {
   }
 
   object KeyListener extends KeyAdapter {
-    var keysDown: Set[Int] = Set()
+    private var keysDown: Set[Int] = Set()
 
     val inputStackBlacklist = Set(
         KeyEvent.VK_A,
