@@ -57,6 +57,8 @@ case class DeleteTool(prefix: List[Input]) extends Tool {
   }
 }
 
+// TODO: Enable GrowTool to grow beyond obj.position. Requires simultaneously
+// enlarging position and changing shape of obj.
 case class GrowTool(prefix: List[Input]) extends Tool {
   // NOTE: input is in a stack, so the last input is first in the list. Thus,
   // we have (MouseInput(pointB), MouseInput(pointA), prefix, ...) but the
