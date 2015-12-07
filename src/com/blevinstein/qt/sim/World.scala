@@ -151,14 +151,22 @@ class World {
   }
 
   // Helper method for checking whether two objects collide
-  def collidesWith(a: QuadObject, b: QuadObject): Boolean =
-      if (anyOp(collideOp(
-          a.toQuadTree(a.position),
-          b.toQuadTree(a.position)))) {
-        true
-      } else {
-        false
-      }
+  def collidesWith(a: QuadObject, b: QuadObject): Boolean = {
+    // Choose the smaller region to check for collision
+    val checkRegion: QuadRectangle =
+        if (a.position.toRectangle.area < b.position.toRectangle.area) {
+          a.position
+        } else {
+          b.position
+        }
+    if (anyOp(collideOp(
+        a.toQuadTree(checkRegion),
+        b.toQuadTree(checkRegion)))) {
+      true
+    } else {
+      false
+    }
+  }
 
   // overrides
 
