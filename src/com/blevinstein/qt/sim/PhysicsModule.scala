@@ -8,19 +8,15 @@ class PhysicsModule extends WorldModule {
 
   var gravity = Point.zero
 
-  def update(world: World): Unit = {
-    for ((id, obj) <- world.objs) obj.state match {
-      case Fixed => Unit
-      case Moving(v) => {
-        if (world.moveBy(id, QuadOffset.approx(v, moveResolution))) {
-          world.accel(id, gravity)
-        } else {
-          // TODO: instead of just halving velocity, check whether colliding
-          // with Fixed or Moving objects, try to update velocities of Moving
-          // objects to synchronize
-          world.objs.put(id, obj.withState(Moving(v / 2)))
+  def getEvents(world: World) = {
+    world.objs.
+      flatMap { case (id, obj) =>
+        obj.state match {
+          case Fixed => List()
+          case Moving(v) => List(
+              MoveBy(id, QuadOffset.approx(v, moveResolution)),
+              Accel(id, gravity))
         }
       }
-    }
   }
 }

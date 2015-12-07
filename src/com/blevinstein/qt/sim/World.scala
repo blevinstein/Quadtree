@@ -4,25 +4,22 @@ import com.blevinstein.geom.{Point,Rectangle}
 import com.blevinstein.qt.{QuadAddr,QuadTree,QuadLeaf,QuadRectangle,QuadOffset}
 import com.blevinstein.qt.sim.Operators.{anyOp,collideOp}
 
-import scala.collection.mutable.HashMap
-
 trait WorldModule {
-  def update(world: World): Unit
+  def getEvents(world: World): Iterable[Event]
 }
 
 // Mutable class describing a group of [objs] in space.
 //
 // Each object is defined as a QuadTree[Option[T]], so that we have a concept of
 // empty space for collision.
-class World {
-  var modules: List[WorldModule] = List()
+class World(val objs: Map[Id, QuadObject], val modules: List[WorldModule]) {
+  def this() = this(Map(), List())
 
-  def install(module: WorldModule): World = {
-    modules = module :: modules
-    this
-  }
+  def withObjs(newObjs: Map[Id, QuadObject]) =
+      new World(newObjs, modules)
 
-  val objs: HashMap[Id, QuadObject] = new HashMap
+  def install(module: WorldModule): World =
+      new World(objs, module :: modules)
 
   def getObj(id: Id): QuadObject = {
     require(objs.contains(id), s"objs does not contain id: $id")
@@ -57,66 +54,77 @@ class World {
     return None
   }
 
-  def update: Unit = {
-    modules.foreach((module) => module.update(this))
+  // Process all events recursively, handling emitted events
+  def afterAllEvents(event: Event): World = afterEvent(event) match {
+    case (newWorld, events) =>
+        events.foldLeft(newWorld)((w: World, e: Event) => w.afterAllEvents(e))
   }
 
-  // Modification functions
+  def afterEvent(event: Event): (World, Iterable[Event]) = event match {
+    case Add(newId: Id, newObj: QuadObject) =>
+        if (collideWithAll(newObj).isEmpty) {
+          (withObjs(objs + ((newId, newObj))), List())
+        } else {
+          (this, List(Failed(event)))
+        }
+    case MoveBy(id: Id, offset: QuadOffset) =>
+        tryReplace(id, getObj(id).withOffset(offset))
+    case MoveTo(id: Id, newPosition: QuadOffset) =>
+        tryReplace(id, getObj(id).withPosition(newPosition))
+    case Remove(id: Id) => (withObjs(objs - id), List())
+    case Reshape(id: Id, newShape: QuadTree[Option[Material]]) =>
+        tryReplace(id, getObj(id).withShape(newShape))
+    // Physics events
+    case SetVelocity(id: Id, newVelocity: Point) =>
+        tryReplace(id, getObj(id).withState(Moving(newVelocity)))
+    case SetFixed(id: Id) =>
+        tryReplace(id, getObj(id).withState(Fixed))
+    case Accel(id: Id, deltaVelocity: Point) => {
+        val obj = getObj(id)
+        obj.state match {
+          case Moving(v) =>
+              tryReplace(id, obj.withState(Moving(v + deltaVelocity)))
+          case Fixed => ???
+        }
+      }
+    // Feedback/emitted events
+    // TODO: instead of setting velocity to zero on collision, try setting only
+    // velocity.x or velocity.y to zero, to enable "sliding".
+    case Collision(idA: Id, idB: Id) => {
+        val objA = getObj(idA)
+        val objB = getObj(idB)
+        (objA.state, objB.state) match {
+          case (Moving(velA), Fixed) =>
+              (this, List(SetVelocity(idA, Point.zero)))
+          case (Moving(velA), Moving(velB)) => {
+              // TODO: calculate mass, preserve avg momentum not avg velocity
+              val newVelocity = (velA + velB) / 2
+              (this, List(
+                  SetVelocity(idA, newVelocity),
+                  SetVelocity(idB, newVelocity)))
+            }
+        }
+      }
+    case Failed(event: Event) => {
+        println(s"Failed Event: $event")
+        (this, List())
+      }
+  }
 
-  // Returns the Id of the added object, or None
-  def add(newObj: QuadObject): Option[Id] = {
-    val collision = !collideWithAll(newObj).isEmpty
+  def update: World =
+      process(modules.flatMap((module) => module.getEvents(this)))
 
-    if (collision) {
-      None
+  def process(events: Iterable[Event]): World = {
+    events.foldLeft(this)((w: World, e: Event) => w.afterAllEvents(e))
+  }
+
+  def tryReplace(id: Id, newObject: QuadObject): (World, Iterable[Event]) = {
+    val collisions = collideWithAll(newObject, Set(id))
+    if (collisions.isEmpty) {
+      (withObjs(objs + ((id, newObject))), List())
     } else {
-      val objId = Id.get
-      objs.put(objId, newObj)
-      Some(objId)
+      (this, collisions.map((otherId) => Collision(id, otherId)))
     }
-  }
-
-  // Returns true if the object moves
-  def moveTo(id: Id, position: QuadOffset): Boolean =
-      tryReplace(id, getObj(id).withPosition(position))
-
-  // Returns true if the object moves
-  def moveBy(id: Id, offset: QuadOffset): Boolean =
-      tryReplace(id, getObj(id).withOffset(offset))
-
-  // Returns true if the object is be resized
-  def reshape(id: Id, newShape: QuadTree[Option[Material]]): Boolean =
-      tryReplace(id, getObj(id).withShape(newShape))
-
-  // Returns true if the object is replaced
-  // Provides the underlying implementation for [moveTo], [moveBy], [reshape]...
-  def tryReplace(id: Id, newObject: QuadObject): Boolean = {
-    if (collideWithAll(newObject, Set(id)).isEmpty) {
-      objs.put(id, newObject)
-      true
-    } else {
-      false
-    }
-  }
-
-  // Physics: change Moving object's velocity by [deltaVelocity]
-  def accel(id: Id, deltaVelocity: Point): Unit = {
-    val obj = getObj(id)
-    require(obj.state != Fixed, "Can't change velocity of a Fixed object.")
-    obj.state match {
-      case Moving(v) => objs.put(id, obj.withState(Moving(v + deltaVelocity)))
-    }
-  }
-
-  // Physics: set Moving object's velocity to [newVelocity]
-  def setVelocity(id: Id, newVelocity: Point): Unit = {
-    val obj = getObj(id)
-    require(obj.state != Fixed, "Can't change velocity of a Fixed object.")
-    objs.put(id, obj.withState(Moving(newVelocity)))
-  }
-
-  def destroy(id: Id): Unit = {
-    objs.remove(id)
   }
 
   // Helper method for static contact checking with all other objects.
@@ -135,10 +143,11 @@ class World {
     contacts
   }
 
+  def canReplace(id: Id, newObject: QuadObject): Boolean =
+      collideWithAll(newObject, Set(id)).isEmpty
+
   // Helper method for checking whether an object collides with any other
   // object (i.e. has an impermissible overlap).
-  // [tryReplace] will fail if the new object would "collide" with any other
-  // existing object.
   def collideWithAll(obj: QuadObject, exclude: Set[Id] = Set()): List[Id] = {
     var collisions = List[Id]()
     for ((id, otherObj) <- objs if !exclude.contains(id))

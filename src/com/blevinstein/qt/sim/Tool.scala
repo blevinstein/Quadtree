@@ -6,8 +6,12 @@ import com.blevinstein.qt.{QuadAddr,QuadRectangle}
 import java.awt.Color
 import java.awt.event.MouseEvent
 
+object Tool {
+  val Noop = (List(), List())
+}
 trait Tool {
-  def activate(world: World, input: List[Input]): Iterable[Drawable]
+  def activate(world: World, input: List[Input]):
+      (Iterable[Drawable], Iterable[Event])
   def clear(world: World, input: List[Input]): Boolean
   def trigger(world: World, input: List[Input]): Boolean
 }
@@ -30,20 +34,21 @@ object DeleteTool extends Tool {
     case MouseInput(point: Point, MouseInput.HOVER) :: _ =>
         world.find(point) match {
           case Some((id, rect, mat)) =>
-              List(FillRect(Color.YELLOW, rect.toRectangle))
-          case None => List()
+              (List(FillRect(Color.YELLOW, rect.toRectangle)), List())
+          case None => Tool.Noop
         }
     case MouseInput(point: Point, MouseEvent.BUTTON1) :: _ =>
         world.find(point) match {
           case Some((id, rect, mat)) => {
             val obj = world.getObj(id)
-            world.reshape(id,
-                obj.shape.toBuilder
-                    .addAll(rect.withRespectTo(obj.position), None)
-                    .build)
-            List()
+            (List(), List(
+                Reshape(
+                    id,
+                    obj.shape.toBuilder
+                        .addAll(rect.withRespectTo(obj.position), None)
+                        .build)))
           }
-          case None => List()
+          case None => Tool.Noop
         }
     case _ => ???
   }

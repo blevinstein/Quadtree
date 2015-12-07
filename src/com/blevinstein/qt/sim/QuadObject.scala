@@ -89,5 +89,8 @@ class QuadObject(val position: QuadRectangle,
   def getMass: Float = {
     avgOp(densityOp(shape)) * position.toRectangle.area
   }
+
+  override def toString: String =
+      s"QuadObject(pos=$position, state=$state, shape=$shape)"
 }
 

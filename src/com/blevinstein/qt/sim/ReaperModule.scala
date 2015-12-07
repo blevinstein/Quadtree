@@ -11,15 +11,14 @@ class ReaperModule extends WorldModule {
       new Rectangle(new Point(ninf, ninf), new Point(inf, inf))
 
   // Reaper function. By default, moves object back to origin.
-  var reaper = (world: World, id: Id, obj: QuadObject) => {
-    world.moveTo(id, QuadOffset.half)
-    world.setVelocity(id, Point.zero)
-  }
+  var reaper: (World, Id, QuadObject) => Iterable[Event] =
+      (world: World, id: Id, obj: QuadObject) =>
+          List(MoveTo(id, QuadOffset.half), SetVelocity(id, Point.zero))
 
-  def update(world: World) {
-    for ((id, obj) <- world.objs
-         if !boundingRectangle.contains(obj.center.toPoint)) {
-      reaper(world, id, obj)
-    }
+  def getEvents(world: World): Iterable[Event] = {
+    world.objs.
+        filter { case (id, obj) =>
+            !boundingRectangle.contains(obj.center.toPoint) }.
+        flatMap { case (id, obj) => reaper(world, id, obj) }
   }
 }

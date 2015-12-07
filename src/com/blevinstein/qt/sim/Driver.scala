@@ -50,7 +50,7 @@ import scala.util.control.Breaks._
 // TODO: Think about better ways of handling degredation when framerate < [FPS]
 //
 // TODO: Debug freezing on osx (stops receiving [KeyEvent]s)
-object Driver extends App {
+object Driver extends App with Runnable {
   val FPS: Int = 30
   // Dimensions of the screen
   var height: Int = 1
@@ -90,33 +90,41 @@ object Driver extends App {
   val reaper = new ReaperModule
   reaper.boundingRectangle = new Rectangle(new Point(-5, -5), new Point(5, 5))
 
-  var world = (new World).
+  var world = new World().
       install(physics).
       install(reaper)
 
   val figureShape =
       ImageHelper.createTreeFromImage(ImageIO.read(new File("data/figure.png")))
-  val figureId = world.add(new QuadObject(
-      (QuadRectangle.unit >> 3) + QuadOffset.half,
-      figureShape)).get
-  world.add(new QuadObject(
-      QuadRectangle.unit,
-      QuadTree.approx(6, (p) =>
-          if (p.y < 0.05) {
-            Material.Gray
-          } else {
-            Material.Empty
-          }),
-      Fixed)).get
-  world.add(new QuadObject(
-      QuadRectangle.unit + new QuadOffset(QuadLen.one, QuadLen.zero),
-      QuadTree.approx(6, (p) =>
-          if (p.y < p.x) {
-            Material.Gray
-          } else {
-            Material.Empty
-          }),
-      Fixed)).get
+  val figureId = Id.get
+
+  world = world.process(List(
+      Add(
+          figureId,
+          new QuadObject(
+              (QuadRectangle.unit >> 3) + QuadOffset.half, figureShape)),
+      Add(
+          Id.get,
+          new QuadObject(
+              QuadRectangle.unit,
+              QuadTree.approx(6, (p) =>
+                  if (p.y < 0.05) {
+                    Material.Gray
+                  } else {
+                    Material.Empty
+                  }),
+          Fixed)),
+      Add(
+          Id.get,
+          new QuadObject(
+              QuadRectangle.unit + new QuadOffset(QuadLen.one, QuadLen.zero),
+              QuadTree.approx(6, (p) =>
+                  if (p.y < p.x) {
+                    Material.Gray
+                  } else {
+                    Material.Empty
+                  }),
+              Fixed))))
 
   def run: Unit = {
     val throttle = new Throttle(FPS)
@@ -143,10 +151,10 @@ object Driver extends App {
         (if (KeyListener.keyDown(KeyEvent.VK_W)) up else Point.zero)
 
     if (contactsEnvironment) {
-      world.setVelocity(figureId, desiredVelocity)
+      world = world.process(List(SetVelocity(figureId, desiredVelocity)))
     }
 
-    world.update
+    world = world.update
   }
 
   // DEBUGGING ROUTINES
@@ -235,7 +243,12 @@ object Driver extends App {
 
     for (tool <- toolbelt) {
       if (tool.trigger(world, getInput)) {
-        drawAll(gl, tool.activate(world, getInput))
+        tool.activate(world, getInput) match {
+          case (drawables, events) => {
+            drawAll(gl, drawables)
+            world = world.process(events)
+          }
+        }
       }
       if (tool.clear(world, getInput)) {
         inputStack.clear()
@@ -371,6 +384,6 @@ object Driver extends App {
     }
   }
 
-  run
+  new Thread(this).start
 }
 
