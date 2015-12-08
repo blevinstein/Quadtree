@@ -16,6 +16,11 @@ trait WorldModule {
 class World(val objs: Map[Id, QuadObject], val modules: List[WorldModule]) {
   def this() = this(Map(), List())
 
+  val moveRes = -6
+
+  def velToOffset(velocity: Point): QuadOffset =
+      QuadOffset.approx(velocity, moveRes)
+
   def withObjs(newObjs: Map[Id, QuadObject]) =
       new World(newObjs, modules)
 
@@ -120,13 +125,23 @@ class World(val objs: Map[Id, QuadObject], val modules: List[WorldModule]) {
     // TODO: instead of setting velocity to zero on collision, try setting only
     // velocity.x or velocity.y to zero, to enable "sliding".
     case Collision(idA: Id, idB: Id) => {
+        def arrestMotion(id: Id, vel: Point): Point = {
+          val obj = getObj(id)
+          if (canReplace(id, obj.withOffset(velToOffset(vel.xComp)))) {
+            vel.xComp
+          } else if (canReplace(id, obj.withOffset(velToOffset(vel.yComp)))) {
+            vel.yComp
+          } else {
+            Point.zero
+          }
+        }
         val objA = getObj(idA)
         val objB = getObj(idB)
         (objA.state, objB.state) match {
           case (Moving(velA), Fixed) =>
-              (this, List(SetVelocity(idA, Point.zero)))
+              (this, List(SetVelocity(idA, arrestMotion(idA, velA))))
           case (Fixed, Moving(velB)) =>
-              (this, List(SetVelocity(idB, Point.zero)))
+              (this, List(SetVelocity(idB, arrestMotion(idB, velB))))
           case (Moving(velA), Moving(velB)) => {
               // TODO: calculate mass, preserve avg momentum not avg velocity
               val newVelocity = (velA + velB) / 2

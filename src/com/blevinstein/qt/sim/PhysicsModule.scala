@@ -4,8 +4,6 @@ import com.blevinstein.geom.Point
 import com.blevinstein.qt.QuadOffset
 
 class PhysicsModule extends WorldModule {
-  val moveResolution = -6
-
   var gravity = Point.zero
 
   def getEvents(world: World): Iterable[Event] = {
@@ -14,7 +12,7 @@ class PhysicsModule extends WorldModule {
         obj.state match {
           case Fixed => List()
           case Moving(v) => List(
-              MoveBy(id, QuadOffset.approx(v, moveResolution)),
+              MoveBy(id, world.velToOffset(v)),
               Accel(id, gravity))
         }
       }

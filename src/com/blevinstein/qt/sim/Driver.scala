@@ -146,13 +146,18 @@ object Driver extends App with Runnable {
     val figure = world.getObj(figureId)
     val contactsEnvironment = !world.contactsWithAll(figureId).isEmpty
 
-    val desiredVelocity = Point.zero +
-        (if (KeyListener.keyDown(KeyEvent.VK_A)) left else Point.zero) +
-        (if (KeyListener.keyDown(KeyEvent.VK_D)) right else Point.zero) +
-        (if (KeyListener.keyDown(KeyEvent.VK_W)) up else Point.zero)
+    if (KeyListener.keyDown(KeyEvent.VK_W) ||
+        KeyListener.keyDown(KeyEvent.VK_A) ||
+        KeyListener.keyDown(KeyEvent.VK_S) ||
+        KeyListener.keyDown(KeyEvent.VK_D)) {
+      val desiredVelocity = Point.zero +
+          (if (KeyListener.keyDown(KeyEvent.VK_A)) left else Point.zero) +
+          (if (KeyListener.keyDown(KeyEvent.VK_D)) right else Point.zero) +
+          (if (KeyListener.keyDown(KeyEvent.VK_W)) up else Point.zero)
 
-    if (contactsEnvironment) {
-      world = world.process(List(SetVelocity(figureId, desiredVelocity)))
+      if (contactsEnvironment) {
+        world = world.process(List(SetVelocity(figureId, desiredVelocity)))
+      }
     }
 
     world = world.update

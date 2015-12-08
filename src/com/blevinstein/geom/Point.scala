@@ -14,6 +14,9 @@ class Point(val x: Float, val y: Float) {
   def *(other: Point): Point = new Point(x * other.x, y * other.y)
   def /(other: Point): Point = new Point(x / other.x, y / other.y)
 
+  def xComp: Point = new Point(x, 0)
+  def yComp: Point = new Point(0, y)
+
   // Transforms [this] from unit rectangle to [rect]
   def within(rect: Rectangle): Point =
       this * rect.size + rect.min
