@@ -67,9 +67,10 @@ class World(val objs: Map[Id, QuadObject], val modules: List[WorldModule]) {
                           point.withRespectTo(obj.position.toRectangle)))
               } match {
                 case Some((Some(material), addrs: List[QuadAddr])) => Some((
-                        id,
-                        addrs.map((addr) => addr.toQuadRectangle within obj.position),
-                        material))
+                    id,
+                    addrs.map((addr) =>
+                        addr.toQuadRectangle within obj.position),
+                    material))
                 case _ => None
               }
         } else {
@@ -150,7 +151,7 @@ class World(val objs: Map[Id, QuadObject], val modules: List[WorldModule]) {
   // Process a list of events by by calling [afterAllEvents] on each input
   // event.
   def process(events: Iterable[Event]): World =
-    events.foldLeft(this)((w: World, e: Event) => w.afterAllEvents(e))
+      events.foldLeft(this)((w: World, e: Event) => w.afterAllEvents(e))
 
   // Considers creating a world where object [id] is replaced by [newObject]. If
   // that world is not legal (e.g. if any two objects are overlapping), will
@@ -166,8 +167,9 @@ class World(val objs: Map[Id, QuadObject], val modules: List[WorldModule]) {
   }
 
   // Helper method for static contact checking with all other objects.
-  def contactsWithAll(id: Id): List[(Id, QuadRectangle, QuadRectangle)]
-      = contactsWithAll(getObj(id), Set(id))
+  def contactsWithAll(id: Id): List[(Id, QuadRectangle, QuadRectangle)] =
+      contactsWithAll(getObj(id), Set(id))
+
   // Get all contacts with objects in the world. "Contact" includes touching
   // along an edge or at a corner (a valid position).
   def contactsWithAll(obj: QuadObject, exclude: Set[Id] = Set()):
