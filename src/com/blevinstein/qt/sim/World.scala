@@ -182,17 +182,22 @@ class World(val objs: Map[Id, QuadObject], val modules: List[WorldModule]) {
   }
 
   // Helper method for static contact checking with all other objects.
-  def contactsWithAll(id: Id): List[(Id, QuadRectangle, QuadRectangle)] =
+  def contactsWithAll(id: Id): List[(Id, QuadAddr, QuadAddr)] =
       contactsWithAll(getObj(id), Set(id))
 
   // Get all contacts with objects in the world. "Contact" includes touching
   // along an edge or at a corner (a valid position).
   def contactsWithAll(obj: QuadObject, exclude: Set[Id] = Set()):
-      List[(Id, QuadRectangle, QuadRectangle)] = {
-    var contacts = List[(Id, QuadRectangle, QuadRectangle)]()
+      List[(Id, QuadAddr, QuadAddr)] = {
+    var contacts = List[(Id, QuadAddr, QuadAddr)]()
     for ((id, otherObj) <- objs if !exclude.contains(id)) {
       for ((rect, otherRect) <- obj.contacts(otherObj)) {
-        contacts = (id, rect, otherRect) :: contacts
+        ((rect withRespectTo obj.position).toAddressList,
+            (otherRect withRespectTo otherObj.position).toAddressList) match {
+          case (List(addr), List(otherAddr)) =>
+              (id, addr, otherAddr) :: contacts
+          case _ => ???
+        }
       }
     }
     contacts
