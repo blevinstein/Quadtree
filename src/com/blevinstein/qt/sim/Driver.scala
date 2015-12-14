@@ -130,9 +130,13 @@ object Driver extends App with Runnable {
   def run: Unit = {
     val throttle = new Throttle(FPS)
     while (true) {
-      mainLoop
-      glCanvas.display()
-      throttle.sleep
+      try {
+        mainLoop
+        glCanvas.display()
+        throttle.sleep
+      } catch {
+        case e: Throwable => println(s"Error: $e")
+      }
     }
   }
 
