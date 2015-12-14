@@ -212,6 +212,7 @@ abstract class QuadTree[+T] {
     var allAddresses = List[QuadAddr]()
     iter((addr, _) => allAddresses = addr :: allAddresses)
 
+    // NOTE: This implementation is O(N^3) where N = # of addresses.
     var graph = Map[QuadAddr, Set[QuadAddr]]()
     for (a <- allAddresses) {
       var neighbors = Set[QuadAddr]()
