@@ -16,7 +16,7 @@ trait WorldModule {
 class World(val objs: Map[Id, QuadObject], val modules: List[WorldModule]) {
   def this() = this(Map(), List())
 
-  val moveRes = -7
+  val moveRes = -6
 
   def velToOffset(velocity: Point): QuadOffset =
       QuadOffset.approx(velocity, moveRes)
