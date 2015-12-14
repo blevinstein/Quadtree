@@ -74,7 +74,8 @@ object Driver extends App with Runnable {
   // TODO: refactor toolbelt -> List, instead of 'active tool' apply all tools
   var toolbelt: List[Tool] = List(
     DeleteTool(List(KeyInput(KeyEvent.VK_X))),
-    GrowTool(List(KeyInput(KeyEvent.VK_G)))
+    GrowTool(List(KeyInput(KeyEvent.VK_G))),
+    CopyTool(List(KeyInput(KeyEvent.VK_C)))
   )
 
   // setup window
@@ -207,6 +208,20 @@ object Driver extends App with Runnable {
               screenRect.min.y,
               screenRect.max.x,
               screenRect.max.y)
+        }
+      case FillRegion(color, rects) => {
+          setColor(gl, color)
+          setFill(gl, true)
+          for (rect <- rects) {
+            val screenRect =
+                (rect - center) * LayoutManager.screen.size / zoom +
+                LayoutManager.screen.center
+            gl.glRectf(
+                screenRect.min.x,
+                screenRect.min.y,
+                screenRect.max.x,
+                screenRect.max.y)
+          }
         }
     }
 

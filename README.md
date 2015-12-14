@@ -15,6 +15,7 @@ WASD - Move the figure
 
 Tools:
 
+C *source* *dest* - CopyTool
 X *click* - DeleteTool
 G *source* *newRect* - GrowTool
 
