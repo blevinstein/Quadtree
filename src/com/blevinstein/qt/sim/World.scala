@@ -73,8 +73,7 @@ class World(val objs: Map[Id, QuadObject], val modules: List[WorldModule]) {
               } match {
                 case Some((Some(material), addrs: List[QuadAddr])) => Some((
                     id,
-                    addrs.map((addr) =>
-                        addr.toQuadRectangle within obj.position),
+                    addrs.map{_.toQuadRectangle within obj.position},
                     material))
                 case _ => None
               }
