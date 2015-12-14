@@ -208,6 +208,14 @@ object Driver extends App with Runnable {
               screenRect.min.y,
               screenRect.max.x,
               screenRect.max.y)
+          // TODO: use BLACK or WHITE depending on brightness of [color]
+          setColor(gl, Color.BLACK)
+          setFill(gl, false)
+          gl.glRectf(
+              screenRect.min.x,
+              screenRect.min.y,
+              screenRect.max.x,
+              screenRect.max.y)
         }
       case FillRegion(color, rects) => {
           setColor(gl, color)
@@ -261,6 +269,7 @@ object Driver extends App with Runnable {
     gl.glRectf(0, 0, width, height)
 
     // draw world
+    // TODO: use FillRegion instead of FillRect
     var rects: List[Drawable] = List()
     world.iter((objId, quadRect, mat) => {
       rects = FillRect(mat.color, quadRect.toRectangle) :: rects
