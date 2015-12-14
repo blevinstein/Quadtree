@@ -70,12 +70,12 @@ class QuadObject(val position: QuadRectangle,
       for (zone <- QuadZone.around(position)) {
         val thisTree = this.toQuadTree(zone.toQuadRectangle)
         val otherTree = other.toQuadTree(zone.toQuadRectangle)
-        thisTree.iter((a: QuadAddr, aMat: Option[Any]) => {
-          if (!aMat.isEmpty) {
-            otherTree.iter((b: QuadAddr, bMat: Option[Any]) => {
-              if (!bMat.isEmpty && (a touches b)) {
-                contactList = (a.toQuadRectangle + zone.min,
-                    b.toQuadRectangle + zone.min) :: contactList
+        thisTree.iter((thisAddr: QuadAddr, thisMat: Option[Any]) => {
+          if (!thisMat.isEmpty) {
+            otherTree.iter((otherAddr: QuadAddr, otherMat: Option[Any]) => {
+              if (!otherMat.isEmpty && (thisAddr touches otherAddr)) {
+                contactList = (thisAddr.toQuadRectangle + zone.min,
+                    otherAddr.toQuadRectangle + zone.min) :: contactList
               }
             })
           }
