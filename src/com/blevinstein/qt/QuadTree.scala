@@ -86,6 +86,13 @@ object QuadTree {
       this
     }
 
+    def addAllRects(rects: Iterable[QuadRectangle], data: T): Builder[T] = {
+      for (rect <- rects) {
+        addAll(rect, data)
+      }
+      this
+    }
+
     def build: QuadTree[T] = {
       def build_recur(addr: QuadAddr): QuadTree[T] = {
         val exactPieces = pieces.filter(_._1 == addr)
