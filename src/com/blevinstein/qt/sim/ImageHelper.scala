@@ -10,17 +10,18 @@ object ImageHelper {
   val colorToMaterial: QuadTree[Color] => QuadTree[Option[Material]] =
       QuadTree.transform((color: Color) =>
           if (color.getAlpha() > 0) {
-            Some(new Material(color, color.getAlpha() / 255f))
+            Some(Material(color, color.getAlpha() / 255f))
           } else {
             None
           })
 
   def createColor(argb: Int): Color = {
+    val bitmask = 0xFF
     new Color(
-        argb >> 16 & 0xFF,
-        argb >> 8 & 0xFF,
-        argb & 0xFF,
-        argb >> 24 & 0xFF)
+        argb >> 16 & bitmask,
+        argb >> 8 & bitmask,
+        argb & bitmask,
+        argb >> 24 & bitmask)
   }
 
   def createTreeFromImage(image: BufferedImage): QuadTree[Option[Material]] = {

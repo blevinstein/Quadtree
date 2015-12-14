@@ -9,8 +9,8 @@ import java.awt.Color
 
 object Material {
   val Empty: Option[Material] = None
-  val Gray = Some(new Material(Color.LIGHT_GRAY, 1f))
-  val Blue = Some(new Material(Color.BLUE, 1f))
+  val Gray = Some(Material(Color.LIGHT_GRAY, 1f))
+  val Blue = Some(Material(Color.BLUE, 1f))
 }
-class Material(val color: Color, val density: Float)
+case class Material(color: Color, density: Float)
 
