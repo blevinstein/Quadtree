@@ -34,5 +34,7 @@ Features
 Cleanup
 -------
 
+- Write a wrapper around Color. Offer better support for HSV?
+
 - Add message to every require() call
 
