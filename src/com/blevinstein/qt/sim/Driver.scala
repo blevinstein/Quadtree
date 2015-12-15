@@ -243,6 +243,7 @@ object Driver extends App with Runnable {
 
   def setLineWidth(gl: GL2, width: Float) = gl.glLineWidth(width)
 
+  // TODO: refactor (center, zoom) into object Camera?
   var zoom = 1f
   var center = Point.zero
   def render(gl: GL2): Unit = {
