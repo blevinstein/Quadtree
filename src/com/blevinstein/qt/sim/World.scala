@@ -194,7 +194,7 @@ class World(val objs: Map[Id, QuadObject], val modules: List[WorldModule]) {
         ((rect withRespectTo obj.position).toAddressList,
             (otherRect withRespectTo otherObj.position).toAddressList) match {
           case (List(addr), List(otherAddr)) =>
-              (id, addr, otherAddr) :: contacts
+              contacts = (id, addr, otherAddr) :: contacts
           case _ => ???
         }
       }

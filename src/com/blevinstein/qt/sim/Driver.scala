@@ -200,9 +200,7 @@ object Driver extends App with Runnable {
       case FillRect(color, rect) => {
           setColor(gl, color)
           setFill(gl, true)
-          val screenRect =
-              (rect - center) * LayoutManager.screen.size / zoom +
-                  LayoutManager.screen.center
+          val screenRect = worldToScreen(rect)
           gl.glRectf(
               screenRect.min.x,
               screenRect.min.y,
@@ -219,11 +217,9 @@ object Driver extends App with Runnable {
         }
       case FillRegion(color, rects) => {
           setColor(gl, color)
-          setFill(gl, true)
+          setFill(gl, false)
           for (rect <- rects) {
-            val screenRect =
-                (rect - center) * LayoutManager.screen.size / zoom +
-                LayoutManager.screen.center
+            val screenRect = worldToScreen(rect)
             gl.glRectf(
                 screenRect.min.x,
                 screenRect.min.y,
@@ -233,8 +229,11 @@ object Driver extends App with Runnable {
         }
     }
 
+
   def drawAll(gl: GL2, drawables: Iterable[Drawable]): Unit =
       drawables.foreach((drawable) => draw(gl, drawable))
+
+  // GL helper functions
 
   def setColor(gl: GL2, c: Color): Unit =
     gl.glColor4d(
@@ -245,6 +244,8 @@ object Driver extends App with Runnable {
 
   def setFill(gl: GL2, fill: Boolean): Unit =
     gl.glPolygonMode(GL_FRONT_AND_BACK, if (fill) GL_FILL else GL_LINE)
+
+  def setLineWidth(gl: GL2, width: Float) = gl.glLineWidth(width)
 
   var zoom = 1f
   var center = Point.zero
@@ -260,7 +261,7 @@ object Driver extends App with Runnable {
     // Get world data
     val figure = world.getObj(figureId)
 
-    // Focus camera
+    // Focus camera on figure
     center = figure.center.toPoint
 
     // draw background
@@ -370,8 +371,14 @@ object Driver extends App with Runnable {
           MouseInput.HOVER) ::
       inputStack.toList
 
+  // NOTE: can implement screenToWorld(rect: Rectangle) trivially if necessary
   def screenToWorld(p: Point): Point = (p - LayoutManager.screen.center) /
       LayoutManager.screen.size * zoom + center
+
+  // NOTE: can implement worldToScreen(p: Point) trivially if necessary
+  def worldToScreen(rect: Rectangle): Rectangle =
+      (rect - center) * LayoutManager.screen.size / zoom +
+      LayoutManager.screen.center
 
   object MouseMotionListener extends MouseMotionAdapter {
     var position: Point = Point.zero
