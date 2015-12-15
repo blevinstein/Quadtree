@@ -53,6 +53,7 @@ object QuadLen {
     (a.base << (a.exp - newExp), b.base << (b.exp - newExp), newExp)
   }
 }
+// TODO: Refactor to be a case class?
 class QuadLen(private val base: Int, private val exp: Int = 0) {
   // Returns true if this represents a length of zero. Should be preferred to
   //   quadLen == QuadLen.zero

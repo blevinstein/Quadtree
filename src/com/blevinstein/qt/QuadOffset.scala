@@ -28,6 +28,7 @@ object QuadOffset {
           QuadLen.approx(point.x, resolution),
           QuadLen.approx(point.y, resolution))
 }
+// TODO: Refactor to be a case class?
 class QuadOffset(val x: QuadLen, val y: QuadLen) {
   val minExp = x minExp y
 
