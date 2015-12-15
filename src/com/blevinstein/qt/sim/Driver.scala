@@ -202,12 +202,7 @@ object Driver extends App with Runnable {
       case FillRect(color, rect) => {
           setColor(gl, color)
           setFill(gl, true)
-          val screenRect = worldToScreen(rect)
-          gl.glRectf(
-              screenRect.min.x,
-              screenRect.min.y,
-              screenRect.max.x,
-              screenRect.max.y)
+          drawRect(gl, worldToScreen(rect))
         }
       case FillRegion(color, rects) => {
           // TODO: use BLACK or WHITE depending on brightness of [color]
@@ -215,22 +210,12 @@ object Driver extends App with Runnable {
           setFill(gl, false)
           setLineWidth(gl, 2)
           for (rect <- rects) {
-            val screenRect = worldToScreen(rect)
-            gl.glRectf(
-                screenRect.min.x,
-                screenRect.min.y,
-                screenRect.max.x,
-                screenRect.max.y)
+            drawRect(gl, worldToScreen(rect))
           }
           setColor(gl, color)
           setFill(gl, true)
           for (rect <- rects) {
-            val screenRect = worldToScreen(rect)
-            gl.glRectf(
-                screenRect.min.x,
-                screenRect.min.y,
-                screenRect.max.x,
-                screenRect.max.y)
+            drawRect(gl, worldToScreen(rect))
           }
 
           // Reset
@@ -243,15 +228,18 @@ object Driver extends App with Runnable {
 
   // GL helper functions
 
+  def drawRect(gl: GL2, rect: Rectangle): Unit =
+      gl.glRectf(rect.min.x, rect.min.y, rect.max.x, rect.max.y)
+
   def setColor(gl: GL2, c: Color): Unit =
-    gl.glColor4d(
-      c.getRed() / 255.0,
-      c.getGreen() / 255.0,
-      c.getBlue() / 255.0,
-      c.getAlpha() / 255.0)
+      gl.glColor4d(
+          c.getRed() / 255.0,
+          c.getGreen() / 255.0,
+          c.getBlue() / 255.0,
+          c.getAlpha() / 255.0)
 
   def setFill(gl: GL2, fill: Boolean): Unit =
-    gl.glPolygonMode(GL_FRONT_AND_BACK, if (fill) GL_FILL else GL_LINE)
+      gl.glPolygonMode(GL_FRONT_AND_BACK, if (fill) GL_FILL else GL_LINE)
 
   def setLineWidth(gl: GL2, width: Float) = gl.glLineWidth(width)
 
