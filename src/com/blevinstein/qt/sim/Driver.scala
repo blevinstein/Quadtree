@@ -35,8 +35,8 @@ import java.awt.event.MouseWheelEvent
 import java.awt.event.WindowAdapter
 import java.awt.event.WindowEvent
 import java.io.File
+import java.util.concurrent.ConcurrentHashMap
 import javax.imageio.ImageIO
-import scala.collection.mutable.HashMap
 import scala.collection.mutable.Stack
 import scala.util.control.Breaks._
 
@@ -316,7 +316,7 @@ object Driver extends App with Runnable {
   }
 
   object KeyListener extends KeyAdapter {
-    private var keysDown: Set[Int] = Set()
+    private val keysDown: ConcurrentHashMap[Int, Unit] = new ConcurrentHashMap()
 
     val inputStackBlacklist = Set(
         KeyEvent.VK_A,
@@ -324,11 +324,11 @@ object Driver extends App with Runnable {
         KeyEvent.VK_S,
         KeyEvent.VK_W)
 
-    def keyDown(keyCode: Int): Boolean = keysDown.contains(keyCode)
+    def keyDown(keyCode: Int): Boolean = keysDown.containsKey(keyCode)
 
     override def keyPressed(e: KeyEvent): Unit = {
       // Update keysDown
-      keysDown += e.getKeyCode()
+      keysDown.put(e.getKeyCode(), ())
       // Update inputStack
       e.getKeyCode() match {
         case KeyEvent.VK_ESCAPE => inputStack.clear()
@@ -339,9 +339,8 @@ object Driver extends App with Runnable {
       }
     }
 
-    override def keyReleased(e: KeyEvent): Unit = {
-      keysDown -= e.getKeyCode()
-    }
+    override def keyReleased(e: KeyEvent): Unit =
+        keysDown.remove(e.getKeyCode())
   }
 
   val zoomUnit = 1.05f;
