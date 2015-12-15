@@ -9,8 +9,8 @@ import com.blevinstein.util.Throttle
 
 import com.jogamp.opengl.GL.GL_COLOR_BUFFER_BIT
 import com.jogamp.opengl.GL.GL_FRONT_AND_BACK
-import com.jogamp.opengl.GL.GL_LINES
 import com.jogamp.opengl.GL.GL_TRIANGLE_FAN
+import com.jogamp.opengl.GL.GL_LINE_SMOOTH
 import com.jogamp.opengl.GL2
 import com.jogamp.opengl.GLAutoDrawable
 import com.jogamp.opengl.GLCapabilities
@@ -190,6 +190,8 @@ object Driver extends App with Runnable {
     gl.glLoadIdentity
 
     gl.glViewport(0, 0, width, height)
+
+    gl.glEnable(GL_LINE_SMOOTH)
   }
 
   // Drawing subroutines
@@ -206,18 +208,12 @@ object Driver extends App with Runnable {
               screenRect.min.y,
               screenRect.max.x,
               screenRect.max.y)
+        }
+      case FillRegion(color, rects) => {
           // TODO: use BLACK or WHITE depending on brightness of [color]
           setColor(gl, Color.BLACK)
           setFill(gl, false)
-          gl.glRectf(
-              screenRect.min.x,
-              screenRect.min.y,
-              screenRect.max.x,
-              screenRect.max.y)
-        }
-      case FillRegion(color, rects) => {
-          setColor(gl, color)
-          setFill(gl, false)
+          setLineWidth(gl, 2)
           for (rect <- rects) {
             val screenRect = worldToScreen(rect)
             gl.glRectf(
@@ -226,9 +222,21 @@ object Driver extends App with Runnable {
                 screenRect.max.x,
                 screenRect.max.y)
           }
+          setColor(gl, color)
+          setFill(gl, true)
+          for (rect <- rects) {
+            val screenRect = worldToScreen(rect)
+            gl.glRectf(
+                screenRect.min.x,
+                screenRect.min.y,
+                screenRect.max.x,
+                screenRect.max.y)
+          }
+
+          // Reset
+          setLineWidth(gl, 1)
         }
     }
-
 
   def drawAll(gl: GL2, drawables: Iterable[Drawable]): Unit =
       drawables.foreach((drawable) => draw(gl, drawable))
