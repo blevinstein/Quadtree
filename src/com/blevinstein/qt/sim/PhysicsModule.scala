@@ -12,8 +12,8 @@ class PhysicsModule extends WorldModule {
         obj.state match {
           case Fixed => List()
           case Moving(v) => List(
-              MoveBy(id, world.velToOffset(v)),
-              Accel(id, gravity))
+              Accel(id, gravity),
+              MoveBy(id, world.velToOffset(v)))
         }
       }
   }
