@@ -136,7 +136,7 @@ object Driver extends App with Runnable {
         glCanvas.display()
         throttle.sleep
       } catch {
-        case e: Throwable => println(s"Error: $e")
+        case e: Throwable => println(s"Error: ${e.getMessage()}")
       }
     }
   }

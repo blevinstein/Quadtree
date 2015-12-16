@@ -20,9 +20,12 @@ class QuadObject(val position: QuadRectangle,
       val newState = (state, other.state) match {
         // TODO: preserve momentum not total velocity
         case (Moving(v1), Moving(v2)) => Moving(v1 + v2)
-        case (Fixed, _) | (_, Fixed) => Fixed
+        case (Fixed, Fixed) | (Fixed, _) | (_, Fixed) => Fixed
         case _ => ???
       }
+
+      // DEBUG
+      println(s"this $state other ${other.state} => $newState")
 
       new QuadObject(
           newPosition,
