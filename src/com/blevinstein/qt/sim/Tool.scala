@@ -1,7 +1,7 @@
 package com.blevinstein.qt.sim
 
 import com.blevinstein.geom.Point
-import com.blevinstein.qt.{QuadAddr,QuadOffset,QuadRectangle,QuadTree}
+import com.blevinstein.qt.{QuadAddr,QuadLeaf,QuadOffset,QuadRectangle,QuadTree}
 
 import java.awt.Color
 import java.awt.event.MouseEvent
@@ -68,6 +68,7 @@ case class CopyTool(prefix: List[Input]) extends Tool {
                     Merge(
                         id,
                         new QuadObject(
+                            // TODO: calc new position, encompassing newRegion
                             obj.position,
                             new QuadTree.Builder[Option[Material]](None)
                                 .addAllRects(newRegion, Some(material))
@@ -200,23 +201,9 @@ case class GrowTool(prefix: List[Input]) extends Tool {
                           Merge(
                               id,
                               new QuadObject(
-                                  obj.position,
-                                  new QuadTree.Builder[Option[Material]](None)
-                                      .addAll(
-                                          newRect.withRespectTo(obj.position),
-                                          Some(material))
-                                      .build,
+                                  newRect,
+                                  new QuadLeaf(Some(material)),
                                   obj.state))))
-                          /*
-                          TODO: diagnose why this doesn't work
-                          Reshape(
-                              id,
-                              obj.shape.toBuilder
-                                  .addAll(
-                                      newRect.withRespectTo(obj.position),
-                                      Some(material))
-                                  .build)))
-                          */
                   }
                   case None => Tool.Noop // Invalid second location
                 }
