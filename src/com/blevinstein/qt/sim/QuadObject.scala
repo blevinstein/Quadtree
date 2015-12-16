@@ -2,7 +2,7 @@ package com.blevinstein.qt.sim
 
 import com.blevinstein.geom.Point
 import com.blevinstein.qt.{QuadTree,QuadRectangle,QuadAddr,QuadOffset}
-import com.blevinstein.qt.sim.Operators.{addOp,avgOp};
+import com.blevinstein.qt.sim.Operators.{addOp,avgOp,complexityOp};
 
 // Immutable container object for holding information about an object.
 //
@@ -12,6 +12,46 @@ class QuadObject(val position: QuadRectangle,
     val shape: QuadTree[Option[Material]],
     val state: State = Moving(Point.zero)) {
   require(position.isPerfectSquare, s"not a square: $position")
+
+  def combine(other: QuadObject): QuadObject = {
+      val newPosition = subsume(position, other.position)
+      println(s"combine $position + ${other.position} => $newPosition")
+
+      val newState = (state, other.state) match {
+        // TODO: preserve momentum not total velocity
+        case (Moving(v1), Moving(v2)) => Moving(v1 + v2)
+        case (Fixed, _) | (_, Fixed) => Fixed
+        case _ => ???
+      }
+
+      new QuadObject(
+          newPosition,
+          addOp(this.toQuadTree(newPosition), other.toQuadTree(newPosition)),
+          newState)
+  }
+
+  // Returns a QuadRectangle that contains both [a] and [b].
+  def subsume(a: QuadRectangle, b: QuadRectangle): QuadRectangle = {
+    // Choose [currentRect], and grow until it contains [otherRect]
+    var currentRect = a
+    val otherRect = b
+
+    def grow(rect: QuadRectangle, posX: Boolean, posY: Boolean) =
+        // Double the size of [rect], then shift in the -x or -y direction if
+        // necessary.
+        rect.resize(rect.size << 1) +
+            (if (posX) { QuadOffset.zero } else { -rect.size.xComp }) +
+            (if (posY) { QuadOffset.zero } else { -rect.size.yComp })
+
+    while (!currentRect.contains(otherRect)) {
+        currentRect = grow(
+            currentRect,
+            otherRect.min.x >= currentRect.min.x,
+            otherRect.min.y >= currentRect.min.y)
+    }
+
+    currentRect
+  } ensuring((result) => result.contains(a) && result.contains(b))
 
   // Converts into a QuadTree within a particular [space].
   def toQuadTree(space: QuadRectangle): QuadTree[Option[Material]] = {

@@ -65,11 +65,14 @@ case class CopyTool(prefix: List[Input]) extends Tool {
                 val newRegion = rects
                     .map((rect) => (rect + offset).withRespectTo(obj.position))
                 (List(), List(
-                    AddShape(
+                    Merge(
                         id,
-                        new QuadTree.Builder[Option[Material]](None)
-                            .addAllRects(newRegion, Some(material))
-                            .build)))
+                        new QuadObject(
+                            obj.position,
+                            new QuadTree.Builder[Option[Material]](None)
+                                .addAllRects(newRegion, Some(material))
+                                .build,
+                            obj.state))))
               }
               case None => Tool.Noop
             }
@@ -194,13 +197,16 @@ case class GrowTool(prefix: List[Input]) extends Tool {
                           // NOTE: This will happily overrwrite existing nodes
                           // in the source object, although it will fail if this
                           // would cause a collision with another object.
-                          AddShape(
+                          Merge(
                               id,
-                              new QuadTree.Builder[Option[Material]](None)
-                                  .addAll(
-                                      newRect.withRespectTo(obj.position),
-                                      Some(material))
-                                  .build)))
+                              new QuadObject(
+                                  obj.position,
+                                  new QuadTree.Builder[Option[Material]](None)
+                                      .addAll(
+                                          newRect.withRespectTo(obj.position),
+                                          Some(material))
+                                      .build,
+                                  obj.state))))
                           /*
                           TODO: diagnose why this doesn't work
                           Reshape(

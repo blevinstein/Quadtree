@@ -23,6 +23,15 @@ class QuadRectangle(val min: QuadOffset, val max: QuadOffset) {
   val size: QuadOffset = max - min
   val isEmpty: Boolean = size.x.isZero || size.y.isZero
 
+  // Operates with respect to [min], NOT the origin.
+  def resize(newSize: QuadOffset): QuadRectangle = new QuadRectangle(min, min + newSize)
+
+  def contains(rect: QuadRectangle): Boolean = contains(rect.min) && contains(rect.max)
+
+  def contains(point: QuadOffset): Boolean =
+      min.x <= point.x && point.x < max.x &&
+      min.y <= point.y && point.y < max.y
+
   // Returns true if [this] QuadRectangle has equal sides of the form (1 << x).
   def isPerfectSquare: Boolean = !perfectLog.isEmpty
   // If [this] has equal sides of the form (1 << x), returns x.

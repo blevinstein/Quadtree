@@ -2,6 +2,10 @@ package com.blevinstein.qt.sim;
 
 import com.blevinstein.qt.QuadTree;
 
+// TODO: Consider renaming (or relocating) to reflect merge/transform/reduce.
+// E.g. sumMerge for adding QuadTree[Int] together, sumReduce for collapsing a
+// QuadTree[Int] into a single Int by addition.
+// OR Operators.Merge.sum, Operators.Reduce.sum?
 object Operators {
   val addOp:
       (QuadTree[Option[Material]], QuadTree[Option[Material]])
@@ -29,4 +33,8 @@ object Operators {
                 case (Some(_), Some(_)) => true
                 case _ => false
               }) _
+  val complexityOp:
+      QuadTree[Any] => Int =
+          QuadTree.transform((_: Any) => 1) _ andThen
+          QuadTree.reduce((ns: List[Int]) => ns.reduce{_+_}) _ // = sumOp
 }
