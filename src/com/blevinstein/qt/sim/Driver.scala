@@ -82,7 +82,7 @@ object Driver extends App with Runnable {
   val frame = new Frame()
   frame.add(glCanvas)
   frame.addWindowListener(WindowListener)
-  frame.setSize(1024, 1024 + 25) // scalastyle:off magic.number
+  frame.setSize(800, 800 + 25) // scalastyle:off magic.number
   frame.setVisible(true)
 
   // setup game
