@@ -18,15 +18,19 @@ class World(val objs: Map[Id, QuadObject], val modules: List[WorldModule]) {
 
   val moveRes = -6
 
+  // TODO: add dt?
   def velToOffset(velocity: Point): QuadOffset =
       QuadOffset.approx(velocity, moveRes)
 
+  // Returns a new World with the same modules installed, and [newObjs].
   def withObjs(newObjs: Map[Id, QuadObject]) =
       new World(newObjs, modules)
 
+  // Returns a new World with [module] installed.
   def install(module: WorldModule): World =
       new World(objs, module :: modules)
 
+  // Returns the object with the given Id.
   def getObj(id: Id): QuadObject = {
     require(objs.contains(id), s"objs does not contain id: $id")
     objs.get(id).get
