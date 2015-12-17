@@ -55,6 +55,7 @@ object QuadLen {
 }
 // TODO: Refactor to be a case class?
 class QuadLen(private val base: Int, private val exp: Int = 0) {
+  def this(value: Int) = this(value, 0)
   // Returns true if this represents a length of zero. Should be preferred to
   //   quadLen == QuadLen.zero
   //   because QuadLen(0, n) is equivalent to QuadLen(0, 0), but equals() will
