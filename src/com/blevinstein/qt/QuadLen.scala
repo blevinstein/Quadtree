@@ -118,8 +118,10 @@ class QuadLen(private val base: Int, private val exp: Int = 0) {
 
   def simplify: QuadLen = if (base == 0) {
     QuadLen.zero
-  } else if (base % 2 == 0) {
+  } else if (base % 2 == 0 && exp < 0) {
     new QuadLen(base / 2, exp + 1).simplify
+  } else if (exp > 0) {
+    new QuadLen(base * 2, exp - 1).simplify
   } else {
     this
   }
