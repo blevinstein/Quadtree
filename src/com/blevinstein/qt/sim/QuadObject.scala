@@ -17,9 +17,9 @@ class QuadObject(val position: QuadRectangle,
       val newPosition = QuadRectangle.subsume(position, other.position)
 
       val newState = (state, other.state) match {
-        // TODO: preserve momentum not total velocity
-        case (Moving(v1), Moving(v2)) => Moving(v1 + v2)
-        case (Fixed, Fixed) | (Fixed, _) | (_, Fixed) => Fixed
+        // TODO: preserve momentum not average velocity
+        case (Moving(v1), Moving(v2)) => Moving((v1 + v2) / 2)
+        case (Fixed, _) | (_, Fixed) => Fixed
         case _ => ???
       }
 
