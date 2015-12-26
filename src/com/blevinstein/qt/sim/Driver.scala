@@ -179,6 +179,10 @@ object Driver extends App with Runnable {
     }
   }
 
+  def printContacts: Unit = {
+    println(s"Contacts with world: ${world.contactsWithAll(figureId)}")
+  }
+
   def printMousePosition: Unit = {
     val worldPos = LayoutManager.screenToWorld(MouseMotionListener.position)
     println(s"Mouse position: ${MouseMotionListener.position} => $worldPos")
@@ -366,6 +370,7 @@ object Driver extends App with Runnable {
           println(s"Screen: ${LayoutManager.screen}")
           printObjectPositions
           printMousePosition
+          printContacts
         }
         case code if inputStackBlacklist contains code => ()
         case code => inputStack.push(KeyInput(code))
