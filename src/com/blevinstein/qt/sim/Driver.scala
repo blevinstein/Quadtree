@@ -110,14 +110,11 @@ object Driver extends App with Runnable {
       Add(
           Id.get,
           new QuadObject(
-              QuadRectangle.unit,
-              QuadTree.approx(6, (p) =>
-                  if (p.y < 0.05) {
-                    Material.Gray
-                  } else {
-                    Material.Empty
-                  }),
-          Fixed)),
+              new QuadRectangle(
+                  QuadOffset(QuadLen(0), QuadLen(-1)),
+                  QuadOffset(QuadLen(1), QuadLen(0))),
+              new QuadLeaf(Material.Gray),
+              Fixed)),
       Add(
           Id.get,
           new QuadObject(
