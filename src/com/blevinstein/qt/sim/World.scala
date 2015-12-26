@@ -145,15 +145,24 @@ class World(val objs: Map[Id, QuadObject], val modules: List[WorldModule]) {
         val objB = getObj(idB)
         (objA.state, objB.state) match {
           case (Moving(velA), Fixed) =>
-              (this, List(SetVelocity(idA, arrestMotion(idA, velA))))
+              (this, List(
+                  SetVelocity(idA, arrestMotion(idA, velA)),
+                  MoveBy(idA, velToOffset(velA))
+              ))
           case (Fixed, Moving(velB)) =>
-              (this, List(SetVelocity(idB, arrestMotion(idB, velB))))
+              (this, List(
+                  SetVelocity(idB, arrestMotion(idB, velB)),
+                  MoveBy(idB, velToOffset(velB))
+              ))
           case (Moving(velA), Moving(velB)) => {
               // TODO: calculate mass, preserve avg momentum not avg velocity
               val newVelocity = (velA + velB) / 2
               (this, List(
                   SetVelocity(idA, newVelocity),
-                  SetVelocity(idB, newVelocity)))
+                  SetVelocity(idB, newVelocity),
+                  MoveBy(idA, velToOffset(newVelocity)),
+                  MoveBy(idB, velToOffset(newVelocity))
+              ))
             }
         }
       }
