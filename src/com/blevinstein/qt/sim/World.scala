@@ -198,8 +198,6 @@ class World(val objs: Map[Id, QuadObject], val modules: List[WorldModule]) {
     var contacts = List[(Id, QuadAddr, QuadAddr)]()
     for ((id, otherObj) <- objs if !exclude.contains(id)) {
       for ((rect, otherRect) <- obj.contacts(otherObj)) {
-        val thisRect = rect withRespectTo obj.position
-
         val thisAddrs = (rect withRespectTo obj.position).toAddressList
         val otherAddrs =
             (otherRect withRespectTo otherObj.position).toAddressList
