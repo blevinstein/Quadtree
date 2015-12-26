@@ -26,6 +26,8 @@ class QuadRectangle(val min: QuadOffset, val max: QuadOffset) {
   // Operates with respect to [min], NOT the origin.
   def resize(newSize: QuadOffset): QuadRectangle = new QuadRectangle(min, min + newSize)
 
+  def center: QuadOffset = (min + max) >> 1
+
   def contains(rect: QuadRectangle): Boolean = contains(rect.min) && contains(rect.max)
 
   def contains(point: QuadOffset): Boolean =
