@@ -372,7 +372,7 @@ object Driver extends App with Runnable {
       inputStack.push(MouseInput(
           LayoutManager.screenToWorld(new Point(
               e.getX(),
-              LayoutManager.screen.size.y - e.getY())),
+              LayoutManager.screen.max.y - e.getY())),
           e.getButton()))
     }
     override def mouseWheelMoved(e: MouseWheelEvent): Unit = {
@@ -396,7 +396,7 @@ object Driver extends App with Runnable {
     var position: Point = Point.zero
     override def mouseMoved(e: MouseEvent): Unit = {
       position =
-          new Point(e.getX(), LayoutManager.screen.size.y - e.getY())
+          new Point(e.getX(), LayoutManager.screen.max.y - e.getY())
     }
   }
 
