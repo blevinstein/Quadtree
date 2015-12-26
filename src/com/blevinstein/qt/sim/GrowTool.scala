@@ -82,27 +82,12 @@ case class GrowTool(prefix: List[Input]) extends Tool {
                         match {
                   case Some(newRect: QuadRectangle) => {
                       (List(), List(
-                          // Reshape the containing object, copying [material]
-                          // into [newRect].
-                          // NOTE: This will happily overrwrite existing nodes
-                          // in the source object, although it will fail if this
-                          // would cause a collision with another object.
                           Merge(
                               id,
                               new QuadObject(
                                   newRect,
                                   new QuadLeaf(Some(material)),
                                   obj.state))))
-                          /*
-                          TODO: diagnose why this doesn't work
-                          Reshape(
-                              id,
-                              obj.shape.toBuilder
-                                  .addAll(
-                                      newRect.withRespectTo(obj.position),
-                                      Some(material))
-                                  .build)))
-                          */
                   }
                   case None => Tool.Noop // Invalid second location
                 }
