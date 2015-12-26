@@ -56,10 +56,10 @@ class QuadRectangle(val min: QuadOffset, val max: QuadOffset) {
     // - A QuadLeaf must be grid aligned
     // - A QuadLeaf must have sides of power-of-two length
     val xGridSize = QuadLen.min(
-        new QuadLen(1, min.x.minExp), // grid aligned
+        QuadLen(1, min.x.minExp), // grid aligned
         size.x.truncatePerfect)       // power-of-two length
     val yGridSize = QuadLen.min(
-        new QuadLen(1, min.y.minExp), // grid aligned
+        QuadLen(1, min.y.minExp), // grid aligned
         size.y.truncatePerfect)       // power-of-two length
 
     if (isEmpty) {

@@ -30,7 +30,7 @@ object QuadOffset {
 }
 // TODO: Refactor to be a case class?
 class QuadOffset(val x: QuadLen, val y: QuadLen) {
-  def this(x: Int, y: Int) = this(new QuadLen(x), new QuadLen(y))
+  def this(x: Int, y: Int) = this(QuadLen(x), QuadLen(y))
 
   val minExp = x minExp y
 

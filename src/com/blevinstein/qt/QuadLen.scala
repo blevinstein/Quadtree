@@ -8,9 +8,9 @@ import scala.language.implicitConversions
  * length = base * (2^exp)
  */
 object QuadLen {
-  val zero = new QuadLen(0, 0)
-  val one = new QuadLen(1, 0)
-  val half = new QuadLen(1, -1)
+  val zero = QuadLen(0, 0)
+  val one = QuadLen(1, 0)
+  val half = QuadLen(1, -1)
 
   // TODO: find a cleaner way to implement this method
   // TODO: change sign of [resolution]
@@ -23,14 +23,14 @@ object QuadLen {
     var max = 1 << -resolution
     while (max - min > 1) {
       val mid = (min + max) / 2
-      if (new QuadLen(mid, resolution) <= floatPart) {
+      if (QuadLen(mid, resolution) <= floatPart) {
         min = mid
       } else {
         max = mid
       }
     }
-    val quadIntPart = new QuadLen(intPart, 0)
-    val quadFloatPart = new QuadLen(min, resolution)
+    val quadIntPart = QuadLen(intPart, 0)
+    val quadFloatPart = QuadLen(min, resolution)
 
     quadIntPart + (quadFloatPart * math.signum(float).toInt)
   }
@@ -70,8 +70,7 @@ object QuadLen {
     (a.base << (a.exp - newExp), b.base << (b.exp - newExp), newExp)
   }
 }
-// TODO: Refactor to be a case class?
-class QuadLen(private val base: Int, private val exp: Int = 0) {
+case class QuadLen(base: Int, exp: Int = 0) {
   def this(value: Int) = this(value, 0)
   // Returns true if this represents a length of zero. Should be preferred to
   //   quadLen == QuadLen.zero
@@ -88,16 +87,16 @@ class QuadLen(private val base: Int, private val exp: Int = 0) {
     1f * base / (1 << -exp)
   }
   def +(other: QuadLen): QuadLen = QuadLen.normalize(this, other) match {
-    case (a, b, ex) => new QuadLen(a + b, ex)
+    case (a, b, ex) => QuadLen(a + b, ex)
   }
   def -(other: QuadLen): QuadLen = QuadLen.normalize(this, other) match {
-    case (a, b, ex) => new QuadLen(a - b, ex)
+    case (a, b, ex) => QuadLen(a - b, ex)
   }
-  def *(k: Int): QuadLen = new QuadLen(base * k, exp)
-  def <<(k: Int): QuadLen = new QuadLen(base, exp + k)
-  def >>(k: Int): QuadLen = new QuadLen(base, exp - k)
+  def *(k: Int): QuadLen = QuadLen(base * k, exp)
+  def <<(k: Int): QuadLen = QuadLen(base, exp + k)
+  def >>(k: Int): QuadLen = QuadLen(base, exp - k)
 
-  def unary_- : QuadLen = new QuadLen(-base, exp)
+  def unary_- : QuadLen = QuadLen(-base, exp)
 
   def minExp(other: QuadLen): Int = QuadLen.normalize(this, other) match {
     case (a, b, exp) => exp
@@ -123,7 +122,7 @@ class QuadLen(private val base: Int, private val exp: Int = 0) {
   // [this].
   def truncatePerfect: QuadLen = {
     require(base > 0, "truncatePerfect only handles positive numbers")
-    var perfectNum = new QuadLen(1, exp)
+    var perfectNum = QuadLen(1, exp)
     while (perfectNum * 2 <= this) perfectNum = perfectNum * 2
     perfectNum
   }
@@ -145,7 +144,7 @@ class QuadLen(private val base: Int, private val exp: Int = 0) {
   def simplify: QuadLen = if (base == 0) {
     QuadLen.zero
   } else if (base % 2 == 0) {
-    new QuadLen(base / 2, exp + 1).simplify
+    QuadLen(base / 2, exp + 1).simplify
   } else {
     this
   }
