@@ -15,7 +15,6 @@ class QuadObject(val position: QuadRectangle,
 
   def combine(other: QuadObject): QuadObject = {
       val newPosition = subsume(position, other.position)
-      println(s"combine $position + ${other.position} => $newPosition")
 
       val newState = (state, other.state) match {
         // TODO: preserve momentum not total velocity
@@ -23,9 +22,6 @@ class QuadObject(val position: QuadRectangle,
         case (Fixed, Fixed) | (Fixed, _) | (_, Fixed) => Fixed
         case _ => ???
       }
-
-      // DEBUG
-      println(s"this $state other ${other.state} => $newState")
 
       new QuadObject(
           newPosition,
