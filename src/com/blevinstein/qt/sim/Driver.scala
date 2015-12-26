@@ -306,6 +306,9 @@ object Driver extends App with Runnable {
     var screen = new Rectangle(Point.zero, new Point(1, 1))
 
     // NOTE: can implement screenToWorld(rect: Rectangle) trivially if necessary
+    // NOTE: I'm using Camera(screen) to get easy set/get functions. This is
+    // potentially confusing, using Camera for both input and output; also
+    // because now it is misleadingly named.
     def screenToWorld(point: Point): Point =
         worldCam.put(Camera(screen).get(point))
 
