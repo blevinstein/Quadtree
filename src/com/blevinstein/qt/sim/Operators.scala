@@ -36,5 +36,5 @@ object Operators {
   val complexityOp:
       QuadTree[Any] => Int =
           QuadTree.transform((_: Any) => 1) _ andThen
-          QuadTree.reduce((ns: List[Int]) => ns.reduce{_+_}) _ // = sumOp
+          QuadTree.reduce((ns: List[Int]) => ns.reduce{_ + _}) _ // = sumOp
 }

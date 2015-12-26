@@ -254,7 +254,7 @@ object Driver extends App with Runnable {
   def setFill(gl: GL2, fill: Boolean): Unit =
       gl.glPolygonMode(GL_FRONT_AND_BACK, if (fill) GL_FILL else GL_LINE)
 
-  def setLineWidth(gl: GL2, width: Float) = gl.glLineWidth(width)
+  def setLineWidth(gl: GL2, width: Float): Unit = gl.glLineWidth(width)
 
   var worldCam = Camera.focus(Point.zero, 1f)
   def render(gl: GL2): Unit = {
@@ -372,8 +372,8 @@ object Driver extends App with Runnable {
           printMousePosition
           printContacts
         }
-        case code if inputStackBlacklist contains code => ()
-        case code => inputStack.push(KeyInput(code))
+        case keyCode if inputStackBlacklist contains keyCode => ()
+        case keyCode => inputStack.push(KeyInput(keyCode))
       }
     }
 

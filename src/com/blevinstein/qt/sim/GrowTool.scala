@@ -23,7 +23,7 @@ case class GrowTool(prefix: List[Input]) extends Tool {
 
   // Given a [source] rectangle, returns a list of all new QuadRectangles (of
   // equal size, adjacent to source) where growth is allowed
-  def growthPossibilities(source: QuadRectangle) = List(
+  def growthPossibilities(source: QuadRectangle): List[QuadRectangle] = List(
       source + source.size.xComp,
       source - source.size.xComp,
       source + source.size.yComp,

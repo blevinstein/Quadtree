@@ -23,7 +23,7 @@ class World(val objs: Map[Id, QuadObject], val modules: List[WorldModule]) {
       QuadOffset.approx(velocity, moveRes)
 
   // Returns a new World with the same modules installed, and [newObjs].
-  def withObjs(newObjs: Map[Id, QuadObject]) =
+  def withObjs(newObjs: Map[Id, QuadObject]): World =
       new World(newObjs, modules)
 
   // Returns a new World with [module] installed.
