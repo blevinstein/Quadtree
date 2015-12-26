@@ -84,20 +84,20 @@ class QuadObject(val position: QuadRectangle,
       List()
     } else {
       var contactList = List[(QuadRectangle, QuadRectangle)]()
-      for (zone <- QuadZone.around(position)) {
-        val thisTree = this.toQuadTree(zone.toQuadRectangle)
-        val otherTree = other.toQuadTree(zone.toQuadRectangle)
-        thisTree.iter((thisAddr: QuadAddr, thisMat: Option[Any]) => {
-          if (!thisMat.isEmpty) {
-            otherTree.iter((otherAddr: QuadAddr, otherMat: Option[Any]) => {
-              if (!otherMat.isEmpty && (thisAddr touches otherAddr)) {
-                contactList = (thisAddr.toQuadRectangle + zone.min,
-                    otherAddr.toQuadRectangle + zone.min) :: contactList
-              }
-            })
-          }
-        })
-      }
+      val contactZone = ((position - position.min) << 1) +
+          position.min - (position.size >> 1)
+      val thisTree = this.toQuadTree(contactZone)
+      val otherTree = other.toQuadTree(contactZone)
+      thisTree.iter((thisAddr: QuadAddr, thisMat: Option[Any]) => {
+        if (!thisMat.isEmpty) {
+          otherTree.iter((otherAddr: QuadAddr, otherMat: Option[Any]) => {
+            if (!otherMat.isEmpty && (thisAddr touches otherAddr)) {
+              contactList = (thisAddr.toQuadRectangle within contactZone,
+                  otherAddr.toQuadRectangle within contactZone) :: contactList
+            }
+          })
+        }
+      })
       contactList
     }
   }
