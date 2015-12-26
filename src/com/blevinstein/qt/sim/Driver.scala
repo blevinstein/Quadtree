@@ -184,7 +184,7 @@ object Driver extends App with Runnable {
 
   def printMousePosition: Unit = {
     val worldPos = LayoutManager.screenToWorld(MouseMotionListener.position)
-    println(s"Mouse position: $worldPos")
+    println(s"Mouse position: ${MouseMotionListener.position} => $worldPos")
   }
 
   def getCanvas: GLCanvas = glCanvas
@@ -303,7 +303,8 @@ object Driver extends App with Runnable {
   object LayoutManager {
     // Position of the screen
     // TODO: handle distortions when screen is not square
-    var screen = new Rectangle(Point.zero, new Point(1, 1))
+    var frame = new Rectangle(Point.zero, Point.unit)
+    var screen = new Rectangle(Point.zero, Point.unit)
 
     // NOTE: can implement screenToWorld(rect: Rectangle) trivially if necessary
     // NOTE: I'm using Camera(screen) to get easy set/get functions. This is
@@ -320,7 +321,8 @@ object Driver extends App with Runnable {
       // Update view panel: center onscreen and maintain aspect ratio
       // HACK: need to divide by 2 when using a retina display, because
       // MouseEvent coords don't align with OpenGL coords
-      screen = centerSquare(new Rectangle(Point.zero, new Point(w, h) / 2))
+      frame = new Rectangle(Point.zero, new Point(w, h) / 2)
+      screen = centerSquare(frame)
     }
 
     // Given a rectangle, finds the largest square that can be fit inside, and
@@ -340,6 +342,8 @@ object Driver extends App with Runnable {
   object KeyListener extends KeyAdapter {
     private val keysDown: ConcurrentHashMap[Int, Unit] = new ConcurrentHashMap()
 
+    var debugMode = true
+
     val inputStackBlacklist = Set(
         KeyEvent.VK_A,
         KeyEvent.VK_D,
@@ -349,13 +353,20 @@ object Driver extends App with Runnable {
     def keyDown(keyCode: Int): Boolean = keysDown.containsKey(keyCode)
 
     override def keyPressed(e: KeyEvent): Unit = {
+      if (debugMode) { println(s"keyPressed ${e.getKeyCode()}") }
       // Update keysDown
       keysDown.put(e.getKeyCode(), ())
+    }
+
+    override def keyReleased(e: KeyEvent): Unit = {
+      if (debugMode) { println(s"keyReleased ${e.getKeyCode()}") }
+      keysDown.remove(e.getKeyCode())
       // Update inputStack
       e.getKeyCode() match {
         case KeyEvent.VK_ESCAPE => inputStack.clear()
         case KeyEvent.VK_Z => {
           println(s"Input stack: $inputStack")
+          println(s"Screen: ${LayoutManager.screen}")
           printObjectPositions
           printMousePosition
         }
@@ -364,8 +375,9 @@ object Driver extends App with Runnable {
       }
     }
 
-    override def keyReleased(e: KeyEvent): Unit =
-        keysDown.remove(e.getKeyCode())
+    override def keyTyped(e: KeyEvent): Unit = {
+      if (debugMode) { println(s"keyTyped ${e.getKeyCode()}") }
+    }
   }
 
   val zoomUnit = 1.05f;
@@ -375,7 +387,7 @@ object Driver extends App with Runnable {
       inputStack.push(MouseInput(
           LayoutManager.screenToWorld(new Point(
               e.getX(),
-              LayoutManager.screen.max.y - e.getY())),
+              LayoutManager.frame.max.y - e.getY())),
           e.getButton()))
     }
     override def mouseWheelMoved(e: MouseWheelEvent): Unit = {
@@ -399,7 +411,7 @@ object Driver extends App with Runnable {
     var position: Point = Point.zero
     override def mouseMoved(e: MouseEvent): Unit = {
       position =
-          new Point(e.getX(), LayoutManager.screen.max.y - e.getY())
+          new Point(e.getX(), LayoutManager.frame.max.y - e.getY())
     }
   }
 
