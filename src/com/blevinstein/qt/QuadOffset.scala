@@ -17,28 +17,27 @@ import scala.language.implicitConversions
  * appropriate depth.
  */
 object QuadOffset {
-  val zero = new QuadOffset(QuadLen.zero, QuadLen.zero)
-  val half = new QuadOffset(QuadLen.half, QuadLen.half)
-  val one = new QuadOffset(QuadLen.one, QuadLen.one)
+  val zero = QuadOffset(QuadLen.zero, QuadLen.zero)
+  val half = QuadOffset(QuadLen.half, QuadLen.half)
+  val one = QuadOffset(QuadLen.one, QuadLen.one)
 
   implicit def toPoint(offset: QuadOffset): Point = offset.toPoint
 
   def approx(point: Point, resolution: Int): QuadOffset =
-      new QuadOffset(
+      QuadOffset(
           QuadLen.approx(point.x, resolution),
           QuadLen.approx(point.y, resolution))
 }
-// TODO: Refactor to be a case class?
-class QuadOffset(val x: QuadLen, val y: QuadLen) {
+case class QuadOffset(x: QuadLen, y: QuadLen) {
   def this(x: Int, y: Int) = this(QuadLen(x), QuadLen(y))
 
   val minExp = x minExp y
 
   // Returns the x component of [this] as a QuadOffset
-  def xComp: QuadOffset = new QuadOffset(x, QuadLen.zero)
+  def xComp: QuadOffset = QuadOffset(x, QuadLen.zero)
 
   // Returns the y component of [this] as a QuadOffset
-  def yComp: QuadOffset = new QuadOffset(QuadLen.zero, y)
+  def yComp: QuadOffset = QuadOffset(QuadLen.zero, y)
 
   // Transforms [this] from unit rectangle to [rect]
   def within(rect: QuadRectangle): QuadOffset =
@@ -89,27 +88,16 @@ class QuadOffset(val x: QuadLen, val y: QuadLen) {
   // Operators
 
   def +(other: QuadOffset): QuadOffset =
-      new QuadOffset(x + other.x, y + other.y)
+      QuadOffset(x + other.x, y + other.y)
 
   def -(other: QuadOffset): QuadOffset =
-      new QuadOffset(x - other.x, y - other.y)
+      QuadOffset(x - other.x, y - other.y)
 
-  def *(k: Int): QuadOffset = new QuadOffset(x*k, y*k)
+  def *(k: Int): QuadOffset = QuadOffset(x*k, y*k)
 
-  def unary_- : QuadOffset = new QuadOffset(-x, -y)
+  def unary_- : QuadOffset = QuadOffset(-x, -y)
 
   // Shift operators are used for scaling by powers of 2.
-  def <<(levels: Int): QuadOffset = new QuadOffset(x << levels, y << levels)
-  def >>(levels: Int): QuadOffset = new QuadOffset(x >> levels, y >> levels)
-
-  override def hashCode: Int =
-      31 * (x.hashCode +
-          31 * y.hashCode)
-
-  override def equals(o: Any): Boolean = o match {
-    case other: QuadOffset => x == other.x && y == other.y
-    case _ => false
-  }
-
-  override def toString: String = s"($x, $y)"
+  def <<(levels: Int): QuadOffset = QuadOffset(x << levels, y << levels)
+  def >>(levels: Int): QuadOffset = QuadOffset(x >> levels, y >> levels)
 }

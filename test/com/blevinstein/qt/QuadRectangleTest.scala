@@ -8,8 +8,8 @@ import org.scalatest._
 class QuadRectangleTest extends FunSuite with Matchers {
   test("QuadRectangle#toRectangle") {
       (new QuadRectangle(
-          new QuadOffset(new QuadLen(3, -2), new QuadLen(1, -1)),
-          new QuadOffset(new QuadLen(1, 0), new QuadLen(3, -2)))
+          QuadOffset(QuadLen(3, -2), QuadLen(1, -1)),
+          QuadOffset(QuadLen(1, 0), QuadLen(3, -2)))
           .toRectangle
       shouldEqual
           new Rectangle(new Point(0.75f, 0.5f), new Point(1, 0.75f)))
@@ -27,17 +27,17 @@ class QuadRectangleTest extends FunSuite with Matchers {
 
   test("QuadRectangle#within, #withRespectTo") {
     val topLeft = new QuadRectangle(
-        new QuadOffset(QuadLen.zero, QuadLen.half),
-        new QuadOffset(QuadLen.half, QuadLen.one))
+        QuadOffset(QuadLen.zero, QuadLen.half),
+        QuadOffset(QuadLen.half, QuadLen.one))
     val bottomRight = new QuadRectangle(
-        new QuadOffset(QuadLen.half, QuadLen.zero),
-        new QuadOffset(QuadLen.one, QuadLen.half))
+        QuadOffset(QuadLen.half, QuadLen.zero),
+        QuadOffset(QuadLen.one, QuadLen.half))
 
     val aWithinB = topLeft within bottomRight
 
     aWithinB shouldEqual new QuadRectangle(
-      new QuadOffset(QuadLen.half, new QuadLen(1, -2)),
-      new QuadOffset(new QuadLen(3, -2), QuadLen.half))
+      QuadOffset(QuadLen.half, QuadLen(1, -2)),
+      QuadOffset(QuadLen(3, -2), QuadLen.half))
 
     aWithinB withRespectTo bottomRight shouldEqual topLeft
 
@@ -53,8 +53,8 @@ class QuadRectangleTest extends FunSuite with Matchers {
 
   test("QuadRectangle#toAddressList basic case") {
     val rect = new QuadRectangle(
-        new QuadOffset(new QuadLen(1, -2), new QuadLen(1, -3)),
-        new QuadOffset(new QuadLen(3, -2), new QuadLen(5, -3)))
+        QuadOffset(QuadLen(1, -2), QuadLen(1, -3)),
+        QuadOffset(QuadLen(3, -2), QuadLen(5, -3)))
 
     // - abcd
     //   yyzz
@@ -77,7 +77,7 @@ class QuadRectangleTest extends FunSuite with Matchers {
   test("QuadRectangle#toAddressList off-grid squares") {
     val rectOne = new QuadRectangle(
         QuadOffset.zero,
-        new QuadOffset(new QuadLen(3, -2), new QuadLen(3, -2)))
+        QuadOffset(QuadLen(3, -2), QuadLen(3, -2)))
 
     // -
     //  abc
@@ -93,7 +93,7 @@ class QuadRectangleTest extends FunSuite with Matchers {
         new QuadAddr(BottomRight, BottomLeft)) // e
 
     val rectTwo = new QuadRectangle(
-        new QuadOffset(new QuadLen(1, -2), new QuadLen(1, -2)),
+        QuadOffset(QuadLen(1, -2), QuadLen(1, -2)),
         QuadOffset.one)
 
     // - axx
@@ -112,15 +112,15 @@ class QuadRectangleTest extends FunSuite with Matchers {
 
   test("QuadRectangle#toAddressList out of bounds") {
     val rect = new QuadRectangle(
-        new QuadOffset(new QuadLen(0), new QuadLen(2).simplify),
-        new QuadOffset(new QuadLen(2).simplify, new QuadLen(4).simplify))
+        QuadOffset(QuadLen(0), QuadLen(2).simplify),
+        QuadOffset(QuadLen(2).simplify, QuadLen(4).simplify))
 
     rect.toAddressList.toSet shouldEqual Set()
   }
 
   test("QuadRectangle#toAddressList large") {
     val rect = new QuadRectangle(QuadOffset.zero,
-        new QuadOffset(new QuadLen(2), new QuadLen(2)))
+        QuadOffset(QuadLen(2), QuadLen(2)))
 
     rect.toAddressList.toSet shouldEqual Set(new QuadAddr())
   }

@@ -21,7 +21,7 @@ object QuadZone {
   }
 }
 class QuadZone(val x: Int, val y: Int) {
-  val min: QuadOffset = new QuadOffset(QuadLen(x, 0), QuadLen(y, 0))
+  val min: QuadOffset = QuadOffset(QuadLen(x, 0), QuadLen(y, 0))
 
   val toQuadRectangle: QuadRectangle =
       new QuadRectangle(min, min + QuadZone.size)

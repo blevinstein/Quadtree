@@ -46,11 +46,11 @@ class QuadRectangle(val min: QuadOffset, val max: QuadOffset) {
   // Recursively generate a List of addresses covered by this rectangle.
   def toAddressList: List[QuadAddr] = {
     def splitOnX(xCoord: QuadLen): List[QuadAddr] =
-        new QuadRectangle(min, new QuadOffset(xCoord, max.y)).toAddressList ++
-            new QuadRectangle(new QuadOffset(xCoord, min.y), max).toAddressList
+        new QuadRectangle(min, QuadOffset(xCoord, max.y)).toAddressList ++
+            new QuadRectangle(QuadOffset(xCoord, min.y), max).toAddressList
     def splitOnY(yCoord: QuadLen): List[QuadAddr] =
-        new QuadRectangle(min, new QuadOffset(max.x, yCoord)).toAddressList ++
-            new QuadRectangle(new QuadOffset(min.x, yCoord), max).toAddressList
+        new QuadRectangle(min, QuadOffset(max.x, yCoord)).toAddressList ++
+            new QuadRectangle(QuadOffset(min.x, yCoord), max).toAddressList
 
     // Grid size is determined by three limitations:
     // - A QuadLeaf must be grid aligned
@@ -64,7 +64,7 @@ class QuadRectangle(val min: QuadOffset, val max: QuadOffset) {
 
     if (isEmpty) {
       List()
-    } else if (size == new QuadOffset(xGridSize, yGridSize) &&
+    } else if (size == QuadOffset(xGridSize, yGridSize) &&
         isPerfectSquare) {
       // base case: grid-aligned square
       if (min.isInUnitRectangle) {
@@ -104,10 +104,10 @@ class QuadRectangle(val min: QuadOffset, val max: QuadOffset) {
 
   // Returns the intersection of two QuadRectangles
   def intersect(other: QuadRectangle): QuadRectangle = {
-    def min2d(a: QuadOffset, b: QuadOffset): QuadOffset = new QuadOffset(
+    def min2d(a: QuadOffset, b: QuadOffset): QuadOffset = QuadOffset(
         if (a.x < b.x) a.x else b.x,
         if (a.y < b.y) a.y else b.y)
-    def max2d(a: QuadOffset, b: QuadOffset): QuadOffset = new QuadOffset(
+    def max2d(a: QuadOffset, b: QuadOffset): QuadOffset = QuadOffset(
         if (a.x > b.x) a.x else b.x,
         if (a.y > b.y) a.y else b.y)
     val newMin = max2d(min, other.min)

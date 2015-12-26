@@ -171,9 +171,9 @@ class QuadTreeTest extends FunSuite with Matchers {
 
   test("QuadAddr <=> QuadOffset") {
     new QuadAddr(TopRight, BottomRight).toOffset shouldEqual
-        new QuadOffset(new QuadLen(3, -2), new QuadLen(1, -1))
+        QuadOffset(QuadLen(3, -2), QuadLen(1, -1))
 
-    (new QuadOffset(new QuadLen(3, -2), new QuadLen(1, -1)).toAddress(2)
+    (QuadOffset(QuadLen(3, -2), QuadLen(1, -1)).toAddress(2)
         shouldEqual
         new QuadAddr(TopRight, BottomRight))
 
@@ -211,7 +211,7 @@ class QuadTreeTest extends FunSuite with Matchers {
     val q1 = new QuadBranch(new QuadLeaf(false), new QuadLeaf(true),
       new QuadLeaf(true), new QuadLeaf(false))
 
-    q1.grow(-1, new QuadOffset(QuadLen.zero, QuadLen.half), false) shouldEqual
+    q1.grow(-1, QuadOffset(QuadLen.zero, QuadLen.half), false) shouldEqual
       new QuadBranch(q1, new QuadLeaf(false),
         new QuadLeaf(false), new QuadLeaf(false))
 
@@ -288,11 +288,11 @@ class QuadTreeTest extends FunSuite with Matchers {
     // NOTE: the "fill" argument of grow should always be the opposite of what
     //     you expect, to minimize false negatives
     q1.grow(2, QuadOffset.zero, false) shouldEqual new QuadLeaf(true)
-    q1.grow(2, new QuadOffset(-QuadLen.one, QuadLen.zero), true) shouldEqual
+    q1.grow(2, QuadOffset(-QuadLen.one, QuadLen.zero), true) shouldEqual
         new QuadLeaf(false)
-    q1.grow(2, new QuadOffset(QuadLen.zero, -QuadLen.one), true) shouldEqual
+    q1.grow(2, QuadOffset(QuadLen.zero, -QuadLen.one), true) shouldEqual
         new QuadLeaf(false)
-    q1.grow(2, new QuadOffset(-QuadLen.one, -QuadLen.one), false) shouldEqual
+    q1.grow(2, QuadOffset(-QuadLen.one, -QuadLen.one), false) shouldEqual
       new QuadLeaf(true)
 
     // zoom in on bottom left quadrant

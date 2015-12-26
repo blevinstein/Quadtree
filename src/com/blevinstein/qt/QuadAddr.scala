@@ -24,7 +24,7 @@ class QuadAddr(val quads: List[Quadrant]) {
   def toQuadRectangle: QuadRectangle = {
     val sideLen = QuadLen(1, -this.length)
     val bottomLeft = this.toOffset
-    val topRight = bottomLeft + new QuadOffset(sideLen, sideLen)
+    val topRight = bottomLeft + QuadOffset(sideLen, sideLen)
     new QuadRectangle(bottomLeft, topRight)
   }
 
@@ -33,7 +33,7 @@ class QuadAddr(val quads: List[Quadrant]) {
     var bottomLeft = QuadOffset.zero
     for (i <- 0 until this.length) {
       val quadrant = this(i)
-      bottomLeft = bottomLeft + new QuadOffset(
+      bottomLeft = bottomLeft + QuadOffset(
         QuadLen(if (quadrant.x) 1 else 0, -(i + 1)),
         QuadLen(if (quadrant.y) 1 else 0, -(i + 1)))
     }
