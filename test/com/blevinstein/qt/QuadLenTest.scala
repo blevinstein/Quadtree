@@ -37,9 +37,27 @@ class QuadLenTest extends FunSuite with Matchers {
 
   test("QuadLen#truncatePerfect") {
     new QuadLen(7, -3).truncatePerfect shouldEqual new QuadLen(1, -1)
-
     new QuadLen(3, -3).truncatePerfect shouldEqual new QuadLen(1, -2)
-
     new QuadLen(3, -4).truncatePerfect shouldEqual new QuadLen(1, -3)
+
+    new QuadLen(9).truncatePerfect shouldEqual new QuadLen(8)
+    new QuadLen(8).truncatePerfect shouldEqual new QuadLen(8)
+    new QuadLen(17).truncatePerfect shouldEqual new QuadLen(16)
+  }
+
+  test("QuadLen#log2") {
+    QuadLen.log2(0) shouldEqual None
+    QuadLen.log2(1) shouldEqual Some(0)
+    QuadLen.log2(2) shouldEqual Some(1)
+    QuadLen.log2(4) shouldEqual Some(2)
+    QuadLen.log2(5) shouldEqual None
+    QuadLen.log2(8) shouldEqual Some(3)
+  }
+
+  test("QuadLen#perfectLog") {
+    new QuadLen(1, -1).perfectLog shouldEqual Some(-1)
+    new QuadLen(1).perfectLog shouldEqual Some(0)
+    new QuadLen(4).perfectLog shouldEqual Some(2)
+    new QuadLen(8).perfectLog shouldEqual Some(3)
   }
 }

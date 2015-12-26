@@ -30,7 +30,7 @@ object QuadLen {
       }
     }
     val quadIntPart = new QuadLen(intPart, 0)
-    val quadFloatPart = new QuadLen(min, resolution).simplify
+    val quadFloatPart = new QuadLen(min, resolution)
 
     quadIntPart + (quadFloatPart * math.signum(float).toInt)
   }
@@ -39,6 +39,23 @@ object QuadLen {
 
   def min(lens: QuadLen*): QuadLen = lens.reduce((a, b) => if (a <= b) a else b)
   def max(lens: QuadLen*): QuadLen = lens.reduce((a, b) => if (a >= b) a else b)
+
+  // Simple recursive implementation of log2
+  def log2(number: Int): Option[Int] = {
+    if (number <= 0) {
+      None // log2 is only defined on positiven numbers
+    } else if (number == 1) {
+      Some(0) // Base case
+    } else if (number % 2 == 0) {
+      // Recursively bitshift to divide by 2
+      log2(number >> 1) match {
+        case Some(n) => Some(n + 1)
+        case None => None
+      }
+    } else {
+      None
+    }
+  }
 
   private def normalize(a: QuadLen, b: QuadLen): (Int, Int, Int) = {
     val newExp = if (a.base == 0 && b.base == 0) {
@@ -62,6 +79,7 @@ class QuadLen(private val base: Int, private val exp: Int = 0) {
   //   return false
   def isZero: Boolean = base == 0
 
+  // Returns the "resolution" of this length, e.g. 3/8 => 1/8 resolution => -3
   def minExp: Int = simplify.exp
 
   val toFloat: Float = if (exp >= 0) {
@@ -70,14 +88,14 @@ class QuadLen(private val base: Int, private val exp: Int = 0) {
     1f * base / (1 << -exp)
   }
   def +(other: QuadLen): QuadLen = QuadLen.normalize(this, other) match {
-    case (a, b, ex) => new QuadLen(a + b, ex).simplify
+    case (a, b, ex) => new QuadLen(a + b, ex)
   }
   def -(other: QuadLen): QuadLen = QuadLen.normalize(this, other) match {
-    case (a, b, ex) => new QuadLen(a - b, ex).simplify
+    case (a, b, ex) => new QuadLen(a - b, ex)
   }
-  def *(k: Int): QuadLen = new QuadLen(base * k, exp).simplify
-  def <<(k: Int): QuadLen = new QuadLen(base, exp + k).simplify
-  def >>(k: Int): QuadLen = new QuadLen(base, exp - k).simplify
+  def *(k: Int): QuadLen = new QuadLen(base * k, exp)
+  def <<(k: Int): QuadLen = new QuadLen(base, exp + k)
+  def >>(k: Int): QuadLen = new QuadLen(base, exp - k)
 
   def unary_- : QuadLen = new QuadLen(-base, exp)
 
@@ -103,35 +121,49 @@ class QuadLen(private val base: Int, private val exp: Int = 0) {
 
   // Returns the largest QuadLen that is "perfect" and less than or equal to
   // [this].
-  def truncatePerfect: QuadLen = base match {
-    case 1 => this
-    case _ => new QuadLen(base - 1, exp).simplify.truncatePerfect
+  def truncatePerfect: QuadLen = {
+    require(base > 0, "truncatePerfect only handles positive numbers")
+    var perfectNum = new QuadLen(1, exp)
+    while (perfectNum * 2 <= this) perfectNum = perfectNum * 2
+    perfectNum
   }
 
   // For "perfect" lengths of the form 1 << x, this will return x
-  def perfectLog: Option[Int] = base match {
-    case 1 => Some(exp)
-    case _ => None
-  }
+  // NOTE: perfectLog discards sign information
+  def perfectLog: Option[Int] =
+      if (base > 0) {
+        QuadLen.log2(base) match {
+          case Some(n) => Some(n + exp)
+          case None => None
+        }
+      } else {
+        None
+      }
 
   def isSimplified: Boolean = base % 2 == 1 || base == 0
 
   def simplify: QuadLen = if (base == 0) {
     QuadLen.zero
-  } else if (base % 2 == 0 && exp < 0) {
+  } else if (base % 2 == 0) {
     new QuadLen(base / 2, exp + 1).simplify
-  } else if (exp > 0) {
-    new QuadLen(base * 2, exp - 1).simplify
   } else {
     this
   }
 
-  override def hashCode: Int =
-    31 * (base.hashCode +
-      31 * exp.hashCode)
+  override def hashCode: Int = {
+    val simplified = simplify
+    31 * (simplified.base.hashCode +
+      31 * simplified.exp.hashCode)
+  }
 
   override def equals(o: Any): Boolean = o match {
-    case other: QuadLen => base == other.base && exp == other.exp
+    case other: QuadLen => {
+      val simplified = simplify
+      val otherSimplified = other.simplify
+
+      simplified.base == otherSimplified.base &&
+          simplified.exp == otherSimplified.exp
+    }
     case _ => false
   }
 
