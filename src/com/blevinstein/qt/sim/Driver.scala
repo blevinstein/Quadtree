@@ -243,9 +243,7 @@ object Driver extends App with Runnable {
 
   def setLineWidth(gl: GL2, width: Float) = gl.glLineWidth(width)
 
-  // TODO: refactor (center, zoom) into object Camera?
-  var zoom = 1f
-  var center = Point.zero
+  var camera = Camera.focus(Point.zero, 1f)
   def render(gl: GL2): Unit = {
     gl.glClear(GL_COLOR_BUFFER_BIT)
 
@@ -259,7 +257,7 @@ object Driver extends App with Runnable {
     val figure = world.getObj(figureId)
 
     // Focus camera on figure
-    center = figure.center.toPoint
+    camera = camera.refocus(figure.center.toPoint)
 
     // draw background
     setFill(gl, true)
@@ -292,23 +290,29 @@ object Driver extends App with Runnable {
 
   object LayoutManager {
     // Position of the screen
-    var screen = new Rectangle(Point.zero, new Point(1, 1))
+    var screen = Camera(new Rectangle(Point.zero, new Point(1, 1)))
 
     // NOTE: can implement screenToWorld(rect: Rectangle) trivially if necessary
-    def screenToWorld(p: Point): Point =
-        (p - screen.center) / screen.size * zoom + center
+    def screenToWorld(point: Point): Point = {
+      println(s"screenToWorld $point => ${screen.get(point)} => ${camera.put(screen.get(point))}")
+      camera.put(screen.get(point))
+    }
 
     // NOTE: can implement worldToScreen(p: Point) trivially if necessary
-    def worldToScreen(rect: Rectangle): Rectangle =
-        (rect - center) / zoom * screen.size + screen.center
+    def worldToScreen(rect: Rectangle): Rectangle = screen.put(camera.get(rect))
 
     def reshape(x: Int, y: Int, w: Int, h: Int) {
       // Update view panel: center onscreen and maintain aspect ratio
-      screen = centerSquare(new Rectangle(Point.zero, new Point(width, height)))
+      // HACK: need to divide by 2 when using a retina display, because
+      // MouseEvent coords don't align with OpenGL coords
+      screen = Camera(new Rectangle(Point.zero, new Point(w, h) / 2))
+      // DEBUG
+      println(s"screen is $screen")
     }
 
     // Given a rectangle, finds the largest square that can be fit inside, and
     // centers it in the available space.
+    // TODO: remove if unused
     def centerSquare(rect: Rectangle): Rectangle = {
       val size = math.min(rect.size.x, rect.size.y)
       val offsetDist = math.abs(rect.size.x - rect.size.y) / 2
@@ -361,9 +365,9 @@ object Driver extends App with Runnable {
     }
     override def mouseWheelMoved(e: MouseWheelEvent): Unit = {
       if (e.getWheelRotation() > 0) {
-        zoom *= zoomUnit
+        camera = camera.zoomIn(zoomUnit)
       } else if (e.getWheelRotation() < 0) {
-        zoom /= zoomUnit
+        camera = camera.zoomOut(zoomUnit)
       }
     }
   }
@@ -379,7 +383,10 @@ object Driver extends App with Runnable {
   object MouseMotionListener extends MouseMotionAdapter {
     var position: Point = Point.zero
     override def mouseMoved(e: MouseEvent): Unit = {
-      position = new Point(e.getX(), LayoutManager.screen.size.y - e.getY())
+      position =
+          new Point(e.getX(), LayoutManager.screen.rect.size.y - e.getY())
+      // DEBUG
+      println(s"mouseMoved $position")
     }
   }
 

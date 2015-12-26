@@ -2,6 +2,7 @@ package com.blevinstein.geom
 
 object Point {
   val zero = new Point(0, 0)
+  val unit = new Point(1, 1)
 }
 class Point(val x: Float, val y: Float) {
   def +(other: Point): Point = new Point(x + other.x, y + other.y)
