@@ -53,6 +53,7 @@ import scala.util.control.Breaks._
 object Driver extends App with Runnable {
   val FPS: Int = 30
   // Dimensions of the screen
+  // TODO: remove these, use LayoutManager.screen instead
   var height: Int = 1
   var width: Int = 1
 
@@ -177,6 +178,11 @@ object Driver extends App with Runnable {
     }
   }
 
+  def printMousePosition: Unit = {
+    val worldPos = LayoutManager.screenToWorld(MouseMotionListener.position)
+    println(s"mouse position: $worldPos")
+  }
+
   def getCanvas: GLCanvas = glCanvas
 
   def setup(gl: GL2): Unit = {
@@ -184,7 +190,8 @@ object Driver extends App with Runnable {
     gl.glLoadIdentity
 
     val glu = new GLU()
-    glu.gluOrtho2D(0, width, 0, height)
+    // HACK: fix retina display issues
+    glu.gluOrtho2D(0, width / 2, 0, height / 2)
 
     gl.glMatrixMode(GL_MODELVIEW)
     gl.glLoadIdentity
@@ -243,7 +250,7 @@ object Driver extends App with Runnable {
 
   def setLineWidth(gl: GL2, width: Float) = gl.glLineWidth(width)
 
-  var camera = Camera.focus(Point.zero, 1f)
+  var worldCam = Camera.focus(Point.zero, 1f)
   def render(gl: GL2): Unit = {
     gl.glClear(GL_COLOR_BUFFER_BIT)
 
@@ -257,7 +264,7 @@ object Driver extends App with Runnable {
     val figure = world.getObj(figureId)
 
     // Focus camera on figure
-    camera = camera.refocus(figure.center.toPoint)
+    worldCam = worldCam.refocus(figure.center.toPoint)
 
     // draw background
     setFill(gl, true)
@@ -290,29 +297,26 @@ object Driver extends App with Runnable {
 
   object LayoutManager {
     // Position of the screen
-    var screen = Camera(new Rectangle(Point.zero, new Point(1, 1)))
+    // TODO: handle distortions when screen is not square
+    var screen = new Rectangle(Point.zero, new Point(1, 1))
 
     // NOTE: can implement screenToWorld(rect: Rectangle) trivially if necessary
-    def screenToWorld(point: Point): Point = {
-      println(s"screenToWorld $point => ${screen.get(point)} => ${camera.put(screen.get(point))}")
-      camera.put(screen.get(point))
-    }
+    def screenToWorld(point: Point): Point =
+        worldCam.put(Camera(screen).get(point))
 
     // NOTE: can implement worldToScreen(p: Point) trivially if necessary
-    def worldToScreen(rect: Rectangle): Rectangle = screen.put(camera.get(rect))
+    def worldToScreen(rect: Rectangle): Rectangle =
+        Camera(screen).put(worldCam.get(rect))
 
     def reshape(x: Int, y: Int, w: Int, h: Int) {
       // Update view panel: center onscreen and maintain aspect ratio
       // HACK: need to divide by 2 when using a retina display, because
       // MouseEvent coords don't align with OpenGL coords
-      screen = Camera(new Rectangle(Point.zero, new Point(w, h) / 2))
-      // DEBUG
-      println(s"screen is $screen")
+      screen = centerSquare(new Rectangle(Point.zero, new Point(w, h) / 2))
     }
 
     // Given a rectangle, finds the largest square that can be fit inside, and
     // centers it in the available space.
-    // TODO: remove if unused
     def centerSquare(rect: Rectangle): Rectangle = {
       val size = math.min(rect.size.x, rect.size.y)
       val offsetDist = math.abs(rect.size.x - rect.size.y) / 2
@@ -342,8 +346,11 @@ object Driver extends App with Runnable {
       // Update inputStack
       e.getKeyCode() match {
         case KeyEvent.VK_ESCAPE => inputStack.clear()
-        case KeyEvent.VK_Z => // Dump inputStack for debugging
-            println(s"Input: $inputStack")
+        case KeyEvent.VK_Z => {
+          println(s"Input stack: $inputStack")
+          printObjectPositions
+          printMousePosition
+        }
         case code if inputStackBlacklist contains code => ()
         case code => inputStack.push(KeyInput(code))
       }
@@ -360,14 +367,14 @@ object Driver extends App with Runnable {
       inputStack.push(MouseInput(
           LayoutManager.screenToWorld(new Point(
               e.getX(),
-              height - e.getY())),
+              LayoutManager.screen.size.y - e.getY())),
           e.getButton()))
     }
     override def mouseWheelMoved(e: MouseWheelEvent): Unit = {
       if (e.getWheelRotation() > 0) {
-        camera = camera.zoomIn(zoomUnit)
+        worldCam = worldCam.zoomIn(zoomUnit)
       } else if (e.getWheelRotation() < 0) {
-        camera = camera.zoomOut(zoomUnit)
+        worldCam = worldCam.zoomOut(zoomUnit)
       }
     }
   }
@@ -384,9 +391,7 @@ object Driver extends App with Runnable {
     var position: Point = Point.zero
     override def mouseMoved(e: MouseEvent): Unit = {
       position =
-          new Point(e.getX(), LayoutManager.screen.rect.size.y - e.getY())
-      // DEBUG
-      println(s"mouseMoved $position")
+          new Point(e.getX(), LayoutManager.screen.size.y - e.getY())
     }
   }
 
