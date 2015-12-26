@@ -192,6 +192,7 @@ object Driver extends App with Runnable {
 
     val glu = new GLU()
     // HACK: fix retina display issues
+    // TODO: https://jogamp.org/bugzilla/show_bug.cgi?id=741
     glu.gluOrtho2D(0, width / 2, 0, height / 2)
 
     gl.glMatrixMode(GL_MODELVIEW)
