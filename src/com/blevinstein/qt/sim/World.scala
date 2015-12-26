@@ -1,7 +1,7 @@
 package com.blevinstein.qt.sim
 
 import com.blevinstein.geom.{Point,Rectangle}
-import com.blevinstein.qt.{QuadAddr,QuadTree,QuadLeaf,QuadRectangle,QuadOffset}
+import com.blevinstein.qt.{QuadAddr,QuadTree,QuadLeaf,QuadLen,QuadRectangle,QuadOffset}
 import com.blevinstein.qt.sim.Operators.{anyOp,collideOp}
 import com.blevinstein.util.Find.findMap
 
@@ -94,7 +94,7 @@ class World(val objs: Map[Id, QuadObject], val modules: List[WorldModule]) {
   // Returns (newWorld, secondaryEvents), where [newWorld] represents the new
   // state of the world after [event], and [secondaryEvents] is a collection of
   // (zero or more) events that occur as a result of the primary event [event].
-  // E.g. a MoveTo/MoveBy event can cause a Collision event.
+  // E.g. a MoveTo/Move event can cause a Collision event.
   def afterEvent(event: Event): (World, Iterable[Event]) = event match {
     case Add(newId: Id, newObj: QuadObject) =>
         if (collideWithAll(newObj).isEmpty) {
@@ -106,8 +106,8 @@ class World(val objs: Map[Id, QuadObject], val modules: List[WorldModule]) {
         tryReplace(id, getObj(id).combine(otherObj))
     case AddShape(id: Id, newShape: QuadTree[Option[Material]]) =>
         tryReplace(id, getObj(id).addShape(newShape))
-    case MoveBy(id: Id, offset: QuadOffset) =>
-        tryReplace(id, getObj(id).withOffset(offset))
+    case Move(id: Id, velocity: Point) =>
+        tryMove(id, velocity)
     case MoveTo(id: Id, newPosition: QuadOffset) =>
         tryReplace(id, getObj(id).withPosition(newPosition))
     case Remove(id: Id) => (withObjs(objs - id), List())
@@ -128,6 +128,8 @@ class World(val objs: Map[Id, QuadObject], val modules: List[WorldModule]) {
       }
     // Feedback/emitted events
     case Collision(idA: Id, idB: Id) => {
+        // NOTE: This gives sliding collisions.
+        // TODO: Add bouncing collisions.
         def arrestMotion(id: Id, vel: Point): Point = {
           val obj = getObj(id)
           if (canReplace(id, obj.withOffset(velToOffset(vel.xComp)))) {
@@ -147,12 +149,12 @@ class World(val objs: Map[Id, QuadObject], val modules: List[WorldModule]) {
           case (Moving(velA), Fixed) =>
               (this, List(
                   SetVelocity(idA, arrestMotion(idA, velA)),
-                  MoveBy(idA, velToOffset(velA))
+                  Move(idA, velA)
               ))
           case (Fixed, Moving(velB)) =>
               (this, List(
                   SetVelocity(idB, arrestMotion(idB, velB)),
-                  MoveBy(idB, velToOffset(velB))
+                  Move(idB, velB)
               ))
           case (Moving(velA), Moving(velB)) => {
               // TODO: calculate mass, preserve avg momentum not avg velocity
@@ -160,8 +162,8 @@ class World(val objs: Map[Id, QuadObject], val modules: List[WorldModule]) {
               (this, List(
                   SetVelocity(idA, newVelocity),
                   SetVelocity(idB, newVelocity),
-                  MoveBy(idA, velToOffset(newVelocity)),
-                  MoveBy(idB, velToOffset(newVelocity))
+                  Move(idA, newVelocity),
+                  Move(idB, newVelocity)
               ))
             }
         }
@@ -194,6 +196,33 @@ class World(val objs: Map[Id, QuadObject], val modules: List[WorldModule]) {
     } else {
       (this, collisions.map((otherId) => Collision(id, otherId)))
     }
+  }
+
+  def maxPossibleOffset(id: Id, obj: QuadObject, vel: Point): QuadOffset = {
+    // # steps = vel / QuadLen(1, moveRes)
+    // NOTE: This is the correct step size when [vel] is axis-aligned, but not
+    // necessarily the correct step size when [vel] is diagonal. Would ideally
+    // be 1 / sqrt(2) of the current step size.
+    val numSteps = (vel.mag / QuadLen(1, moveRes).toFloat).toInt
+    var maxI =
+        (for (i <- 0 to numSteps) yield i).
+            takeWhile((i) =>
+                canReplace(
+                    id,
+                    obj.withOffset(velToOffset(vel * (1f * i / numSteps))))).
+            last
+    velToOffset(vel * (1f * maxI / numSteps))
+  }
+
+  def tryMove(id: Id, velocity: Point): (World, Iterable[Event]) = {
+    val obj = getObj(id)
+    var newObj = obj.withOffset(velToOffset(velocity))
+    val collisions = collideWithAll(newObj, Set(id))
+    if (!collisions.isEmpty) {
+      newObj = obj.withOffset(maxPossibleOffset(id, obj, velocity))
+    }
+    (withObjs(objs + ((id, newObj))),
+        collisions.map((otherId) => Collision(id, otherId)))
   }
 
   // Helper method for static contact checking with all other objects.

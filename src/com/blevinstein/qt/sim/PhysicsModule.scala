@@ -13,7 +13,7 @@ class PhysicsModule extends WorldModule {
           case Fixed => List()
           case Moving(v) => List(
               Accel(id, gravity),
-              MoveBy(id, world.velToOffset(v)))
+              Move(id, v))
         }
       }
   }

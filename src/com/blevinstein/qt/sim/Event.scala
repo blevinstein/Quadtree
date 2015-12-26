@@ -10,7 +10,7 @@ case class Add(newId: Id, obj: QuadObject) extends Event
 case class AddShape(id: Id, newShape: QuadTree[Option[Material]]) extends Event
 
 case class Merge(id: Id, other: QuadObject) extends Event
-case class MoveBy(id: Id, deltaPosition: QuadOffset) extends Event
+case class Move(id: Id, velocity: Point) extends Event
 case class MoveTo(id: Id, newPosition: QuadOffset) extends Event
 case class Remove(id: Id) extends Event
 case class Reshape(id: Id, newShape: QuadTree[Option[Material]]) extends Event
