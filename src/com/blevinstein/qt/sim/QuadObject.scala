@@ -10,7 +10,7 @@ import com.blevinstein.qt.sim.Operators.{addOp,avgOp,complexityOp};
 // describing its [position].
 class QuadObject(val position: QuadRectangle,
     val shape: QuadTree[Option[Material]],
-    val state: State = Moving(Point.zero)) {
+    val state: State) {
   require(position.isPerfectSquare, s"not a square: $position")
 
   def combine(other: QuadObject): QuadObject = {

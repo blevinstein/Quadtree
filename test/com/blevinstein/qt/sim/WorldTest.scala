@@ -10,7 +10,9 @@ class WorldTest extends FunSuite with Matchers {
     val blockId = Id.get
     val blockPos = new QuadRectangle(new QuadOffset(5, 5), new QuadOffset(6, 6))
     val world = new World().process(List(
-        Add(blockId, new QuadObject(blockPos, new QuadLeaf(Material.Blue)))
+        Add(blockId,
+            new QuadObject(
+                blockPos, new QuadLeaf(Material.Blue), Moving(Point.zero)))
     ))
     world.find(new Point(5.5f, 5.5f)) shouldEqual
         Some((blockId, blockPos, Material.Blue.get))

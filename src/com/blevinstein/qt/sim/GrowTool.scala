@@ -1,6 +1,6 @@
 package com.blevinstein.qt.sim
 
-import com.blevinstein.qt.{QuadRectangle,QuadTree}
+import com.blevinstein.qt.{QuadLeaf,QuadRectangle,QuadTree}
 
 import java.awt.Color
 import java.awt.event.MouseEvent
@@ -87,13 +87,12 @@ case class GrowTool(prefix: List[Input]) extends Tool {
                           // NOTE: This will happily overrwrite existing nodes
                           // in the source object, although it will fail if this
                           // would cause a collision with another object.
-                          AddShape(
+                          Merge(
                               id,
-                              new QuadTree.Builder[Option[Material]](None)
-                                  .addAll(
-                                      newRect.withRespectTo(obj.position),
-                                      Some(material))
-                                  .build)))
+                              new QuadObject(
+                                  newRect,
+                                  new QuadLeaf(Some(material)),
+                                  obj.state))))
                           /*
                           TODO: diagnose why this doesn't work
                           Reshape(

@@ -105,7 +105,8 @@ object Driver extends App with Runnable {
       Add(
           figureId,
           new QuadObject(
-              (QuadRectangle.unit >> 3) + QuadOffset.half, figureShape)),
+              (QuadRectangle.unit >> 3) + QuadOffset.half, figureShape,
+              Moving(Point.zero))),
       Add(
           Id.get,
           new QuadObject(
