@@ -127,16 +127,17 @@ class World(val objs: Map[Id, QuadObject], val modules: List[WorldModule]) {
         }
       }
     // Feedback/emitted events
-    // TODO: instead of setting velocity to zero on collision, try setting only
-    // velocity.x or velocity.y to zero, to enable "sliding".
     case Collision(idA: Id, idB: Id) => {
         def arrestMotion(id: Id, vel: Point): Point = {
           val obj = getObj(id)
           if (canReplace(id, obj.withOffset(velToOffset(vel.xComp)))) {
+            // Slide along x axis
             vel.xComp
           } else if (canReplace(id, obj.withOffset(velToOffset(vel.yComp)))) {
+            // Slide along y axis
             vel.yComp
           } else {
+            // Fully blocked
             Point.zero
           }
         }
