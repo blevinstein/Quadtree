@@ -343,7 +343,7 @@ object Driver extends App with Runnable {
   object KeyListener extends KeyAdapter {
     private val keysDown: ConcurrentHashMap[Int, Unit] = new ConcurrentHashMap()
 
-    var debugMode = true
+    var debugMode = false
 
     val inputStackBlacklist = Set(
         KeyEvent.VK_A,
