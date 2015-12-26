@@ -173,7 +173,7 @@ object Driver extends App with Runnable {
 
   // DEBUGGING ROUTINES
   def printObjectPositions: Unit = {
-    println("object positions:")
+    println("Object positions:")
     for ((id, obj) <- world.objs) {
       println(s"${obj.position}")
     }
@@ -181,7 +181,7 @@ object Driver extends App with Runnable {
 
   def printMousePosition: Unit = {
     val worldPos = LayoutManager.screenToWorld(MouseMotionListener.position)
-    println(s"mouse position: $worldPos")
+    println(s"Mouse position: $worldPos")
   }
 
   def getCanvas: GLCanvas = glCanvas
