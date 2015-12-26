@@ -202,7 +202,7 @@ object Driver extends App with Runnable {
       case FillRect(color, rect) => {
           setColor(gl, color)
           setFill(gl, true)
-          drawRect(gl, worldToScreen(rect))
+          drawRect(gl, LayoutManager.worldToScreen(rect))
         }
       case FillRegion(color, rects) => {
           // TODO: use BLACK or WHITE depending on brightness of [color]
@@ -210,12 +210,12 @@ object Driver extends App with Runnable {
           setFill(gl, false)
           setLineWidth(gl, 2)
           for (rect <- rects) {
-            drawRect(gl, worldToScreen(rect))
+            drawRect(gl, LayoutManager.worldToScreen(rect))
           }
           setColor(gl, color)
           setFill(gl, true)
           for (rect <- rects) {
-            drawRect(gl, worldToScreen(rect))
+            drawRect(gl, LayoutManager.worldToScreen(rect))
           }
 
           // Reset
@@ -294,6 +294,14 @@ object Driver extends App with Runnable {
     // Position of the screen
     var screen = new Rectangle(Point.zero, new Point(1, 1))
 
+    // NOTE: can implement screenToWorld(rect: Rectangle) trivially if necessary
+    def screenToWorld(p: Point): Point =
+        (p - screen.center) / screen.size * zoom + center
+
+    // NOTE: can implement worldToScreen(p: Point) trivially if necessary
+    def worldToScreen(rect: Rectangle): Rectangle =
+        (rect - center) / zoom * screen.size + screen.center
+
     def reshape(x: Int, y: Int, w: Int, h: Int) {
       // Update view panel: center onscreen and maintain aspect ratio
       screen = centerSquare(new Rectangle(Point.zero, new Point(width, height)))
@@ -346,7 +354,7 @@ object Driver extends App with Runnable {
     override def mouseClicked(e: MouseEvent): Unit = {
       // TODO: BROKEN fix y coordinate when width < height
       inputStack.push(MouseInput(
-          screenToWorld(new Point(
+          LayoutManager.screenToWorld(new Point(
               e.getX(),
               height - e.getY())),
           e.getButton()))
@@ -364,18 +372,9 @@ object Driver extends App with Runnable {
 
   def getInput: List[Input] =
       MouseInput(
-          screenToWorld(MouseMotionListener.position),
+          LayoutManager.screenToWorld(MouseMotionListener.position),
           MouseInput.HOVER) ::
       inputStack.toList
-
-  // NOTE: can implement screenToWorld(rect: Rectangle) trivially if necessary
-  def screenToWorld(p: Point): Point = (p - LayoutManager.screen.center) /
-      LayoutManager.screen.size * zoom + center
-
-  // NOTE: can implement worldToScreen(p: Point) trivially if necessary
-  def worldToScreen(rect: Rectangle): Rectangle =
-      (rect - center) * LayoutManager.screen.size / zoom +
-      LayoutManager.screen.center
 
   object MouseMotionListener extends MouseMotionAdapter {
     var position: Point = Point.zero
