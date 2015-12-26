@@ -379,9 +379,9 @@ object Driver extends App with Runnable {
           e.getButton()))
     }
     override def mouseWheelMoved(e: MouseWheelEvent): Unit = {
-      if (e.getWheelRotation() > 0) {
+      if (e.getWheelRotation() < 0) {
         worldCam = worldCam.zoomIn(zoomUnit)
-      } else if (e.getWheelRotation() < 0) {
+      } else if (e.getWheelRotation() > 0) {
         worldCam = worldCam.zoomOut(zoomUnit)
       }
     }
