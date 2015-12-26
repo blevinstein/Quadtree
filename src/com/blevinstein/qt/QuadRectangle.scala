@@ -13,6 +13,29 @@ object QuadRectangle {
         QuadOffset.approx(min, resolution),
         QuadOffset.approx(max, resolution))
   }
+
+  // Returns a QuadRectangle that contains both [a] and [b].
+  def subsume(a: QuadRectangle, b: QuadRectangle): QuadRectangle = {
+    // Choose [currentRect], and grow until it contains [otherRect]
+    var currentRect = a
+    val otherRect = b
+
+    def grow(rect: QuadRectangle, posX: Boolean, posY: Boolean) =
+        // Double the size of [rect], then shift in the -x or -y direction if
+        // necessary.
+        rect.resize(rect.size << 1) +
+            (if (posX) { QuadOffset.zero } else { -rect.size.xComp }) +
+            (if (posY) { QuadOffset.zero } else { -rect.size.yComp })
+
+    while (!currentRect.contains(otherRect)) {
+        currentRect = grow(
+            currentRect,
+            otherRect.min.x >= currentRect.min.x,
+            otherRect.min.y >= currentRect.min.y)
+    }
+
+    currentRect
+  } ensuring((result) => result.contains(a) && result.contains(b))
 }
 class QuadRectangle(val min: QuadOffset, val max: QuadOffset) {
   def this(max: QuadOffset) = this(QuadOffset.zero, max)

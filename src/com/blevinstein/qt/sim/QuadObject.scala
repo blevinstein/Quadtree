@@ -14,7 +14,7 @@ class QuadObject(val position: QuadRectangle,
   require(position.isPerfectSquare, s"not a square: $position")
 
   def combine(other: QuadObject): QuadObject = {
-      val newPosition = subsume(position, other.position)
+      val newPosition = QuadRectangle.subsume(position, other.position)
 
       val newState = (state, other.state) match {
         // TODO: preserve momentum not total velocity
@@ -28,29 +28,6 @@ class QuadObject(val position: QuadRectangle,
           addOp(this.toQuadTree(newPosition), other.toQuadTree(newPosition)),
           newState)
   }
-
-  // Returns a QuadRectangle that contains both [a] and [b].
-  def subsume(a: QuadRectangle, b: QuadRectangle): QuadRectangle = {
-    // Choose [currentRect], and grow until it contains [otherRect]
-    var currentRect = a
-    val otherRect = b
-
-    def grow(rect: QuadRectangle, posX: Boolean, posY: Boolean) =
-        // Double the size of [rect], then shift in the -x or -y direction if
-        // necessary.
-        rect.resize(rect.size << 1) +
-            (if (posX) { QuadOffset.zero } else { -rect.size.xComp }) +
-            (if (posY) { QuadOffset.zero } else { -rect.size.yComp })
-
-    while (!currentRect.contains(otherRect)) {
-        currentRect = grow(
-            currentRect,
-            otherRect.min.x >= currentRect.min.x,
-            otherRect.min.y >= currentRect.min.y)
-    }
-
-    currentRect
-  } ensuring((result) => result.contains(a) && result.contains(b))
 
   // Converts into a QuadTree within a particular [space].
   def toQuadTree(space: QuadRectangle): QuadTree[Option[Material]] = {
@@ -101,6 +78,7 @@ class QuadObject(val position: QuadRectangle,
 
   // Returns a list of squares where [this] is touching [other]. This includes
   // overlapping areas, as well as areas that share an edge or corner.
+  // NOTE: This function is O(N^2) using callbacks, could be improved.
   def contacts(other: QuadObject): List[(QuadRectangle, QuadRectangle)] = {
     if (!(this.position touches other.position)) {
       List()
