@@ -46,13 +46,16 @@ case class CopyTool(prefix: List[Input]) extends Tool {
               case Some((id, rects, material)) => {
                 val obj = world.getObj(id)
                 val offset = QuadOffset.approx(pointB - pointA, world.moveRes)
+
                 (List(), List(
                     Merge(
                         id,
                         new QuadObject(
                             obj.position + offset,
                             new QuadTree.Builder[Option[Material]](None)
-                                .addAllRects(rects, Some(material))
+                                .addAllRects(
+                                    rects.map{_ withRespectTo obj.position},
+                                    Some(material))
                                 .build,
                             obj.state))))
               }
